@@ -1,30 +1,35 @@
-# Interactive portfolio game
+# Product Design Portfolio Game
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+A playful and interactive product design portfolio presented as a **2D pixel art styled game**. Navigate through a retro-inspired world to explore projects, case studies, and design work in a fun and delightful way.
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/vladiordan27-gmailcoms-projects/v0-interactive-portfolio-game)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/s828ThzOLPi)
 
-## Overview
+## 🎮 Overview
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. Users can explore different zones, interact with content, and discover projects in a way that's both memorable and enjoyable.
 
-## Deployment
+**The main goal:** Make portfolio exploration fun and delightful for users, turning the typical portfolio browsing experience into an interactive adventure.
 
-Your project is live at:
+## ✨ Features
 
-**[https://vercel.com/vladiordan27-gmailcoms-projects/v0-interactive-portfolio-game](https://vercel.com/vladiordan27-gmailcoms-projects/v0-interactive-portfolio-game)**
+- **2D Pixel Art Aesthetic**: Retro-inspired visuals with pixel-perfect styling
+- **Interactive Navigation**: Move your character using keyboard controls (WASD/Arrow keys) or touch joystick on mobile
+- **Zone-Based Exploration**: Discover different sections like About Me, Projects, and Case Studies by exploring the game world
+- **Responsive Design**: Works seamlessly on both desktop and mobile devices
+- **Smooth Animations**: Delightful interactions and transitions throughout the experience
 
-## Build your app
+## 🎯 How to Play
 
-Continue building your app on:
+- **Desktop**: Use `WASD` or arrow keys to move, `SPACE` to interact with zones, `ESC` to close modals
+- **Mobile**: Use the on-screen joystick to move and tap the interact button when near zones
 
-**[https://v0.app/chat/s828ThzOLPi](https://v0.app/chat/s828ThzOLPi)**
+## 🚀 Deployment
 
-## How It Works
+Live at: **[https://vercel.com/vladiordan27-gmailcoms-projects/v0-interactive-portfolio-game](https://vercel.com/vladiordan27-gmailcoms-projects/v0-interactive-portfolio-game)**
 
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## 🛠️ Tech Stack
+
+- **Next.js** - React framework for the web application
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Styling with custom pixel art borders and animations
+- **React Hooks** - State management and game loop implementation
