@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --font-pixel: var(--font-pixel);
+  --color-game-bg: #2d3436;
+  --color-game-ui: #dfe6e9;
+  --color-game-accent: #0984e3;
+}
+
+@layer base {
+  body {
+    @apply font-pixel;
+    image-rendering: pixelated;
+  }
+}
+
+/* Custom Scrollbar for modals */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2d3436; 
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #636e72; 
+  border: 2px solid #2d3436;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b2bec3; 
+}
+
+.pixel-border {
+  box-shadow: 
+    -4px 0 0 0 black,
+    4px 0 0 0 black,
+    0 -4px 0 0 black,
+    0 4px 0 0 black;
+  margin: 4px;
+}
+
+.pixel-border-sm {
+  box-shadow: 
+    -2px 0 0 0 black,
+    2px 0 0 0 black,
+    0 -2px 0 0 black,
+    0 2px 0 0 black;
+  margin: 2px;
+}
