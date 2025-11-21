@@ -16,7 +16,8 @@ interface GameState {
 
 // Constants
 const PLAYER_SIZE = 48
-const INTERACTION_DISTANCE = 80
+const INTERACTION_DISTANCE = 100
+const INTERACTION_BUFFER = 10
 
 // Mock Data Content (Separated from positioning)
 const ZONE_CONTENT = {
@@ -281,12 +282,21 @@ export default function PixelPortfolio() {
 
     // 2. Zone Interaction
     let nearestZone: InteractionType = null
+    let minDistance = Number.POSITIVE_INFINITY
 
     for (const zone of config.zones) {
       const dist = Math.sqrt(Math.pow(x - zone.x, 2) + Math.pow(y - zone.y, 2))
-      if (dist < INTERACTION_DISTANCE) {
-        nearestZone = zone.id as InteractionType
-        break // Assume only one zone active at a time
+
+      // If this is the currently active zone, use the buffered distance (hysteresis)
+      // This prevents flickering when standing right on the edge
+      const threshold = activeZone === zone.id ? INTERACTION_DISTANCE + INTERACTION_BUFFER : INTERACTION_DISTANCE
+
+      if (dist < threshold) {
+        // If multiple zones are in range (unlikely), pick the closest one
+        if (dist < minDistance) {
+          minDistance = dist
+          nearestZone = zone.id as InteractionType
+        }
       }
     }
 
@@ -371,7 +381,7 @@ export default function PixelPortfolio() {
 
               {/* Interaction Ring */}
               <div
-                className={`absolute inset-0 -m-4 border-2 border-dashed rounded-full opacity-30 ${activeZone === zone.id ? "border-white animate-spin-slow" : "border-transparent"}`}
+                className={`absolute inset-0 -m-16 border-2 border-dashed rounded-full opacity-30 ${activeZone === zone.id ? "border-white animate-spin-slow" : "border-transparent"}`}
               />
             </div>
           )
