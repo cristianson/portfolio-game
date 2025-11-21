@@ -161,9 +161,7 @@ export default function PixelPortfolio() {
       const newConfig = mobile ? MOBILE_CONFIG : DESKTOP_CONFIG
       setConfig(newConfig)
 
-      // Reset player to center if map changes significantly (optional, but good for safety)
-      // We'll just clamp it in the game loop, but let's ensure it's not out of bounds immediately
-      // playerPosRef.current = { x: newConfig.width / 2, y: newConfig.height / 2 }
+      playerPosRef.current = { x: newConfig.width / 2, y: newConfig.height / 2 }
     }
     handleResize()
     window.addEventListener("resize", handleResize)
@@ -334,7 +332,6 @@ export default function PixelPortfolio() {
         style={{
           width: config.width,
           height: config.height,
-          // Initial transform will be set by loop
           backgroundImage: `
             linear-gradient(#333 1px, transparent 1px),
             linear-gradient(90deg, #333 1px, transparent 1px)
@@ -386,7 +383,6 @@ export default function PixelPortfolio() {
         ref={playerRef}
         className="absolute z-10 flex flex-col items-center will-change-transform"
         style={{
-          // Initial position
           left: config.width / 2 - PLAYER_SIZE / 2,
           top: config.height / 2 - PLAYER_SIZE / 2,
           width: PLAYER_SIZE,
@@ -437,10 +433,6 @@ export default function PixelPortfolio() {
             <p className="flex items-center gap-2">
               <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">SPACE</span>
               <span>to interact</span>
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">ESC</span>
-              <span>to close</span>
             </p>
           </div>
         </div>
