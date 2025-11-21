@@ -379,44 +379,44 @@ export default function PixelPortfolio() {
             </div>
           )
         })}
+      </div>
 
-        {/* Player */}
+      {/* Player */}
+      <div
+        ref={playerRef}
+        className="absolute z-10 flex flex-col items-center will-change-transform"
+        style={{
+          // Initial position
+          left: config.width / 2 - PLAYER_SIZE / 2,
+          top: config.height / 2 - PLAYER_SIZE / 2,
+          width: PLAYER_SIZE,
+          height: PLAYER_SIZE,
+        }}
+      >
+        {/* Name Tag */}
+        <div className="absolute -top-12 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
+          Player 1
+        </div>
+
+        {/* Character Sprite Placeholder */}
         <div
-          ref={playerRef}
-          className="absolute z-10 flex flex-col items-center will-change-transform"
-          style={{
-            // Initial position
-            left: config.width / 2 - PLAYER_SIZE / 2,
-            top: config.height / 2 - PLAYER_SIZE / 2,
-            width: PLAYER_SIZE,
-            height: PLAYER_SIZE,
-          }}
+          className={`w-full h-full relative transition-transform ${gameState.direction === "LEFT" ? "scale-x-[-1]" : ""}`}
         >
-          {/* Name Tag */}
-          <div className="absolute -top-12 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
-            Player 1
+          {/* Body */}
+          <div className="absolute bottom-0 w-8 h-10 bg-blue-600 left-2 pixel-border-sm"></div>
+          {/* Head */}
+          <div className="absolute bottom-10 w-8 h-8 bg-orange-200 left-2 pixel-border-sm">
+            {/* Eyes */}
+            <div className="absolute top-3 left-1 w-1 h-1 bg-black"></div>
+            <div className="absolute top-3 right-1 w-1 h-1 bg-black"></div>
           </div>
-
-          {/* Character Sprite Placeholder */}
+          {/* Legs Animation */}
           <div
-            className={`w-full h-full relative transition-transform ${gameState.direction === "LEFT" ? "scale-x-[-1]" : ""}`}
-          >
-            {/* Body */}
-            <div className="absolute bottom-0 w-8 h-10 bg-blue-600 left-2 pixel-border-sm"></div>
-            {/* Head */}
-            <div className="absolute bottom-10 w-8 h-8 bg-orange-200 left-2 pixel-border-sm">
-              {/* Eyes */}
-              <div className="absolute top-3 left-1 w-1 h-1 bg-black"></div>
-              <div className="absolute top-3 right-1 w-1 h-1 bg-black"></div>
-            </div>
-            {/* Legs Animation */}
-            <div
-              className={`absolute -bottom-1 left-2 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse" : ""}`}
-            ></div>
-            <div
-              className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse delay-75" : ""}`}
-            ></div>
-          </div>
+            className={`absolute -bottom-1 left-2 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse" : ""}`}
+          ></div>
+          <div
+            className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse delay-75" : ""}`}
+          ></div>
         </div>
       </div>
 
@@ -452,7 +452,7 @@ export default function PixelPortfolio() {
               onClick={() => setIsModalOpen(true)}
               className="bg-yellow-400 hover:bg-yellow-300 text-black px-6 py-3 pixel-border flex items-center gap-2 transition-colors"
             >
-              <span className="animate-pulse">PRESS INTERACT</span>
+              <span className="animate-pulse">PRESS SPACE TO INTERACT</span>
             </button>
           </div>
         )}
@@ -468,7 +468,7 @@ export default function PixelPortfolio() {
             {/* Mobile-specific tooltip with arrow */}
             <div className="absolute bottom-28 left-6 pointer-events-none md:hidden animate-bounce z-20">
               <div className="bg-yellow-400 text-black text-[10px] font-bold px-3 py-1 pixel-border relative whitespace-nowrap">
-                PRESS INTERACT
+                PRESS TO INTERACT
                 {/* Arrow pointing down-left towards the button */}
                 <svg className="absolute -bottom-4 left-2 w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
                   <path d="M0 0 L12 12 L24 0 Z" />
