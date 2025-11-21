@@ -392,6 +392,11 @@ export default function PixelPortfolio() {
             height: PLAYER_SIZE,
           }}
         >
+          {/* Name Tag */}
+          <div className="absolute -top-12 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
+            Player 1
+          </div>
+
           {/* Character Sprite Placeholder */}
           <div
             className={`w-full h-full relative transition-transform ${gameState.direction === "LEFT" ? "scale-x-[-1]" : ""}`}
@@ -411,11 +416,6 @@ export default function PixelPortfolio() {
             <div
               className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse delay-75" : ""}`}
             ></div>
-          </div>
-
-          {/* Name Tag */}
-          <div className="absolute -top-6 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap">
-            Player 1
           </div>
         </div>
       </div>
