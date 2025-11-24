@@ -30,7 +30,7 @@ const ZONE_CONTENT = {
       title: "About Me",
       body: (
         <div className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-6 items-start">
+          <div className="flex flex-col gap-6 items-start">
             <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 pixel-border-sm overflow-hidden">
               <Image
                 src="/avatar.webp"
@@ -40,7 +40,7 @@ const ZONE_CONTENT = {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex-1 space-y-4">
+            <div className="space-y-4">
               <p>
                 Hi! I'm a Product Designer passionate about creating intuitive
                 and engaging digital experiences.
