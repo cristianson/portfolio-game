@@ -33,7 +33,7 @@ const ZONE_CONTENT = {
           <div className="flex flex-col md:flex-row gap-6 items-start">
             <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 pixel-border-sm overflow-hidden">
               <Image
-                src="/avatar.jpeg"
+                src="/avatar.webp"
                 alt="Profile photo"
                 width={160}
                 height={160}
