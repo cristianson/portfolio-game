@@ -119,7 +119,7 @@ const DESKTOP_CONFIG = {
 const MOBILE_CONFIG = {
   width: 600, // Smaller map for mobile
   height: 800, // Taller for vertical scrolling feel, but kept compact
-  speed: 8, // Faster movement on mobile
+  speed: 6, // Reduced from 8 to 6 for slightly slower, more controlled movement on mobile
   zones: [
     { id: "ABOUT", x: 150, y: 150 }, // Top left-ish
     { id: "PROJECTS", x: 450, y: 200 }, // Top right-ish
