@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import { Joystick } from "./joystick";
 
@@ -29,18 +30,31 @@ const ZONE_CONTENT = {
       title: "About Me",
       body: (
         <div className="space-y-4">
-          <p>
-            Hi! I'm a Product Designer passionate about creating intuitive and
-            engaging digital experiences.
-          </p>
-          <p>
-            With a background in both UX research and UI design, I bridge the
-            gap between user needs and business goals.
-          </p>
-          <p>
-            When I'm not designing, I'm probably playing retro RPGs or pixel art
-            games!
-          </p>
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 pixel-border-sm overflow-hidden">
+              <Image
+                src="/avatar.jpeg"
+                alt="Profile photo"
+                width={160}
+                height={160}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 space-y-4">
+              <p>
+                Hi! I'm a Product Designer passionate about creating intuitive
+                and engaging digital experiences.
+              </p>
+              <p>
+                With a background in both UX research and UI design, I bridge
+                the gap between user needs and business goals.
+              </p>
+              <p>
+                When I'm not designing, I'm probably playing retro RPGs or pixel
+                art games!
+              </p>
+            </div>
+          </div>
           <div className="mt-4 p-4 bg-zinc-800 text-green-400 text-xs font-mono">
             <p>SKILLS:</p>
             <ul className="list-disc list-inside mt-2">
@@ -505,7 +519,9 @@ export default function PixelPortfolio() {
         {/* Top Bar */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
           <div className="bg-white text-black px-4 py-2 pixel-border pointer-events-auto">
-            <h1 className="text-sm md:text-base font-bold">PORTFOLIO.EXE</h1>
+            <h1 className="text-sm md:text-base font-bold">
+              Cristian's_Portfolio.EXE
+            </h1>
             <p className="text-[10px] text-gray-500">v1.0.0</p>
           </div>
 
