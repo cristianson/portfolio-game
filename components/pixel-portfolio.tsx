@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { X } from "lucide-react"
-import { Joystick } from "./joystick"
+import { useState, useEffect, useRef, useCallback } from "react";
+import { X } from "lucide-react";
+import { Joystick } from "./joystick";
 
 // Types
-type Position = { x: number; y: number }
-type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT" | "IDLE"
-type InteractionType = "ABOUT" | "PROJECTS" | "CASE_STUDIES" | null
+type Position = { x: number; y: number };
+type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT" | "IDLE";
+type InteractionType = "ABOUT" | "PROJECTS" | "CASE_STUDIES" | null;
 
 interface GameState {
-  direction: Direction
-  isMoving: boolean
+  direction: Direction;
+  isMoving: boolean;
 }
 
 // Constants
-const PLAYER_SIZE = 48
-const INTERACTION_DISTANCE = 100
-const INTERACTION_BUFFER = 10
+const PLAYER_SIZE = 48;
+const INTERACTION_DISTANCE = 100;
+const INTERACTION_BUFFER = 10;
 
 // Mock Data Content (Separated from positioning)
 const ZONE_CONTENT = {
@@ -29,11 +29,18 @@ const ZONE_CONTENT = {
       title: "About Me",
       body: (
         <div className="space-y-4">
-          <p>Hi! I'm a Product Designer passionate about creating intuitive and engaging digital experiences.</p>
           <p>
-            With a background in both UX research and UI design, I bridge the gap between user needs and business goals.
+            Hi! I'm a Product Designer passionate about creating intuitive and
+            engaging digital experiences.
           </p>
-          <p>When I'm not designing, I'm probably playing retro RPGs or pixel art games!</p>
+          <p>
+            With a background in both UX research and UI design, I bridge the
+            gap between user needs and business goals.
+          </p>
+          <p>
+            When I'm not designing, I'm probably playing retro RPGs or pixel art
+            games!
+          </p>
           <div className="mt-4 p-4 bg-zinc-800 text-green-400 text-xs font-mono">
             <p>SKILLS:</p>
             <ul className="list-disc list-inside mt-2">
@@ -56,19 +63,47 @@ const ZONE_CONTENT = {
       body: (
         <div className="grid gap-6">
           <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-lg mb-2 font-bold">E-Commerce Redesign</h3>
-            <p className="text-xs mb-2">UX/UI Design • 2024</p>
-            <p className="text-sm">
-              A complete overhaul of a fashion retailer's mobile checkout flow, resulting in a 15% increase in
-              conversion.
+            <h3 className="text-lg mb-2 font-bold">
+              Public Transport Ticket Gallery
+            </h3>
+            <p className="text-xs mb-2">
+              Design & Front-end • Personal Project
             </p>
+            <p className="text-sm mb-3">
+              A curated digital archive where public transport tickets are
+              displayed as pieces of visual culture. Explores interaction
+              patterns, subtle animations, and storytelling through mundane
+              artifacts.
+            </p>
+            <a
+              href="https://tickets-phi-one.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs underline hover:text-purple-600 font-bold"
+            >
+              Visit Live Gallery &gt;
+            </a>
           </div>
+
           <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-lg mb-2 font-bold">Finance Dashboard</h3>
-            <p className="text-xs mb-2">Product Design • 2023</p>
-            <p className="text-sm">
-              Designed a complex data visualization tool for fintech analysts to track market trends in real-time.
+            <h3 className="text-lg mb-2 font-bold">Airbnb Listing Comparer</h3>
+            <p className="text-xs mb-2">
+              Chrome Extension • Product & AI Engineering
             </p>
+            <p className="text-sm mb-3">
+              A Chrome extension that uses AI (Luna) to automate comparing
+              Airbnb listings. It extracts data, highlights pros/cons, and
+              generates side-by-side comparisons to save travelers time and
+              reduce decision fatigue.
+            </p>
+            <a
+              href="https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs underline hover:text-purple-600 font-bold"
+            >
+              View on Chrome Web Store &gt;
+            </a>
           </div>
         </div>
       ),
@@ -83,27 +118,36 @@ const ZONE_CONTENT = {
       body: (
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg text-orange-500 mb-2">The User Journey of "App X"</h3>
+            <h3 className="text-lg text-orange-500 mb-2">
+              The User Journey of "App X"
+            </h3>
             <p className="text-sm leading-relaxed">
-              An in-depth look at how we solved the retention problem for a social media startup through gamification
-              and improved onboarding flows.
+              An in-depth look at how we solved the retention problem for a
+              social media startup through gamification and improved onboarding
+              flows.
             </p>
-            <button className="mt-2 text-xs underline hover:text-orange-400">Read full study &gt;</button>
+            <button className="mt-2 text-xs underline hover:text-orange-400">
+              Read full study &gt;
+            </button>
           </div>
           <hr className="border-zinc-700" />
           <div>
-            <h3 className="text-lg text-orange-500 mb-2">Accessibility First</h3>
+            <h3 className="text-lg text-orange-500 mb-2">
+              Accessibility First
+            </h3>
             <p className="text-sm leading-relaxed">
-              How implementing WCAG 2.1 standards from day one improved the overall usability for all users, not just
-              those with disabilities.
+              How implementing WCAG 2.1 standards from day one improved the
+              overall usability for all users, not just those with disabilities.
             </p>
-            <button className="mt-2 text-xs underline hover:text-orange-400">Read full study &gt;</button>
+            <button className="mt-2 text-xs underline hover:text-orange-400">
+              Read full study &gt;
+            </button>
           </div>
         </div>
       ),
     },
   },
-}
+};
 
 const DESKTOP_CONFIG = {
   width: 1200,
@@ -114,7 +158,7 @@ const DESKTOP_CONFIG = {
     { id: "PROJECTS", x: 900, y: 250 },
     { id: "CASE_STUDIES", x: 550, y: 600 },
   ],
-}
+};
 
 const MOBILE_CONFIG = {
   width: 600, // Smaller map for mobile
@@ -125,213 +169,233 @@ const MOBILE_CONFIG = {
     { id: "PROJECTS", x: 450, y: 200 }, // Top right-ish
     { id: "CASE_STUDIES", x: 300, y: 600 }, // Bottom center
   ],
-}
+};
 
 export default function PixelPortfolio() {
-  const [isMobile, setIsMobile] = useState(false)
-  const [config, setConfig] = useState(DESKTOP_CONFIG)
+  const [isMobile, setIsMobile] = useState(false);
+  const [config, setConfig] = useState(DESKTOP_CONFIG);
 
   // Game State
   const [gameState, setGameState] = useState<GameState>({
     direction: "IDLE",
     isMoving: false,
-  })
+  });
 
-  const [activeZone, setActiveZone] = useState<InteractionType>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
+  const [activeZone, setActiveZone] = useState<InteractionType>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   // Refs for loop
-  const requestRef = useRef<number>(0)
-  const keysPressed = useRef<Set<string>>(new Set())
-  const playerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<HTMLDivElement>(null)
+  const requestRef = useRef<number>(0);
+  const keysPressed = useRef<Set<string>>(new Set());
+  const playerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
 
-  const playerPosRef = useRef({ x: DESKTOP_CONFIG.width / 2, y: DESKTOP_CONFIG.height / 2 })
-  const joystickRef = useRef({ x: 0, y: 0 })
+  const playerPosRef = useRef({
+    x: DESKTOP_CONFIG.width / 2,
+    y: DESKTOP_CONFIG.height / 2,
+  });
+  const joystickRef = useRef({ x: 0, y: 0 });
 
   // Initialize viewport and detect mobile
   useEffect(() => {
     const handleResize = () => {
-      const width = window.innerWidth
-      const height = window.innerHeight
-      setViewportSize({ width, height })
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setViewportSize({ width, height });
 
-      const mobile = width < 768
-      setIsMobile(mobile)
-      const newConfig = mobile ? MOBILE_CONFIG : DESKTOP_CONFIG
-      setConfig(newConfig)
+      const mobile = width < 768;
+      setIsMobile(mobile);
+      const newConfig = mobile ? MOBILE_CONFIG : DESKTOP_CONFIG;
+      setConfig(newConfig);
 
-      playerPosRef.current = { x: newConfig.width / 2, y: newConfig.height / 2 }
-    }
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+      playerPosRef.current = {
+        x: newConfig.width / 2,
+        y: newConfig.height / 2,
+      };
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Input Handling
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Escape" && isModalOpen) {
-        setIsModalOpen(false)
-        return
+        setIsModalOpen(false);
+        return;
       }
 
-      if (isModalOpen) return
+      if (isModalOpen) return;
       if (e.code === "Space" && activeZone) {
-        e.preventDefault() // Prevent page scroll
-        setIsModalOpen(true)
-        return
+        e.preventDefault(); // Prevent page scroll
+        setIsModalOpen(true);
+        return;
       }
-      keysPressed.current.add(e.code)
-    }
+      keysPressed.current.add(e.code);
+    };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.current.delete(e.code)
-    }
+      keysPressed.current.delete(e.code);
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    window.addEventListener("keyup", handleKeyUp)
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      window.removeEventListener("keyup", handleKeyUp)
-    }
-  }, [isModalOpen, activeZone])
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [isModalOpen, activeZone]);
 
   // Game Loop
   const updateGame = useCallback(() => {
-    if (isModalOpen) return
+    if (isModalOpen) return;
 
-    let { x, y } = playerPosRef.current
-    let moving = false
-    let dx = 0
-    let dy = 0
+    let { x, y } = playerPosRef.current;
+    let moving = false;
+    let dx = 0;
+    let dy = 0;
 
     // Keyboard Controls
-    const keys = keysPressed.current
+    const keys = keysPressed.current;
     const keyDx =
-      (keys.has("ArrowRight") || keys.has("KeyD") ? 1 : 0) - (keys.has("ArrowLeft") || keys.has("KeyA") ? 1 : 0)
+      (keys.has("ArrowRight") || keys.has("KeyD") ? 1 : 0) -
+      (keys.has("ArrowLeft") || keys.has("KeyA") ? 1 : 0);
     const keyDy =
-      (keys.has("ArrowDown") || keys.has("KeyS") ? 1 : 0) - (keys.has("ArrowUp") || keys.has("KeyW") ? 1 : 0)
+      (keys.has("ArrowDown") || keys.has("KeyS") ? 1 : 0) -
+      (keys.has("ArrowUp") || keys.has("KeyW") ? 1 : 0);
 
     // Joystick Controls
-    const joyDx = joystickRef.current.x
-    const joyDy = joystickRef.current.y
+    const joyDx = joystickRef.current.x;
+    const joyDy = joystickRef.current.y;
 
     // Combine inputs (Keyboard takes priority if pressed, otherwise Joystick)
     if (keyDx !== 0 || keyDy !== 0) {
-      dx = keyDx
-      dy = keyDy
+      dx = keyDx;
+      dy = keyDy;
     } else if (joyDx !== 0 || joyDy !== 0) {
-      dx = joyDx
-      dy = joyDy
+      dx = joyDx;
+      dy = joyDy;
     }
 
     if (dx !== 0 || dy !== 0) {
-      moving = true
+      moving = true;
 
       // Normalize vector if length > 1 (to prevent faster diagonal movement)
       // For joystick, it's already normalized 0-1, but keyboard needs it
-      const length = Math.sqrt(dx * dx + dy * dy)
+      const length = Math.sqrt(dx * dx + dy * dy);
       if (length > 1) {
-        dx = dx / length
-        dy = dy / length
+        dx = dx / length;
+        dy = dy / length;
       }
 
-      x += dx * config.speed
-      y += dy * config.speed
+      x += dx * config.speed;
+      y += dy * config.speed;
     }
 
     // Boundary checks
-    x = Math.max(PLAYER_SIZE / 2, Math.min(config.width - PLAYER_SIZE / 2, x))
-    y = Math.max(PLAYER_SIZE / 2, Math.min(config.height - PLAYER_SIZE / 2, y))
+    x = Math.max(PLAYER_SIZE / 2, Math.min(config.width - PLAYER_SIZE / 2, x));
+    y = Math.max(PLAYER_SIZE / 2, Math.min(config.height - PLAYER_SIZE / 2, y));
 
     // Update Ref
-    playerPosRef.current = { x, y }
+    playerPosRef.current = { x, y };
 
     if (playerRef.current) {
-      playerRef.current.style.left = `${x - PLAYER_SIZE / 2}px`
-      playerRef.current.style.top = `${y - PLAYER_SIZE / 2}px`
+      playerRef.current.style.left = `${x - PLAYER_SIZE / 2}px`;
+      playerRef.current.style.top = `${y - PLAYER_SIZE / 2}px`;
     }
 
     // Camera Logic - Direct DOM update
     if (mapRef.current && viewportSize.width > 0) {
-      const cameraX = Math.max(0, Math.min(config.width - viewportSize.width, x - viewportSize.width / 2))
-      const cameraY = Math.max(0, Math.min(config.height - viewportSize.height, y - viewportSize.height / 2))
-      mapRef.current.style.transform = `translate3d(${-cameraX}px, ${-cameraY}px, 0)`
+      const cameraX = Math.max(
+        0,
+        Math.min(config.width - viewportSize.width, x - viewportSize.width / 2)
+      );
+      const cameraY = Math.max(
+        0,
+        Math.min(
+          config.height - viewportSize.height,
+          y - viewportSize.height / 2
+        )
+      );
+      mapRef.current.style.transform = `translate3d(${-cameraX}px, ${-cameraY}px, 0)`;
     }
 
     // State Updates (Only when changed)
     // 1. Direction & Movement State
-    let newDirection = gameState.direction
+    let newDirection = gameState.direction;
     if (moving) {
       if (Math.abs(dy) > Math.abs(dx)) {
-        newDirection = dy > 0 ? "DOWN" : "UP"
+        newDirection = dy > 0 ? "DOWN" : "UP";
       } else {
-        newDirection = dx > 0 ? "RIGHT" : "LEFT"
+        newDirection = dx > 0 ? "RIGHT" : "LEFT";
       }
     }
 
     setGameState((prev) => {
       if (prev.direction !== newDirection || prev.isMoving !== moving) {
-        return { direction: newDirection, isMoving: moving }
+        return { direction: newDirection, isMoving: moving };
       }
-      return prev
-    })
+      return prev;
+    });
 
     // 2. Zone Interaction
-    let nearestZone: InteractionType = null
-    let minDistance = Number.POSITIVE_INFINITY
+    let nearestZone: InteractionType = null;
+    let minDistance = Number.POSITIVE_INFINITY;
 
     for (const zone of config.zones) {
-      const dist = Math.sqrt(Math.pow(x - zone.x, 2) + Math.pow(y - zone.y, 2))
+      const dist = Math.sqrt(Math.pow(x - zone.x, 2) + Math.pow(y - zone.y, 2));
 
       // If this is the currently active zone, use the buffered distance (hysteresis)
       // This prevents flickering when standing right on the edge
-      const threshold = activeZone === zone.id ? INTERACTION_DISTANCE + INTERACTION_BUFFER : INTERACTION_DISTANCE
+      const threshold =
+        activeZone === zone.id
+          ? INTERACTION_DISTANCE + INTERACTION_BUFFER
+          : INTERACTION_DISTANCE;
 
       if (dist < threshold) {
         // If multiple zones are in range (unlikely), pick the closest one
         if (dist < minDistance) {
-          minDistance = dist
-          nearestZone = zone.id as InteractionType
+          minDistance = dist;
+          nearestZone = zone.id as InteractionType;
         }
       }
     }
 
     if (nearestZone !== activeZone) {
-      setActiveZone(nearestZone)
+      setActiveZone(nearestZone);
     }
 
-    requestRef.current = requestAnimationFrame(updateGame)
-  }, [activeZone, isModalOpen, viewportSize, gameState.direction, config]) // Added config dependency
+    requestRef.current = requestAnimationFrame(updateGame);
+  }, [activeZone, isModalOpen, viewportSize, gameState.direction, config]); // Added config dependency
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(updateGame)
-    return () => cancelAnimationFrame(requestRef.current)
-  }, [updateGame])
+    requestRef.current = requestAnimationFrame(updateGame);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [updateGame]);
 
   // Joystick Handler
   const handleJoystickMove = useCallback(
     (x: number, y: number) => {
-      if (isModalOpen) return
-      joystickRef.current = { x, y }
+      if (isModalOpen) return;
+      joystickRef.current = { x, y };
     },
-    [isModalOpen],
-  )
+    [isModalOpen]
+  );
 
   const handleJoystickStop = useCallback(() => {
-    joystickRef.current = { x: 0, y: 0 }
-  }, [])
+    joystickRef.current = { x: 0, y: 0 };
+  }, []);
 
   const getZoneData = (id: string) => {
-    const staticData = ZONE_CONTENT[id as keyof typeof ZONE_CONTENT]
-    const posData = config.zones.find((z) => z.id === id)
-    return { ...staticData, ...posData }
-  }
+    const staticData = ZONE_CONTENT[id as keyof typeof ZONE_CONTENT];
+    const posData = config.zones.find((z) => z.id === id);
+    return { ...staticData, ...posData };
+  };
 
-  const currentZoneData = activeZone ? getZoneData(activeZone) : null
+  const currentZoneData = activeZone ? getZoneData(activeZone) : null;
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden select-none touch-none">
@@ -358,7 +422,7 @@ export default function PixelPortfolio() {
 
         {/* Zones */}
         {config.zones.map((zone) => {
-          const data = ZONE_CONTENT[zone.id as keyof typeof ZONE_CONTENT]
+          const data = ZONE_CONTENT[zone.id as keyof typeof ZONE_CONTENT];
           return (
             <div
               key={zone.id}
@@ -381,10 +445,14 @@ export default function PixelPortfolio() {
 
               {/* Interaction Ring */}
               <div
-                className={`absolute inset-0 -m-16 border-2 border-dashed rounded-full opacity-30 ${activeZone === zone.id ? "border-white animate-spin-slow" : "border-transparent"}`}
+                className={`absolute inset-0 -m-16 border-2 border-dashed rounded-full opacity-30 ${
+                  activeZone === zone.id
+                    ? "border-white animate-spin-slow"
+                    : "border-transparent"
+                }`}
               />
             </div>
-          )
+          );
         })}
       </div>
 
@@ -406,7 +474,9 @@ export default function PixelPortfolio() {
 
         {/* Character Sprite Placeholder */}
         <div
-          className={`w-full h-full relative transition-transform ${gameState.direction === "LEFT" ? "scale-x-[-1]" : ""}`}
+          className={`w-full h-full relative transition-transform ${
+            gameState.direction === "LEFT" ? "scale-x-[-1]" : ""
+          }`}
         >
           {/* Body */}
           <div className="absolute bottom-0 w-8 h-10 bg-blue-600 left-2 pixel-border-sm"></div>
@@ -418,10 +488,14 @@ export default function PixelPortfolio() {
           </div>
           {/* Legs Animation */}
           <div
-            className={`absolute -bottom-1 left-2 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse" : ""}`}
+            className={`absolute -bottom-1 left-2 w-3 h-3 bg-black ${
+              gameState.isMoving ? "animate-pulse" : ""
+            }`}
           ></div>
           <div
-            className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${gameState.isMoving ? "animate-pulse delay-75" : ""}`}
+            className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${
+              gameState.isMoving ? "animate-pulse delay-75" : ""
+            }`}
           ></div>
         </div>
       </div>
@@ -437,11 +511,15 @@ export default function PixelPortfolio() {
 
           <div className="hidden md:block bg-black/80 text-white p-4 pixel-border text-xs space-y-2">
             <p className="flex items-center gap-2">
-              <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">WASD</span>
+              <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">
+                WASD
+              </span>
               <span>to move</span>
             </p>
             <p className="flex items-center gap-2">
-              <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">SPACE</span>
+              <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">
+                SPACE
+              </span>
               <span>to interact</span>
             </p>
           </div>
@@ -472,7 +550,10 @@ export default function PixelPortfolio() {
               <div className="bg-yellow-400 text-black text-[10px] font-bold px-3 py-1 pixel-border relative whitespace-nowrap">
                 PRESS TO INTERACT
                 {/* Arrow pointing down-left towards the button */}
-                <svg className="absolute -bottom-4 left-2 w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                <svg
+                  className="absolute -bottom-4 left-2 w-4 h-4 text-yellow-400 fill-current"
+                  viewBox="0 0 24 24"
+                >
                   <path d="M0 0 L12 12 L24 0 Z" />
                 </svg>
               </div>
@@ -511,7 +592,9 @@ export default function PixelPortfolio() {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 md:p-8 overflow-y-auto bg-[#f0f0f0] flex-1">{currentZoneData.content.body}</div>
+            <div className="p-6 md:p-8 overflow-y-auto bg-[#f0f0f0] flex-1">
+              {currentZoneData.content.body}
+            </div>
 
             {/* Modal Footer */}
             <div className="bg-gray-200 p-4 border-t-4 border-black text-right text-xs text-gray-500 hidden md:block shrink-0">
@@ -521,5 +604,5 @@ export default function PixelPortfolio() {
         </div>
       )}
     </div>
-  )
+  );
 }
