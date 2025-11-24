@@ -31,12 +31,12 @@ const ZONE_CONTENT = {
       body: (
         <div className="space-y-4">
           <div className="flex flex-col gap-6 items-start">
-            <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 pixel-border-sm overflow-hidden">
+            <div className="w-[300px] h-[300px] flex-shrink-0 pixel-border-sm overflow-hidden">
               <Image
                 src="/avatar.webp"
                 alt="Profile photo"
-                width={160}
-                height={160}
+                width={300}
+                height={300}
                 className="w-full h-full object-cover"
               />
             </div>
