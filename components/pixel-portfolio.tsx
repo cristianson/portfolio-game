@@ -69,7 +69,7 @@ const ZONE_CONTENT = {
     },
   },
   PROJECTS: {
-    label: "Projects",
+    label: "Built Projects",
     color: "bg-purple-500",
     icon: "💻",
     content: {
