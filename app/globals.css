@@ -49,3 +49,34 @@
     0 2px 0 0 black;
   margin: 2px;
 }
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) translateX(-10px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(110vh) translateX(10px);
+    opacity: 0.4;
+  }
+}
+
+.animate-fall {
+  animation: fall linear infinite;
+}
+
+.pixel-snowflake {
+  width: 4px;
+  height: 4px;
+  background: white;
+  box-shadow: 
+    4px 0 white,
+    -4px 0 white,
+    0 4px white,
+    0 -4px white;
+  border-radius: 0;
+  opacity: 0.7;
+}

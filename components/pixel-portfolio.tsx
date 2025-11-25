@@ -19,6 +19,7 @@ interface GameState {
 const PLAYER_SIZE = 80;
 const INTERACTION_DISTANCE = 80; // Adjusted to match visual ring (Radius 80px)
 const INTERACTION_BUFFER = 10;
+const SNOWFLAKE_COUNT = 30; // Number of snowflakes
 
 // Mock Data Content (Separated from positioning)
 const ZONE_CONTENT = {
@@ -95,7 +96,7 @@ const ZONE_CONTENT = {
               rel="noopener noreferrer"
               className="inline-block !mt-6 px-4 py-2 bg-purple-600 text-white text-xs font-bold pixel-border-sm hover:bg-purple-700 transition-colors"
             >
-              Visit Live Gallery &gt;
+              Visit Ticket Gallery &gt;
             </a>
           </div>
 
@@ -236,6 +237,21 @@ export default function PixelPortfolio() {
     y: DEFAULT_HEIGHT / 2,
   });
   const joystickRef = useRef({ x: 0, y: 0 });
+
+  // Snowflakes - Initialize on client only to match hydration
+  const [snowflakes, setSnowflakes] = useState<
+    Array<{ id: number; left: number; speed: number; delay: number }>
+  >([]);
+
+  useEffect(() => {
+    const flakes = Array.from({ length: SNOWFLAKE_COUNT }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100, // Random horizontal position 0-100%
+      speed: 5 + Math.random() * 10, // Random duration between 5-15s
+      delay: -(Math.random() * 15), // Negative delay to start mid-animation
+    }));
+    setSnowflakes(flakes);
+  }, []);
 
   // Initialize viewport and detect mobile
   useEffect(() => {
@@ -453,6 +469,22 @@ export default function PixelPortfolio() {
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden select-none touch-none">
+      {/* Snowflakes Overlay - Fixed to viewport */}
+      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+        {snowflakes.map((flake) => (
+          <div
+            key={flake.id}
+            className="absolute pixel-snowflake pointer-events-none animate-fall"
+            style={{
+              left: `${flake.left}%`,
+              top: "-10px",
+              animationDuration: `${flake.speed}s`,
+              animationDelay: `${flake.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Game World */}
       <div
         ref={mapRef}
@@ -626,6 +658,10 @@ export default function PixelPortfolio() {
             <p className="flex items-center gap-2">
               <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">
                 WASD
+              </span>
+              <span>or</span>
+              <span className="bg-gray-700 px-2 py-1 pixel-border-sm text-[10px] font-bold shadow-sm">
+                Arrow Keys
               </span>
               <span>to move</span>
             </p>
