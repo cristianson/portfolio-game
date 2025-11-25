@@ -437,6 +437,13 @@ export default function PixelPortfolio() {
         {/* Zones */}
         {config.zones.map((zone) => {
           const data = ZONE_CONTENT[zone.id as keyof typeof ZONE_CONTENT];
+          // Calculate the ring size to match INTERACTION_DISTANCE
+          // Zone visual is 80x80 centered on (zone.x, zone.y)
+          // Ring should extend INTERACTION_DISTANCE from center, so diameter = INTERACTION_DISTANCE * 2
+          const ringSize = INTERACTION_DISTANCE * 2;
+          const zoneSize = 80;
+          const ringMargin = (ringSize - zoneSize) / 2;
+
           return (
             <div
               key={zone.id}
@@ -457,60 +464,66 @@ export default function PixelPortfolio() {
                 {data.label}
               </div>
 
-              {/* Interaction Ring */}
+              {/* Interaction Ring - sized to match INTERACTION_DISTANCE */}
               <div
-                className={`absolute inset-0 -m-16 border-2 border-dashed rounded-full opacity-30 ${
+                className={`absolute border-2 border-dashed rounded-full opacity-30 pointer-events-none ${
                   activeZone === zone.id
                     ? "border-white animate-spin-slow"
                     : "border-transparent"
                 }`}
+                style={{
+                  width: ringSize,
+                  height: ringSize,
+                  left: `calc(50% - ${ringSize / 2}px)`,
+                  top: `calc(50% - ${ringSize / 2}px)`,
+                }}
               />
             </div>
           );
         })}
-      </div>
 
-      {/* Player */}
-      <div
-        ref={playerRef}
-        className="absolute z-10 flex flex-col items-center will-change-transform"
-        style={{
-          left: config.width / 2 - PLAYER_SIZE / 2,
-          top: config.height / 2 - PLAYER_SIZE / 2,
-          width: PLAYER_SIZE,
-          height: PLAYER_SIZE,
-        }}
-      >
-        {/* Name Tag */}
-        <div className="absolute -top-12 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
-          Player 1
-        </div>
-
-        {/* Character Sprite Placeholder */}
+        {/* Player - INSIDE the map so it transforms with the camera */}
         <div
-          className={`w-full h-full relative transition-transform ${
-            gameState.direction === "LEFT" ? "scale-x-[-1]" : ""
-          }`}
+          ref={playerRef}
+          className="absolute z-10 flex flex-col items-center will-change-transform"
+          style={{
+            left: config.width / 2 - PLAYER_SIZE / 2,
+            top: config.height / 2 - PLAYER_SIZE / 2,
+            width: PLAYER_SIZE,
+            height: PLAYER_SIZE,
+          }}
         >
-          {/* Body */}
-          <div className="absolute bottom-0 w-8 h-10 bg-blue-600 left-2 pixel-border-sm"></div>
-          {/* Head */}
-          <div className="absolute bottom-10 w-8 h-8 bg-orange-200 left-2 pixel-border-sm">
-            {/* Eyes */}
-            <div className="absolute top-3 left-1 w-1 h-1 bg-black"></div>
-            <div className="absolute top-3 right-1 w-1 h-1 bg-black"></div>
+          {/* Name Tag */}
+          <div className="absolute -top-12 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
+            Player 1
           </div>
-          {/* Legs Animation */}
+
+          {/* Character Sprite Placeholder */}
           <div
-            className={`absolute -bottom-1 left-2 w-3 h-3 bg-black ${
-              gameState.isMoving ? "animate-pulse" : ""
+            className={`w-full h-full relative transition-transform ${
+              gameState.direction === "LEFT" ? "scale-x-[-1]" : ""
             }`}
-          ></div>
-          <div
-            className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${
-              gameState.isMoving ? "animate-pulse delay-75" : ""
-            }`}
-          ></div>
+          >
+            {/* Body */}
+            <div className="absolute bottom-0 w-8 h-10 bg-blue-600 left-2 pixel-border-sm"></div>
+            {/* Head */}
+            <div className="absolute bottom-10 w-8 h-8 bg-orange-200 left-2 pixel-border-sm">
+              {/* Eyes */}
+              <div className="absolute top-3 left-1 w-1 h-1 bg-black"></div>
+              <div className="absolute top-3 right-1 w-1 h-1 bg-black"></div>
+            </div>
+            {/* Legs Animation */}
+            <div
+              className={`absolute -bottom-1 left-2 w-3 h-3 bg-black ${
+                gameState.isMoving ? "animate-pulse" : ""
+              }`}
+            ></div>
+            <div
+              className={`absolute -bottom-1 right-4 w-3 h-3 bg-black ${
+                gameState.isMoving ? "animate-pulse delay-75" : ""
+              }`}
+            ></div>
+          </div>
         </div>
       </div>
 
