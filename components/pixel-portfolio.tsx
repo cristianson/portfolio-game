@@ -468,12 +468,6 @@ export default function PixelPortfolio() {
           backgroundColor: "#222",
         }}
       >
-        {/* Decorative Map Elements */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-green-900 rounded-full blur-xl"></div>
-          <div className="absolute bottom-40 right-40 w-64 h-64 bg-blue-900 rounded-full blur-xl"></div>
-        </div>
-
         {/* Zones */}
         {config.zones.map((zone) => {
           const data = ZONE_CONTENT[zone.id as keyof typeof ZONE_CONTENT];
