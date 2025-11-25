@@ -32,28 +32,147 @@ const ZONE_CONTENT = {
       body: (
         <div className="space-y-4">
           <div className="flex flex-col gap-6 items-start">
-            <div className="w-[300px] h-[300px] flex-shrink-0 pixel-border-sm overflow-hidden">
-              <Image
-                src="/avatar.webp"
-                alt="Profile photo"
-                width={300}
-                height={300}
-                className="w-full h-full object-cover"
-              />
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-[300px] h-[300px] flex-shrink-0 pixel-border-sm overflow-hidden">
+                <Image
+                  src="/avatar.webp"
+                  alt="Profile photo"
+                  width={300}
+                  height={300}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4">
+                <p className="text-game-body">
+                  I love designing and building useful products and fun projects
+                  with AI.
+                </p>
+                <p className="text-game-body">
+                  I've been designing for the past 5 years and worked with AI
+                  startups, fintech, and B2B SaaS companies.
+                </p>
+                <p className="text-game-body">
+                  When I'm not designing, I'm probably playing retro RPGs or
+                  pixel art games!
+                </p>
+              </div>
             </div>
-            <div className="space-y-4">
-              <p className="text-game-body">
-                I love designing and building useful products and fun projects
-                with AI.
-              </p>
-              <p className="text-game-body">
-                I've been designing for the past 5 years and worked with AI
-                startups, fintech, and B2B SaaS companies.
-              </p>
-              <p className="text-game-body">
-                When I'm not designing, I'm probably playing retro RPGs or pixel
-                art games!
-              </p>
+
+            {/* Timeline Section */}
+            <div className="w-full pt-6 mt-2 border-t-4 border-dashed border-black/10">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="text-2xl">⏳</span> Work Timeline
+              </h3>
+
+              <div className="space-y-8">
+                {/* Lette AI */}
+                <div className="relative pl-6 border-l-4 border-black/20">
+                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-blue-500 border-2 border-black rounded-full"></div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
+                    <h4 className="text-lg font-bold leading-tight">
+                      Founding Product Designer
+                    </h4>
+                    <span className="text-sm font-bold bg-blue-100 px-2 py-0.5 rounded text-blue-800 border-2 border-blue-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
+                      2025–Present
+                    </span>
+                  </div>
+                  <a
+                    href="https://www.lette.ai/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
+                  >
+                    Lette AI
+                  </a>
+                  <p className="text-game-body text-sm">
+                    Leading design for AI agents that streamline property
+                    management operations, from leasing and maintenance to
+                    tenant support.
+                  </p>
+                </div>
+
+                {/* Fully AI */}
+                <div className="relative pl-6 border-l-4 border-black/20">
+                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
+                    <h4 className="text-lg font-bold leading-tight">
+                      Product Design Lead
+                    </h4>
+                    <span className="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded text-gray-800 border-2 border-gray-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
+                      2024–2025
+                    </span>
+                  </div>
+                  <a
+                    href="https://www.gofully.ai/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
+                  >
+                    Fully AI
+                  </a>
+                  <p className="text-game-body text-sm">
+                    Led design for enterprise-grade AI virtual assistants across
+                    hospitality, automotive (incl. BMW collaboration), health,
+                    and e-commerce. Managed another designer, shaped product
+                    strategy, delivered client demos, and shipped a production
+                    launch. The company was later acquired by Circus Group.
+                  </p>
+                </div>
+
+                {/* Spoke AI */}
+                <div className="relative pl-6 border-l-4 border-black/20">
+                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
+                    <h4 className="text-lg font-bold leading-tight">
+                      Product Designer
+                    </h4>
+                    <span className="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded text-gray-800 border-2 border-gray-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
+                      2023–2024
+                    </span>
+                  </div>
+                  <a
+                    href="https://www.spoke.ai/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
+                  >
+                    Spoke AI (Berlin)
+                  </a>
+                  <p className="text-game-body text-sm">
+                    Worked on an AI-powered macOS app and a Slack app providing
+                    summaries and daily digests. Fast-paced environment (15–17
+                    people). Close collaboration with CPO, weekly research
+                    sessions, heavy AI workflow involvement. Team later joined
+                    Salesforce to support Slack AI.
+                  </p>
+                </div>
+
+                {/* Sortlist */}
+                <div className="relative pl-6 border-l-4 border-black/20">
+                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
+                    <h4 className="text-lg font-bold leading-tight">
+                      Product Designer
+                    </h4>
+                    <span className="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded text-gray-800 border-2 border-gray-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
+                      2021–2023
+                    </span>
+                  </div>
+                  <a
+                    href="https://www.sortlist.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
+                  >
+                    Sortlist
+                  </a>
+                  <p className="text-game-body text-sm">
+                    Worked across a large, multi-file design system, shipped
+                    features, improved DS workflows, and won a global design
+                    systems hackathon by building a Figma annotation tool.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -710,7 +829,11 @@ export default function PixelPortfolio() {
       {/* Modal */}
       {isModalOpen && currentZoneData && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-0 md:p-4 animate-in fade-in duration-200">
-          <div className="bg-white text-black w-full h-full md:w-full md:max-w-2xl md:h-auto md:max-h-[80vh] flex flex-col md:pixel-border shadow-2xl animate-in zoom-in-95 duration-200">
+          <div
+            className={`bg-white text-black w-full h-full md:w-full ${
+              activeZone === "ABOUT" ? "md:max-w-4xl" : "md:max-w-3xl"
+            } md:h-auto md:max-h-[80vh] flex flex-col md:pixel-border shadow-2xl animate-in zoom-in-95 duration-200`}
+          >
             {/* Modal Header */}
             <div
               className={`${currentZoneData.color} p-4 flex justify-between items-center border-b-4 border-black shrink-0`}

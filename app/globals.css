@@ -18,7 +18,7 @@
 @layer components {
   /* Typography */
   .text-game-body {
-    @apply font-geist-mono text-base leading-relaxed;
+    @apply font-geist-mono font-regular text-base leading-relaxed;
   }
 
   .text-game-caption {
