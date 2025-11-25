@@ -1,7 +1,8 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme inline {
   --font-pixel: var(--font-pixel);
+  --font-geist-mono: var(--font-geist-mono);
   --color-game-bg: #2d3436;
   --color-game-ui: #dfe6e9;
   --color-game-accent: #0984e3;
@@ -14,38 +15,62 @@
   }
 }
 
+@layer components {
+  /* Typography */
+  .text-game-body {
+    @apply font-geist-mono text-base leading-relaxed;
+  }
+
+  .text-game-caption {
+    @apply font-geist-mono text-xs mb-2;
+  }
+
+  .text-game-heading {
+    @apply text-lg mb-2 font-bold;
+  }
+
+  /* UI Components */
+  .btn-primary {
+    @apply inline-block px-4 py-2 bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors;
+    box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
+      0 2px 0 0 black;
+    margin: 2px;
+  }
+
+  .btn-secondary {
+    @apply inline-block px-4 py-2 bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition-colors;
+    box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
+      0 2px 0 0 black;
+    margin: 2px;
+  }
+}
+
 /* Custom Scrollbar for modals */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #2d3436; 
+  background: #2d3436;
 }
- 
+
 ::-webkit-scrollbar-thumb {
-  background: #636e72; 
+  background: #636e72;
   border: 2px solid #2d3436;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b2bec3; 
+  background: #b2bec3;
 }
 
 .pixel-border {
-  box-shadow: 
-    -4px 0 0 0 black,
-    4px 0 0 0 black,
-    0 -4px 0 0 black,
+  box-shadow: -4px 0 0 0 black, 4px 0 0 0 black, 0 -4px 0 0 black,
     0 4px 0 0 black;
   margin: 4px;
 }
 
 .pixel-border-sm {
-  box-shadow: 
-    -2px 0 0 0 black,
-    2px 0 0 0 black,
-    0 -2px 0 0 black,
+  box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
     0 2px 0 0 black;
   margin: 2px;
 }
@@ -72,11 +97,7 @@
   width: 4px;
   height: 4px;
   background: white;
-  box-shadow: 
-    4px 0 white,
-    -4px 0 white,
-    0 4px white,
-    0 -4px white;
+  box-shadow: 4px 0 white, -4px 0 white, 0 4px white, 0 -4px white;
   border-radius: 0;
   opacity: 0.7;
 }

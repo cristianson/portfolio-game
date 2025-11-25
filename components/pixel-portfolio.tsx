@@ -42,28 +42,19 @@ const ZONE_CONTENT = {
               />
             </div>
             <div className="space-y-4">
-              <p>
-                Hi! I'm a Product Designer passionate about creating intuitive
-                and engaging digital experiences.
+              <p className="text-game-body">
+                I love designing and building useful products and fun projects
+                with AI.
               </p>
-              <p>
-                With a background in both UX research and UI design, I bridge
-                the gap between user needs and business goals.
+              <p className="text-game-body">
+                I've been designing for the past 5 years and worked with AI
+                startups, fintech, and B2B SaaS companies.
               </p>
-              <p>
+              <p className="text-game-body">
                 When I'm not designing, I'm probably playing retro RPGs or pixel
                 art games!
               </p>
             </div>
-          </div>
-          <div className="mt-4 p-4 bg-zinc-800 text-green-400 text-xs font-mono">
-            <p>SKILLS:</p>
-            <ul className="list-disc list-inside mt-2">
-              <li>Figma & Prototyping</li>
-              <li>User Research</li>
-              <li>Design Systems</li>
-              <li>HTML/CSS/React</li>
-            </ul>
           </div>
         </div>
       ),
@@ -78,13 +69,13 @@ const ZONE_CONTENT = {
       body: (
         <div className="grid gap-6">
           <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-lg mb-2 font-bold">
+            <h3 className="text-game-heading">
               Public Transport Ticket Gallery
             </h3>
-            <p className="text-xs mb-2">
+            <p className="text-game-caption">
               Design & Front-end • Personal Project
             </p>
-            <p className="text-sm">
+            <p className="text-game-body">
               A curated digital archive where public transport tickets are
               displayed as pieces of visual culture. Explores interaction
               patterns, subtle animations, and storytelling through mundane
@@ -94,18 +85,18 @@ const ZONE_CONTENT = {
               href="https://tickets-phi-one.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block !mt-6 px-4 py-2 bg-purple-600 text-white text-xs font-bold pixel-border-sm hover:bg-purple-700 transition-colors"
+              className="btn-primary mt-6"
             >
               Visit Ticket Gallery &gt;
             </a>
           </div>
 
           <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-lg mb-2 font-bold">Airbnb Listing Comparer</h3>
-            <p className="text-xs mb-2">
+            <h3 className="text-game-heading">Airbnb Listing Comparer</h3>
+            <p className="text-game-caption">
               Chrome Extension • Product & AI Engineering
             </p>
-            <p className="text-sm">
+            <p className="text-game-body">
               A Chrome extension that uses AI (Luna) to automate comparing
               Airbnb listings. It extracts data, highlights pros/cons, and
               generates side-by-side comparisons to save travelers time and
@@ -115,7 +106,7 @@ const ZONE_CONTENT = {
               href="https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block !mt-6 px-4 py-2 bg-purple-600 text-white text-xs font-bold pixel-border-sm hover:bg-purple-700 transition-colors"
+              className="btn-primary mt-6"
             >
               View on Chrome Web Store &gt;
             </a>
@@ -136,27 +127,23 @@ const ZONE_CONTENT = {
             <h3 className="text-lg text-orange-500 mb-2">
               The User Journey of "App X"
             </h3>
-            <p className="text-sm leading-relaxed">
+            <p className="text-game-body">
               An in-depth look at how we solved the retention problem for a
               social media startup through gamification and improved onboarding
               flows.
             </p>
-            <button className="inline-block !mt-6 px-4 py-2 bg-orange-500 text-white text-xs font-bold pixel-border-sm hover:bg-orange-600 transition-colors">
-              Read full study &gt;
-            </button>
+            <button className="btn-secondary mt-6">Read full study &gt;</button>
           </div>
           <hr className="border-zinc-700" />
           <div>
             <h3 className="text-lg text-orange-500 mb-2">
               Accessibility First
             </h3>
-            <p className="text-sm leading-relaxed">
+            <p className="text-game-body">
               How implementing WCAG 2.1 standards from day one improved the
               overall usability for all users, not just those with disabilities.
             </p>
-            <button className="inline-block !mt-6 px-4 py-2 bg-orange-500 text-white text-xs font-bold pixel-border-sm hover:bg-orange-600 transition-colors">
-              Read full study &gt;
-            </button>
+            <button className="btn-secondary mt-6">Read full study &gt;</button>
           </div>
         </div>
       ),
