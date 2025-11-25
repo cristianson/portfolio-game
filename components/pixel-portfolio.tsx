@@ -51,10 +51,7 @@ const ZONE_CONTENT = {
                   I've been designing for the past 5 years and worked with AI
                   startups, fintech, and B2B SaaS companies.
                 </p>
-                <p className="text-game-body">
-                  When I'm not designing, I'm probably playing retro RPGs or
-                  pixel art games!
-                </p>
+                <p className="text-game-body">[Add text here]</p>
               </div>
             </div>
 
