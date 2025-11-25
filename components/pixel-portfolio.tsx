@@ -17,7 +17,7 @@ interface GameState {
 
 // Constants
 const PLAYER_SIZE = 48;
-const INTERACTION_DISTANCE = 100;
+const INTERACTION_DISTANCE = 80; // Adjusted to match visual ring (Radius 80px)
 const INTERACTION_BUFFER = 10;
 
 // Mock Data Content (Separated from positioning)
@@ -163,31 +163,53 @@ const ZONE_CONTENT = {
   },
 };
 
-const DESKTOP_CONFIG = {
-  width: 1200,
-  height: 800,
-  speed: 4,
-  zones: [
-    { id: "ABOUT", x: 200, y: 200 },
-    { id: "PROJECTS", x: 900, y: 250 },
-    { id: "CASE_STUDIES", x: 550, y: 600 },
-  ],
+// Default config values (used for SSR and initial render)
+const DEFAULT_WIDTH = 1200;
+const DEFAULT_HEIGHT = 800;
+
+// Helper to generate responsive config based on viewport size
+const getResponsiveConfig = (width: number, height: number) => {
+  const isMobile = width < 768;
+
+  // Map dimensions:
+  // Use the larger of (Screen Size) or (Minimum Size).
+  // This ensures the map always fills the screen, but has a minimum size for gameplay.
+  const mapWidth = Math.max(width, isMobile ? 600 : DEFAULT_WIDTH);
+  const mapHeight = Math.max(height, DEFAULT_HEIGHT);
+
+  return {
+    width: mapWidth,
+    height: mapHeight,
+    speed: isMobile ? 6 : 4,
+    zones: [
+      {
+        id: "ABOUT",
+        x: mapWidth * 0.2, // 20% from left
+        y: mapHeight * 0.25, // 25% from top
+      },
+      {
+        id: "PROJECTS",
+        x: mapWidth * 0.8, // 80% from left
+        y: mapHeight * 0.3, // 30% from top
+      },
+      {
+        id: "CASE_STUDIES",
+        x: mapWidth * 0.5, // 50% (Center)
+        y: mapHeight * 0.75, // 75% from top
+      },
+    ],
+  };
 };
 
-const MOBILE_CONFIG = {
-  width: 600, // Smaller map for mobile
-  height: 800, // Taller for vertical scrolling feel, but kept compact
-  speed: 6, // Reduced from 8 to 6 for slightly slower, more controlled movement on mobile
-  zones: [
-    { id: "ABOUT", x: 150, y: 150 }, // Top left-ish
-    { id: "PROJECTS", x: 450, y: 200 }, // Top right-ish
-    { id: "CASE_STUDIES", x: 300, y: 600 }, // Bottom center
-  ],
-};
+// Initial config for SSR - always use defaults to avoid hydration mismatch
+const INITIAL_CONFIG = getResponsiveConfig(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
 export default function PixelPortfolio() {
   const [isMobile, setIsMobile] = useState(false);
-  const [config, setConfig] = useState(DESKTOP_CONFIG);
+
+  // Always initialize with the same values on server and client to avoid hydration mismatch
+  // The actual window size will be applied in useEffect after mount
+  const [config, setConfig] = useState(INITIAL_CONFIG);
 
   // Game State
   const [gameState, setGameState] = useState<GameState>({
@@ -205,9 +227,13 @@ export default function PixelPortfolio() {
   const playerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
 
+  // Track current config for resize calculations
+  const configRef = useRef(config);
+
+  // Use default values for initial position (will be updated in useEffect)
   const playerPosRef = useRef({
-    x: DESKTOP_CONFIG.width / 2,
-    y: DESKTOP_CONFIG.height / 2,
+    x: DEFAULT_WIDTH / 2,
+    y: DEFAULT_HEIGHT / 2,
   });
   const joystickRef = useRef({ x: 0, y: 0 });
 
@@ -220,14 +246,28 @@ export default function PixelPortfolio() {
 
       const mobile = width < 768;
       setIsMobile(mobile);
-      const newConfig = mobile ? MOBILE_CONFIG : DESKTOP_CONFIG;
-      setConfig(newConfig);
 
-      playerPosRef.current = {
-        x: newConfig.width / 2,
-        y: newConfig.height / 2,
-      };
+      const newConfig = getResponsiveConfig(width, height);
+
+      // Preserve relative position
+      const prevWidth = configRef.current.width;
+      const prevHeight = configRef.current.height;
+
+      // If dimensions changed, scale position
+      if (prevWidth !== newConfig.width || prevHeight !== newConfig.height) {
+        const relativeX = playerPosRef.current.x / prevWidth;
+        const relativeY = playerPosRef.current.y / prevHeight;
+
+        playerPosRef.current = {
+          x: newConfig.width * relativeX,
+          y: newConfig.height * relativeY,
+        };
+      }
+
+      setConfig(newConfig);
+      configRef.current = newConfig;
     };
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
