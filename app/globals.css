@@ -8,6 +8,14 @@
   --color-game-accent: #0984e3;
 }
 
+/* Base styles - always apply */
+body {
+  font-family: var(--font-pixel), monospace;
+  image-rendering: pixelated;
+  background-color: #18181b; /* zinc-900 fallback */
+  color: white;
+}
+
 @layer base {
   body {
     @apply font-pixel;
@@ -18,7 +26,8 @@
 @layer components {
   /* Typography */
   .text-game-body {
-    @apply font-geist-mono font-regular text-base leading-relaxed;
+    @apply font-geist-mono text-base leading-relaxed;
+    font-weight: 400;
   }
 
   .text-game-caption {
@@ -43,6 +52,48 @@
       0 2px 0 0 black;
     margin: 2px;
   }
+
+  /* Pixel Borders */
+  .pixel-border {
+    box-shadow: -4px 0 0 0 black, 4px 0 0 0 black, 0 -4px 0 0 black,
+      0 4px 0 0 black;
+    margin: 4px;
+  }
+
+  .pixel-border-sm {
+    box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
+      0 2px 0 0 black;
+    margin: 2px;
+  }
+
+  /* Snowflakes */
+  .pixel-snowflake {
+    width: 4px;
+    height: 4px;
+    background: white;
+    box-shadow: 4px 0 white, -4px 0 white, 0 4px white, 0 -4px white;
+    border-radius: 0;
+    opacity: 0.7;
+  }
+
+  .animate-fall {
+    animation: fall linear infinite;
+  }
+}
+
+/* Animations */
+@keyframes fall {
+  0% {
+    transform: translateY(0) translateX(-10px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(110vh) translateX(10px);
+    opacity: 0.4;
+  }
 }
 
 /* Custom Scrollbar for modals */
@@ -61,43 +112,4 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #b2bec3;
-}
-
-.pixel-border {
-  box-shadow: -4px 0 0 0 black, 4px 0 0 0 black, 0 -4px 0 0 black,
-    0 4px 0 0 black;
-  margin: 4px;
-}
-
-.pixel-border-sm {
-  box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
-    0 2px 0 0 black;
-  margin: 2px;
-}
-
-@keyframes fall {
-  0% {
-    transform: translateY(0) translateX(-10px);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(110vh) translateX(10px);
-    opacity: 0.4;
-  }
-}
-
-.animate-fall {
-  animation: fall linear infinite;
-}
-
-.pixel-snowflake {
-  width: 4px;
-  height: 4px;
-  background: white;
-  box-shadow: 4px 0 white, -4px 0 white, 0 4px white, 0 -4px white;
-  border-radius: 0;
-  opacity: 0.7;
 }
