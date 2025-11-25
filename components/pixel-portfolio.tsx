@@ -235,7 +235,7 @@ const ZONE_CONTENT = {
     },
   },
   CASE_STUDIES: {
-    label: "Case Studies",
+    label: "Case Studies WIP",
     color: "bg-orange-500",
     icon: "📚",
     content: {
