@@ -24,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${pressStart2P.variable} font-pixel antialiased bg-zinc-900 text-white overflow-hidden`}
+        suppressHydrationWarning
       >
         {children}
         <Analytics />
