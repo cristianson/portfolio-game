@@ -88,7 +88,7 @@ const ZONE_CONTENT = {
                   </p>
                 </div>
 
-                {/* Fully AI */}
+                {/* FULLY AI */}
                 <div className="relative pl-6 border-l-4 border-black/20">
                   <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
@@ -105,7 +105,7 @@ const ZONE_CONTENT = {
                     rel="noopener noreferrer"
                     className="text-blue-600 font-bold mb-2 hover:underline inline-block"
                   >
-                    Fully AI
+                    FULLY AI
                   </a>
                   <p className="text-game-body text-sm">
                     Led design for enterprise-grade AI virtual assistants across
