@@ -21,6 +21,12 @@ export function JobEntry({
   isLast = false,
   isFirst = false,
 }: JobEntryProps) {
+  const periodClasses = `text-mono-base font-bold px-2 py-0.5 rounded border-2 w-fit whitespace-nowrap ${
+    isCurrent
+      ? "bg-blue-100 text-blue-800 border-blue-300"
+      : "bg-gray-100 text-gray-800 border-gray-300"
+  }`;
+
   return (
     <div className="relative pl-6">
       {/* Connector from previous entry */}
@@ -42,16 +48,10 @@ export function JobEntry({
 
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
         <h4 className="text-mono-2xl font-bold leading-tight">{title}</h4>
-        <span
-          className={`text-mono-base font-bold px-2 py-0.5 rounded border-2 mt-1 sm:mt-0 w-fit whitespace-nowrap ${
-            isCurrent
-              ? "bg-blue-100 text-blue-800 border-blue-300"
-              : "bg-gray-100 text-gray-800 border-gray-300"
-          }`}
-        >
-          {period}
-        </span>
+        {/* Desktop Period */}
+        <span className={`hidden sm:block ${periodClasses}`}>{period}</span>
       </div>
+
       <a
         href={url}
         target="_blank"
@@ -60,6 +60,12 @@ export function JobEntry({
       >
         {company}
       </a>
+
+      {/* Mobile Period */}
+      <div className="sm:hidden mb-4">
+        <span className={periodClasses}>{period}</span>
+      </div>
+
       <p className="text-mono-base leading-relaxed">{description}</p>
     </div>
   );

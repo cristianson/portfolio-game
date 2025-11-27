@@ -70,7 +70,7 @@ const ZONE_CONTENT = {
                   period="Dec 2025 – Present"
                   company="Lette AI"
                   url="https://www.lette.ai/"
-                  description="Leading design for AI agents that streamline property management operations, from leasing and maintenance to tenant support."
+                  description="A solution for orchestrating AI agents that streamline property management operations, from leasing, maintenance, tenant support and more."
                   isCurrent={true}
                   isFirst={true}
                 />
