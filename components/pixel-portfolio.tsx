@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import { Joystick } from "./joystick";
+import { JobEntry } from "./job-entry";
 
 // Types
 type Position = { x: number; y: number };
@@ -43,132 +44,61 @@ const ZONE_CONTENT = {
                 />
               </div>
               <div className="space-y-4">
-                <p className="text-game-body">
+                <p className="text-mono-base leading-relaxed">
                   I love designing and building useful products and fun projects
                   with AI.
                 </p>
-                <p className="text-game-body">
+                <p className="text-mono-base leading-relaxed">
                   I've been designing for the past 5 years and worked with AI
                   startups, fintech, and B2B SaaS companies.
                 </p>
-                <p className="text-game-body">[Add text here]</p>
+                <p className="text-mono-base leading-relaxed">
+                  [Add text here]
+                </p>
               </div>
             </div>
 
             {/* Timeline Section */}
             <div className="w-full pt-6 mt-2 border-t-4 border-dashed border-black/10">
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="text-2xl">⏳</span> Work Timeline
-              </h3>
+              {/* <h3 className="text-mono-lg font-bold mb-6 flex items-center gap-2">
+                <span className="text-mono-lg">⏳</span> Work Timeline
+              </h3> */}
 
               <div className="space-y-8">
-                {/* Lette AI */}
-                <div className="relative pl-6 border-l-4 border-black/20">
-                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-blue-500 border-2 border-black rounded-full"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
-                    <h4 className="text-lg font-bold leading-tight">
-                      Founding Product Designer
-                    </h4>
-                    <span className="text-sm font-bold bg-blue-100 px-2 py-0.5 rounded text-blue-800 border-2 border-blue-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
-                      2025–Present
-                    </span>
-                  </div>
-                  <a
-                    href="https://www.lette.ai/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
-                  >
-                    Lette AI
-                  </a>
-                  <p className="text-game-body text-sm">
-                    Leading design for AI agents that streamline property
-                    management operations, from leasing and maintenance to
-                    tenant support.
-                  </p>
-                </div>
+                <JobEntry
+                  title="Founding Product Designer"
+                  period="Dec 2025 – Present"
+                  company="Lette AI"
+                  url="https://www.lette.ai/"
+                  description="Leading design for AI agents that streamline property management operations, from leasing and maintenance to tenant support."
+                  isCurrent={true}
+                  isFirst={true}
+                />
 
-                {/* FULLY AI */}
-                <div className="relative pl-6 border-l-4 border-black/20">
-                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
-                    <h4 className="text-lg font-bold leading-tight">
-                      Product Design Lead
-                    </h4>
-                    <span className="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded text-gray-800 border-2 border-gray-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
-                      2024–2025
-                    </span>
-                  </div>
-                  <a
-                    href="https://www.gofully.ai/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
-                  >
-                    FULLY AI
-                  </a>
-                  <p className="text-game-body text-sm">
-                    Led design for enterprise-grade AI virtual assistants across
-                    hospitality, automotive (incl. BMW collaboration), health,
-                    and e-commerce. Managed another designer, shaped product
-                    strategy, delivered client demos, and shipped a production
-                    launch. The company was later acquired by Circus Group.
-                  </p>
-                </div>
+                <JobEntry
+                  title="Product Design Lead"
+                  period="Aug 2024 - Jul 2025"
+                  company="FULLY AI (Acquired by Circus Group)"
+                  url="https://www.gofully.ai/"
+                  description="A no-code multi-agent platform to create brand-ready AI agents embedded in your product that learn, adapt, and improve across every stage of the customer lifecycle."
+                />
 
-                {/* Spoke AI */}
-                <div className="relative pl-6 border-l-4 border-black/20">
-                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
-                    <h4 className="text-lg font-bold leading-tight">
-                      Product Designer
-                    </h4>
-                    <span className="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded text-gray-800 border-2 border-gray-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
-                      2023–2024
-                    </span>
-                  </div>
-                  <a
-                    href="https://www.spoke.ai/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
-                  >
-                    Spoke AI (Berlin)
-                  </a>
-                  <p className="text-game-body text-sm">
-                    Worked on an AI-powered macOS app and a Slack app providing
-                    summaries and daily digests. Fast-paced environment (15–17
-                    people). Close collaboration with CPO, weekly research
-                    sessions, heavy AI workflow involvement. Team later joined
-                    Salesforce to support Slack AI.
-                  </p>
-                </div>
+                <JobEntry
+                  title="Product Designer"
+                  period="Feb 2023 - Mar 2024"
+                  company="Spoke.ai (Acquired by Slack)"
+                  url="https://www.spoke.ai/"
+                  description="An AI inbox that centralizes notifications from Slack and other work tools, summarizes them, prioritizes tasks, and suggests next actions."
+                />
 
-                {/* Sortlist */}
-                <div className="relative pl-6 border-l-4 border-black/20">
-                  <div className="absolute -left-[10px] top-1 w-4 h-4 bg-gray-300 border-2 border-black rounded-full"></div>
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
-                    <h4 className="text-lg font-bold leading-tight">
-                      Product Designer
-                    </h4>
-                    <span className="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded text-gray-800 border-2 border-gray-200 mt-1 sm:mt-0 w-fit whitespace-nowrap">
-                      2021–2023
-                    </span>
-                  </div>
-                  <a
-                    href="https://www.sortlist.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 font-bold mb-2 hover:underline inline-block"
-                  >
-                    Sortlist
-                  </a>
-                  <p className="text-game-body text-sm">
-                    Worked across a large, multi-file design system, shipped
-                    features, improved DS workflows, and won a global design
-                    systems hackathon by building a Figma annotation tool.
-                  </p>
-                </div>
+                <JobEntry
+                  title="Product Designer"
+                  period="Oct 2021 - Jan 2023"
+                  company="Sortlist"
+                  url="https://www.sortlist.com/"
+                  description="A matchmaking B2B SaaS platform that allows companies to find the most relevant digital agencies for their projects."
+                  isLast={true}
+                />
               </div>
             </div>
           </div>
@@ -185,13 +115,13 @@ const ZONE_CONTENT = {
       body: (
         <div className="grid gap-6">
           <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-game-heading">
+            <h3 className="text-pixel-lg mb-2">
               Public Transport Ticket Gallery
             </h3>
-            <p className="text-game-caption">
+            <p className="text-mono-xs mb-2">
               Design & Front-end • Personal Project
             </p>
-            <p className="text-game-body">
+            <p className="text-mono-base leading-relaxed">
               A curated digital archive where public transport tickets are
               displayed as pieces of visual culture. Explores interaction
               patterns, subtle animations, and storytelling through mundane
@@ -208,11 +138,11 @@ const ZONE_CONTENT = {
           </div>
 
           <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-game-heading">Airbnb Listing Comparer</h3>
-            <p className="text-game-caption">
+            <h3 className="text-pixel-lg mb-2">Airbnb Listing Comparer</h3>
+            <p className="text-mono-xs mb-2">
               Chrome Extension • Product & AI Engineering
             </p>
-            <p className="text-game-body">
+            <p className="text-mono-base leading-relaxed">
               A Chrome extension that uses AI (Luna) to automate comparing
               Airbnb listings. It extracts data, highlights pros/cons, and
               generates side-by-side comparisons to save travelers time and
@@ -224,7 +154,7 @@ const ZONE_CONTENT = {
               rel="noopener noreferrer"
               className="btn-primary mt-6"
             >
-              View on Chrome Web Store &gt;
+              View Extension &gt;
             </a>
           </div>
         </div>
@@ -240,10 +170,10 @@ const ZONE_CONTENT = {
       body: (
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg text-orange-500 mb-2">
+            <h3 className="text-pixel-lg text-orange-500 mb-2">
               The User Journey of "App X"
             </h3>
-            <p className="text-game-body">
+            <p className="text-mono-base leading-relaxed">
               An in-depth look at how we solved the retention problem for a
               social media startup through gamification and improved onboarding
               flows.
@@ -252,10 +182,10 @@ const ZONE_CONTENT = {
           </div>
           <hr className="border-zinc-700" />
           <div>
-            <h3 className="text-lg text-orange-500 mb-2">
+            <h3 className="text-pixel-lg text-orange-500 mb-2">
               Accessibility First
             </h3>
-            <p className="text-game-body">
+            <p className="text-mono-base leading-relaxed">
               How implementing WCAG 2.1 standards from day one improved the
               overall usability for all users, not just those with disabilities.
             </p>
@@ -281,10 +211,16 @@ const getResponsiveConfig = (width: number, height: number) => {
   const mapWidth = Math.max(width, isMobile ? 600 : DEFAULT_WIDTH);
   const mapHeight = Math.max(height, DEFAULT_HEIGHT);
 
+  // Calculate speed proportional to map size for consistent feel across screen sizes
+  // Mobile: Keep speed constant (mobile screens don't vary much in size)
+  // Desktop: Scale speed proportionally, with higher multiplier for large screens (1920px+)
+  const baseSpeed = mapWidth >= 1920 ? 5 : 4;
+  const speed = isMobile ? 6 : (mapWidth / DEFAULT_WIDTH) * baseSpeed;
+
   return {
     width: mapWidth,
     height: mapHeight,
-    speed: isMobile ? 6 : 4,
+    speed: speed,
     zones: [
       {
         id: "ABOUT",
@@ -751,7 +687,7 @@ export default function PixelPortfolio() {
         {/* Top Bar */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
           <div className="bg-white text-black px-4 py-2 pixel-border pointer-events-auto">
-            <h1 className="text-sm md:text-base font-bold">
+            <h1 className="text-pixel-sm md:text-pixel-base font-bold">
               Cristian's_Portfolio.EXE
             </h1>
             <p className="text-[10px] text-gray-500">v1.0.0</p>
@@ -835,8 +771,8 @@ export default function PixelPortfolio() {
             <div
               className={`${currentZoneData.color} p-4 flex justify-between items-center border-b-4 border-black shrink-0`}
             >
-              <h2 className="text-white text-xl md:text-2xl flex items-center gap-3">
-                <span className="text-3xl">{currentZoneData.icon}</span>
+              <h2 className="text-white text-pixel-xl md:text-pixel-2xl flex items-center gap-3">
+                <span className="text-pixel-2xl">{currentZoneData.icon}</span>
                 {currentZoneData.content.title}
               </h2>
               <button
@@ -853,7 +789,7 @@ export default function PixelPortfolio() {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-gray-200 p-4 border-t-4 border-black text-right text-xs text-gray-500 hidden md:block shrink-0">
+            <div className="bg-gray-200 p-4 border-t-4 border-black text-right text-mono-xs text-gray-500 hidden md:block shrink-0">
               PRESS ESC TO CLOSE
             </div>
           </div>

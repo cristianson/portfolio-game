@@ -24,18 +24,46 @@ body {
 }
 
 @layer components {
-  /* Typography */
-  .text-game-body {
-    @apply font-geist-mono text-base leading-relaxed;
-    font-weight: 400;
+  /* Typography System */
+
+  /* Geist Mono - Supports weights 400-800 (Regular to ExtraBold) */
+  .text-mono-xs {
+    @apply font-geist-mono text-xs;
+  }
+  .text-mono-sm {
+    @apply font-geist-mono text-sm;
+  }
+  .text-mono-base {
+    @apply font-geist-mono text-base;
+  }
+  .text-mono-lg {
+    @apply font-geist-mono text-lg;
+  }
+  .text-mono-xl {
+    @apply font-geist-mono text-xl;
+  }
+  .text-mono-2xl {
+    @apply font-geist-mono text-2xl;
   }
 
-  .text-game-caption {
-    @apply font-geist-mono text-xs mb-2;
+  /* Pixel Font - Single weight (Regular) */
+  .text-pixel-xs {
+    @apply font-pixel text-xs;
   }
-
-  .text-game-heading {
-    @apply text-lg mb-2 font-bold;
+  .text-pixel-sm {
+    @apply font-pixel text-sm;
+  }
+  .text-pixel-base {
+    @apply font-pixel text-base;
+  }
+  .text-pixel-lg {
+    @apply font-pixel text-lg;
+  }
+  .text-pixel-xl {
+    @apply font-pixel text-xl;
+  }
+  .text-pixel-2xl {
+    @apply font-pixel text-2xl;
   }
 
   /* UI Components */

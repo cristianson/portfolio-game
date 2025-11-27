@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pixel Portfolio",
+  title: "Cristian Iordan's Portfolio",
   description: "A gamified portfolio experience",
   generator: "v0.app",
 };
