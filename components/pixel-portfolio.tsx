@@ -375,13 +375,13 @@ const getResponsiveConfig = (width: number, height: number) => {
             y: mapHeight * 0.25,
           },
           {
-            id: "SOCIALS",
-            x: mapWidth * 0.25, // Bottom-Left
+            id: "CASE_STUDIES",
+            x: mapWidth * 0.75, // Bottom-Right
             y: mapHeight * 0.75,
           },
           {
-            id: "CASE_STUDIES",
-            x: mapWidth * 0.75, // Bottom-Right
+            id: "SOCIALS",
+            x: mapWidth * 0.25, // Bottom-Left
             y: mapHeight * 0.75,
           },
         ]
