@@ -115,6 +115,26 @@ const ZONE_CONTENT = {
       body: (
         <div className="grid gap-6">
           <div className="border-2 border-black p-4 bg-white text-black">
+            <h3 className="text-pixel-lg mb-2">Airbnb Listing Comparer</h3>
+            <p className="text-mono-xs mb-2">
+              Chrome Extension • Product & AI Engineering
+            </p>
+            <p className="text-mono-base leading-relaxed">
+              A Chrome extension that uses AI (Luna) to automate comparing
+              Airbnb listings. It extracts data, highlights pros/cons, and
+              generates side-by-side comparisons to save travelers time and
+              reduce decision fatigue.
+            </p>
+            <a
+              href="https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary mt-6"
+            >
+              View Extension &gt;
+            </a>
+          </div>
+          <div className="border-2 border-black p-4 bg-white text-black">
             <h3 className="text-pixel-lg mb-2">
               Public Transport Ticket Gallery
             </h3>
@@ -136,27 +156,6 @@ const ZONE_CONTENT = {
               Visit Ticket Gallery &gt;
             </a>
           </div>
-
-          <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-pixel-lg mb-2">Airbnb Listing Comparer</h3>
-            <p className="text-mono-xs mb-2">
-              Chrome Extension • Product & AI Engineering
-            </p>
-            <p className="text-mono-base leading-relaxed">
-              A Chrome extension that uses AI (Luna) to automate comparing
-              Airbnb listings. It extracts data, highlights pros/cons, and
-              generates side-by-side comparisons to save travelers time and
-              reduce decision fatigue.
-            </p>
-            <a
-              href="https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary mt-6"
-            >
-              View Extension &gt;
-            </a>
-          </div>
         </div>
       ),
     },
@@ -170,26 +169,41 @@ const ZONE_CONTENT = {
       body: (
         <div className="space-y-6">
           <div>
-            <h3 className="text-pixel-lg text-orange-500 mb-2">
-              The User Journey of "App X"
-            </h3>
+            <h3 className="text-pixel-lg text-orange-500 mb-2">Spoke.ai</h3>
             <p className="text-mono-base leading-relaxed">
-              An in-depth look at how we solved the retention problem for a
-              social media startup through gamification and improved onboarding
-              flows.
+              I helped redesign an AI inbox for Slack into a native macOS app so
+              it fits naturally into people’s daily workflow. By bringing AI
+              summaries, a priority sidebar, and native notifications closer to
+              where work happens, time spent focused in the app tripled and DAU
+              grew by 147%.
             </p>
-            <button className="btn-secondary mt-6">Read full study &gt;</button>
+            <a
+              href="https://www.figma.com/deck/XzPSjhrtDVSIyqK6fkwZP9/Spoke.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary mt-6"
+            >
+              More info &gt;
+            </a>
           </div>
           <hr className="border-zinc-700" />
           <div>
-            <h3 className="text-pixel-lg text-orange-500 mb-2">
-              Accessibility First
-            </h3>
+            <h3 className="text-pixel-lg text-orange-500 mb-2">FULLY AI</h3>
             <p className="text-mono-base leading-relaxed">
-              How implementing WCAG 2.1 standards from day one improved the
-              overall usability for all users, not just those with disabilities.
+              I created the vision and v1 of an AI-driven Bento dashboard that
+              adapts content to each step of the customer journey. With modular
+              blocks built for engagement and clarity, it set clear targets
+              (+30% time on page, 40–60% FAQs resolved) and became a valuable
+              asset in investor and acquisition discussions.
             </p>
-            <button className="btn-secondary mt-6">Read full study &gt;</button>
+            <a
+              href="https://www.figma.com/deck/dxL9upoAsEYSZVEJ8eDp7A/FULLY-AI"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary mt-6"
+            >
+              More info &gt;
+            </a>
           </div>
         </div>
       ),
