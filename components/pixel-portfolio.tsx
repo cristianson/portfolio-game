@@ -95,6 +95,58 @@ const INTERACTION_DISTANCE = 100; // Adjusted to match visual ring (Radius 80px)
 const INTERACTION_BUFFER = 10;
 const SNOWFLAKE_COUNT = 30; // Number of snowflakes
 
+// --- UI Components ---
+
+interface PixelTooltipProps {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+  arrow?: "none" | "right" | "bottom";
+  arrowPosition?: string; // Tailwind classes for arrow positioning (e.g. "left-9")
+}
+
+const PixelTooltip = ({
+  children,
+  className = "",
+  onClick,
+  arrow = "none",
+  arrowPosition = "",
+}: PixelTooltipProps) => {
+  const BaseTag = onClick ? "button" : "div";
+  const interactiveClasses = onClick
+    ? "hover:bg-yellow-300 active:bg-yellow-500 transition-colors"
+    : "";
+
+  return (
+    <div
+      className={`absolute animate-bounce pointer-events-auto z-40 ${className}`}
+    >
+      <BaseTag
+        onClick={onClick}
+        className={`bg-yellow-400 text-black font-bold pixel-border flex items-center gap-2 shadow-lg whitespace-nowrap ${interactiveClasses}`}
+      >
+        {children}
+        {arrow === "right" && (
+          <svg
+            className={`absolute top-1/2 -translate-y-1/2 -right-3 w-4 h-4 text-yellow-400 fill-current -rotate-90 ${arrowPosition}`}
+            viewBox="0 0 24 24"
+          >
+            <path d="M0 0 L12 12 L24 0 Z" />
+          </svg>
+        )}
+        {arrow === "bottom" && (
+          <svg
+            className={`absolute -bottom-3 w-4 h-4 text-yellow-400 fill-current ${arrowPosition}`}
+            viewBox="0 0 24 24"
+          >
+            <path d="M0 0 L12 12 L24 0 Z" />
+          </svg>
+        )}
+      </BaseTag>
+    </div>
+  );
+};
+
 // Mock Data Content (Separated from positioning)
 const ZONE_CONTENT = {
   ABOUT: {
@@ -430,6 +482,7 @@ export default function PixelPortfolio() {
 
   const [activeZone, setActiveZone] = useState<InteractionType>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   // Refs for loop
@@ -498,6 +551,13 @@ export default function PixelPortfolio() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Dismiss instructions when moving
+  useEffect(() => {
+    if (gameState.isMoving && showInstructions) {
+      setShowInstructions(false);
+    }
+  }, [gameState.isMoving, showInstructions]);
 
   // Input Handling
   useEffect(() => {
@@ -755,9 +815,14 @@ export default function PixelPortfolio() {
               <div className="relative z-10 flex flex-col items-center">
                 {/* Floating Icon */}
                 <div
-                  className={`relative z-20 mb-[-10px] animate-float transition-transform duration-300 ${
-                    activeZone === zone.id ? "scale-110" : "scale-100"
+                  className={`relative z-20 mb-[-16px] transition-transform duration-300 ${
+                    activeZone === zone.id
+                      ? "scale-110 animate-float"
+                      : "scale-100 animate-float"
                   }`}
+                  style={{
+                    animationDuration: activeZone === zone.id ? "2s" : "3s",
+                  }}
                 >
                   {/* Icon Container */}
                   <div
@@ -938,15 +1003,35 @@ export default function PixelPortfolio() {
         </div>
 
         {/* Interaction Prompt */}
-        {activeZone && !isModalOpen && (
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 animate-bounce pointer-events-auto hidden md:block">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-yellow-400 hover:bg-yellow-300 text-black px-6 py-3 pixel-border flex items-center gap-2 transition-colors"
+        {showInstructions && !isModalOpen && (
+          <>
+            {/* Desktop Prompt */}
+            <PixelTooltip className="hidden md:block bottom-24 left-1/2 -translate-x-1/2 pointer-events-none">
+              <div className="px-6 py-3 text-base">
+                <span className="animate-pulse">MOVE AROUND TO EXPLORE</span>
+              </div>
+            </PixelTooltip>
+
+            {/* Mobile Prompt (Pointing to Joystick) */}
+            <PixelTooltip
+              className="md:hidden bottom-16 right-44 pointer-events-none"
+              arrow="right"
+              arrowPosition="-right-3"
             >
+              <div className="px-3 py-2 text-[10px]">MOVE TO EXPLORE</div>
+            </PixelTooltip>
+          </>
+        )}
+
+        {activeZone && !isModalOpen && (
+          <PixelTooltip
+            className="hidden md:block bottom-24 left-1/2 -translate-x-1/2"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <div className="px-6 py-3 text-base">
               <span className="animate-pulse">PRESS SPACE TO INTERACT</span>
-            </button>
-          </div>
+            </div>
+          </PixelTooltip>
         )}
 
         {/* Mobile Controls */}
@@ -958,18 +1043,13 @@ export default function PixelPortfolio() {
         {activeZone && !isModalOpen && (
           <>
             {/* Mobile-specific tooltip with arrow */}
-            <div className="absolute bottom-28 left-6 pointer-events-none md:hidden animate-bounce z-20">
-              <div className="bg-yellow-400 text-black text-[10px] font-bold px-3 py-1 pixel-border relative whitespace-nowrap">
-                PRESS TO INTERACT
-                {/* Arrow pointing down-left towards the button */}
-                <svg
-                  className="absolute -bottom-4 left-2 w-4 h-4 text-yellow-400 fill-current"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M0 0 L12 12 L24 0 Z" />
-                </svg>
-              </div>
-            </div>
+            <PixelTooltip
+              className="md:hidden bottom-28 left-6 pointer-events-none"
+              arrow="bottom"
+              arrowPosition="left-9"
+            >
+              <div className="px-3 py-2 text-[10px]">PRESS TO INTERACT</div>
+            </PixelTooltip>
 
             <div className="absolute bottom-8 left-8 pointer-events-auto md:hidden">
               <button
