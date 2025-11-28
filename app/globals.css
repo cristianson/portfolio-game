@@ -120,6 +120,10 @@ body {
   .animate-spin-slow {
     animation: spin 3s linear infinite;
   }
+
+  .animate-pulse-horizontal {
+    animation: pulse-horizontal 1s infinite;
+  }
 }
 
 /* Animations */
@@ -156,6 +160,16 @@ body {
   50% {
     opacity: 0.5;
     transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-horizontal {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px); /* Move left */
   }
 }
 

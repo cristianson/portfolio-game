@@ -1,4 +1,4 @@
-import PixelPortfolio from '@/components/pixel-portfolio'
+import PixelPortfolio from '@/components/game'
 
 export default function Home() {
   return (

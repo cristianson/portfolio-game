@@ -1,3 +1,11 @@
+/**
+ * Joystick Component
+ *
+ * A touch-friendly virtual joystick for mobile devices.
+ * It captures touch/mouse events to calculate a normalized direction vector (x, y)
+ * which is passed up to the game loop for player movement.
+ */
+
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
@@ -124,3 +132,4 @@ export function Joystick({ onMove, onStop }: JoystickProps) {
     </div>
   )
 }
+

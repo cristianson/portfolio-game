@@ -1,3 +1,11 @@
+/**
+ * Job Entry Component
+ *
+ * A UI component used within the "About Me" section (data.tsx) to display a single
+ * work experience entry. It handles the timeline styling (connecting lines, dots)
+ * and responsive layout for job titles, companies, and dates.
+ */
+
 import React from "react";
 
 interface JobEntryProps {
