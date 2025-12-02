@@ -108,14 +108,10 @@ export const ZONE_CONTENT = {
         <div className="grid gap-6">
           <div className="border-2 border-black p-4 bg-white text-black">
             <h3 className="text-pixel-lg mb-2">Airbnb Listing Comparer</h3>
-            <p className="text-mono-xs mb-2">
-              Chrome Extension • Product & AI Engineering
-            </p>
             <p className="text-mono-base leading-relaxed">
-              A Chrome extension that uses AI (Luna) to automate comparing
-              Airbnb listings. It extracts data, highlights pros/cons, and
-              generates side-by-side comparisons to save travelers time and
-              reduce decision fatigue.
+              An AI-powered Chrome extension that helps travelers compare and
+              decide on the most relevant Airbnb listings, saving their time and
+              reducing decision fatigue.
             </p>
             <a
               href="https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe"
@@ -130,14 +126,10 @@ export const ZONE_CONTENT = {
             <h3 className="text-pixel-lg mb-2">
               Public Transport Ticket Gallery
             </h3>
-            <p className="text-mono-xs mb-2">
-              Design & Front-end • Personal Project
-            </p>
             <p className="text-mono-base leading-relaxed">
-              A curated digital archive where public transport tickets are
-              displayed as pieces of visual culture. Explores interaction
-              patterns, subtle animations, and storytelling through mundane
-              artifacts.
+              A minimal website where I collect public transport tickets from
+              places I visited. It's designed as a playground for myself to
+              experiment with UI, motion, and front-end craft.
             </p>
             <a
               href="https://tickets-phi-one.vercel.app/"
