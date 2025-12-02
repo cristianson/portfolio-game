@@ -16,8 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Cristian Iordan's Portfolio",
-  description: "A gamified portfolio experience",
-  generator: "v0.app",
+  description: "A gamified product designer portfolio experience",
+  icons: {
+    icon: "/Favicon.png",
+    apple: "/Favicon.png",
+  },
 };
 
 export default function RootLayout({
