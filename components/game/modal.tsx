@@ -50,7 +50,7 @@ export const Modal = ({ activeZone, onClose }: ModalProps) => {
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-gray-200 p-4 border-t-4 border-black text-right text-mono-xs text-gray-500 hidden md:block shrink-0">
+        <div className="bg-gray-200 p-4 border-t-4 border-black text-right text-mono-sm font-semibold text-gray-500 hidden md:block shrink-0">
           PRESS ESC TO CLOSE
         </div>
       </div>
