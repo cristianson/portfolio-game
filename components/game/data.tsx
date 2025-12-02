@@ -33,15 +33,23 @@ export const ZONE_CONTENT = {
               </div>
               <div className="space-y-4">
                 <p className="text-mono-base leading-relaxed">
-                  I love designing and building useful products and fun projects
-                  with AI.
+                  I'm a product designer who loves building thoughtful digital
+                  experiences, belding design, AI and code.
                 </p>
                 <p className="text-mono-base leading-relaxed">
                   I've been designing for the past 5 years and worked with AI
                   startups, fintech, and B2B SaaS companies.
                 </p>
-                <p className="text-mono-base leading-relaxed">
-                  [Add text here]
+                <p className="text-mono-base leading-relaxed font-semibold">
+                  Founding Product Designer {""}
+                  <a
+                    href="https://www.lette.ai/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    @Lette AI
+                  </a>
                 </p>
               </div>
             </div>
