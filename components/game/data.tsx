@@ -28,6 +28,7 @@ export const ZONE_CONTENT = {
                   alt="Profile photo"
                   width={300}
                   height={300}
+                  priority
                   className="w-full h-full object-cover"
                 />
               </div>

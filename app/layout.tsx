@@ -30,6 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preload" href="/avatar.webp" as="image" type="image/webp" />
+      </head>
       <body
         className={`${pressStart2P.variable} ${geistMono.variable} font-pixel antialiased bg-zinc-900 text-white overflow-hidden`}
         suppressHydrationWarning
