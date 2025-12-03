@@ -101,6 +101,8 @@ const INITIAL_CONFIG = getResponsiveConfig(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
 export default function PixelPortfolio() {
   const [isMobile, setIsMobile] = useState(false);
+  // Track if component has mounted and initialized - prevents flash of incorrect layout
+  const [isReady, setIsReady] = useState(false);
 
   // Always initialize with the same values on server and client to avoid hydration mismatch
   // The actual window size will be applied in useEffect after mount
@@ -180,6 +182,8 @@ export default function PixelPortfolio() {
     };
 
     handleResize();
+    // Mark as ready after first initialization - this prevents the initial flash
+    setIsReady(true);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -362,7 +366,11 @@ export default function PixelPortfolio() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden select-none touch-none">
+    <div
+      className={`relative w-full h-screen bg-black overflow-hidden select-none touch-none transition-opacity duration-300 ${
+        isReady ? "opacity-100" : "opacity-0"
+      }`}
+    >
       {/* Snowflakes Overlay - Fixed to viewport */}
       <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
         {snowflakes.map((flake) => (

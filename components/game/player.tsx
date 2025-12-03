@@ -24,20 +24,9 @@ export const Player = forwardRef<HTMLDivElement, PlayerProps>(
         ref={ref}
         className="absolute z-10 flex flex-col items-center will-change-transform"
         style={{
-          left: 0, // Position will be handled via ref directly for performance, but we need initial render or declarative backup if we want.
-          // actually, the original code updated style.left/top directly on the ref.
-          // But for the initial render, or if we switch to React state for position (which we aren't, we are using ref),
-          // we might want to pass style. However, in the original code:
-          // playerRef.current.style.left = `${x - PLAYER_SIZE / 2}px`;
-          // The parent component handles the positioning via ref.
-          // So this component just renders the inner sprite.
-          // WAIT. The original code had the `ref` on the wrapper div and updated it manually.
-          // If I extract this component, I need to pass the ref down.
-          // And the parent (index.tsx) will update the style.
-          // SO `x` and `y` props might strictly not be needed for the DOM update if the parent does it directly.
-          // BUT, for the React render cycle (like direction changes), we need to render.
-          // The parent `updateGame` loop modifies `playerRef.current.style`.
-          // So I should stick to that pattern.
+          // Set initial position from props - the game loop will update this via ref for performance
+          left: x - PLAYER_SIZE / 2,
+          top: y - PLAYER_SIZE / 2,
           width: PLAYER_SIZE,
           height: PLAYER_SIZE,
         }}
