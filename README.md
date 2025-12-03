@@ -3,7 +3,7 @@
 A playful and interactive product design portfolio presented as a **2D pixel art styled game**. Navigate through a retro-inspired world to explore projects, case studies, and design work in a fun and delightful way.
 
 [![Live Site](https://img.shields.io/badge/Live%20Site-cristianiordan.design-4CAF50?style=for-the-badge)](https://cristianiordan.design)
-[![GitHub Pages](https://img.shields.io/badge/Deployed%20on-GitHub%20Pages-222?style=for-the-badge&logo=github)](https://github.com/cristianson/portfolio-game)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000?style=for-the-badge&logo=vercel)](https://vercel.com)
 
 ## 🎮 Overview
 
@@ -31,7 +31,7 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 
 ## 🛠️ Tech Stack
 
-- **Next.js 16** - React framework with static export for GitHub Pages
+- **Next.js 15** - React framework deployed on Vercel
 - **React 19** - UI library
 - **TypeScript** - Type-safe development
 - **Tailwind CSS 4** - Styling with custom pixel art borders and animations
