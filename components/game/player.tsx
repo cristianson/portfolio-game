@@ -9,6 +9,7 @@
 import React, { forwardRef } from "react";
 import { Direction } from "./types";
 import { PLAYER_SIZE } from "./constants";
+import { getCurrentSeason } from "./seasons";
 
 interface PlayerProps {
   x: number;
@@ -19,6 +20,9 @@ interface PlayerProps {
 
 export const Player = forwardRef<HTMLDivElement, PlayerProps>(
   ({ x, y, direction, isMoving }, ref) => {
+    const currentSeason = getCurrentSeason();
+    const showAccessory = currentSeason.playerAccessory !== "none";
+
     return (
       <div
         ref={ref}
@@ -32,25 +36,27 @@ export const Player = forwardRef<HTMLDivElement, PlayerProps>(
         }}
       >
         {/* Name Tag */}
-        <div className="absolute -top-12 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
+        <div className="absolute -top-4 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
           Player 1
         </div>
 
-        {/* Character Sprite - Pixel Human with Santa Hat */}
+        {/* Character Sprite - Pixel Human */}
         <div
           className={`w-full h-full relative transition-transform duration-150 ${
             direction === "LEFT" ? "scale-x-[-1]" : ""
           }`}
         >
-          {/* Santa Hat */}
-          <div className="absolute top-[-12px] left-1/2 -translate-x-1/2 w-10 h-8 z-30">
-            {/* Pom-pom - Centered on top */}
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white pixel-border-sm rounded-full z-40"></div>
-            {/* Red Hat Body */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-6 bg-red-600 pixel-border-sm rounded-t-full"></div>
-            {/* White Trim */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-3 bg-white pixel-border-sm"></div>
-          </div>
+          {/* Seasonal Accessory - Only show if season has one defined */}
+          {showAccessory && currentSeason.playerAccessory === "santa-hat" && (
+            <div className="absolute top-[-12px] left-1/2 -translate-x-1/2 w-10 h-8 z-30">
+              {/* Pom-pom - Centered on top */}
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white pixel-border-sm rounded-full z-40"></div>
+              {/* Red Hat Body */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-6 bg-red-600 pixel-border-sm rounded-t-full"></div>
+              {/* White Trim */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-3 bg-white pixel-border-sm"></div>
+            </div>
+          )}
 
           {/* Head */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-6 z-20">
@@ -114,7 +120,7 @@ export const Player = forwardRef<HTMLDivElement, PlayerProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 Player.displayName = "Player";

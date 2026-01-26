@@ -22,6 +22,7 @@ import { Player } from "./player";
 import { Zone } from "./zone";
 import { Modal } from "./modal";
 import { PixelTooltip } from "./pixel-tooltip";
+import { getCurrentSeason } from "./seasons";
 
 const SNOWFLAKE_COUNT = 30;
 
@@ -135,20 +136,28 @@ export default function PixelPortfolio() {
   });
   const joystickRef = useRef({ x: 0, y: 0 });
 
+  // Get current season configuration
+  const currentSeason = getCurrentSeason();
+
   // Snowflakes - Initialize on client only to match hydration
   const [snowflakes, setSnowflakes] = useState<
     Array<{ id: number; left: number; speed: number; delay: number }>
   >([]);
 
   useEffect(() => {
-    const flakes = Array.from({ length: SNOWFLAKE_COUNT }).map((_, i) => ({
-      id: i,
-      left: Math.random() * 100, // Random horizontal position 0-100%
-      speed: 5 + Math.random() * 10, // Random duration between 5-15s
-      delay: -(Math.random() * 15), // Negative delay to start mid-animation
-    }));
-    setSnowflakes(flakes);
-  }, []);
+    // Only initialize snowflakes if the current season shows them
+    if (currentSeason.showSnowflakes) {
+      const flakes = Array.from({ length: SNOWFLAKE_COUNT }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100, // Random horizontal position 0-100%
+        speed: 5 + Math.random() * 10, // Random duration between 5-15s
+        delay: -(Math.random() * 15), // Negative delay to start mid-animation
+      }));
+      setSnowflakes(flakes);
+    } else {
+      setSnowflakes([]);
+    }
+  }, [currentSeason.showSnowflakes]);
 
   // Initialize viewport and detect mobile
   useEffect(() => {
@@ -371,21 +380,27 @@ export default function PixelPortfolio() {
         isReady ? "opacity-100" : "opacity-0"
       }`}
     >
-      {/* Snowflakes Overlay - Fixed to viewport */}
-      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-        {snowflakes.map((flake) => (
-          <div
-            key={flake.id}
-            className="absolute pixel-snowflake pointer-events-none animate-fall"
-            style={{
-              left: `${flake.left}%`,
-              top: "-10px",
-              animationDuration: `${flake.speed}s`,
-              animationDelay: `${flake.delay}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Seasonal Effects Overlay - Fixed to viewport */}
+      {currentSeason.showSnowflakes && snowflakes.length > 0 && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {snowflakes.map((flake) => (
+            <div
+              key={flake.id}
+              className="absolute pixel-snowflake pointer-events-none animate-fall"
+              style={{
+                left: `${flake.left}%`,
+                top: "-10px",
+                animationDuration: `${flake.speed}s`,
+                animationDelay: `${flake.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Future seasonal effects can be added here */}
+      {/* Example: {currentSeason.showFlowers && <FloatingFlowers />} */}
+      {/* Example: {currentSeason.showLeaves && <FallingLeaves />} */}
 
       {/* Game World */}
       <div
