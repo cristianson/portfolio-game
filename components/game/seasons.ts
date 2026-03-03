@@ -75,7 +75,7 @@ export const SEASONS: Record<SeasonId, SeasonConfig> = {
 // ============================================
 // 🎯 CHANGE THIS TO SWITCH SEASONS
 // ============================================
-export const CURRENT_SEASON: SeasonId = "winter";
+export const CURRENT_SEASON: SeasonId = "spring";
 
 // Helper to get the current season config
 export const getCurrentSeason = (): SeasonConfig => {

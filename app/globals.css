@@ -108,6 +108,21 @@ body {
     animation: fall linear infinite;
   }
 
+  /* Tulips - Spring Effect */
+  .pixel-tulip {
+    width: 12px;
+    height: 16px;
+    position: relative;
+  }
+
+  .animate-sway {
+    animation: sway ease-in-out infinite;
+  }
+
+  .animate-grow {
+    animation: grow ease-out forwards;
+  }
+
   /* RPG Animations */
   .animate-float {
     animation: float 3s ease-in-out infinite;
@@ -138,6 +153,39 @@ body {
   100% {
     transform: translateY(110vh) translateX(10px);
     opacity: 0.4;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  15% {
+    transform: rotate(-2deg) translateX(-1px);
+  }
+  30% {
+    transform: rotate(-4deg) translateX(-2px);
+  }
+  50% {
+    transform: rotate(0deg) translateX(0);
+  }
+  65% {
+    transform: rotate(2deg) translateX(1px);
+  }
+  80% {
+    transform: rotate(4deg) translateX(2px);
+  }
+}
+
+@keyframes grow {
+  0% {
+    transform: translateY(20px) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 

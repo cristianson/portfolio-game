@@ -23,8 +23,11 @@ import { Zone } from "./zone";
 import { Modal } from "./modal";
 import { PixelTooltip } from "./pixel-tooltip";
 import { getCurrentSeason } from "./seasons";
+import { Tulips } from "./tulips";
 
 const SNOWFLAKE_COUNT = 30;
+const TULIP_COUNT_DESKTOP = 8;
+const TULIP_COUNT_MOBILE = 5;
 
 // Helper to generate responsive config based on viewport size
 const getResponsiveConfig = (width: number, height: number) => {
@@ -144,6 +147,18 @@ export default function PixelPortfolio() {
     Array<{ id: number; left: number; speed: number; delay: number }>
   >([]);
 
+  // Tulips - Initialize on client only to match hydration
+  const [tulips, setTulips] = useState<
+    Array<{
+      id: number;
+      x: number;
+      y: number;
+      color: "red" | "pink" | "yellow" | "purple";
+      swaySpeed: number;
+      growDelay: number;
+    }>
+  >([]);
+
   useEffect(() => {
     // Only initialize snowflakes if the current season shows them
     if (currentSeason.showSnowflakes) {
@@ -157,7 +172,122 @@ export default function PixelPortfolio() {
     } else {
       setSnowflakes([]);
     }
-  }, [currentSeason.showSnowflakes]);
+
+    // Initialize tulips if the current season shows them
+    if (currentSeason.showFlowers) {
+      const colors: Array<"red" | "pink" | "yellow" | "purple"> = [
+        "red",
+        "pink",
+        "yellow",
+        "purple",
+      ];
+
+      // Use different tulip count based on screen size
+      const tulipCount = isMobile ? TULIP_COUNT_MOBILE : TULIP_COUNT_DESKTOP;
+
+      // Define safe zones to avoid (zones + mobile UI elements + player start position)
+      const SAFE_ZONE_RADIUS = 120; // Distance to keep away from zones
+      const PLAYER_SAFE_ZONE_RADIUS = 150; // Distance to keep away from player start
+      const MIN_TULIP_DISTANCE = 80; // Minimum distance between tulips
+      const MOBILE_JOYSTICK_SAFE_ZONE = {
+        x: config.width - 100, // Right side
+        y: config.height - 100, // Bottom
+        radius: 120,
+      };
+
+      // Player starting position (center of map)
+      const playerStartX = config.width / 2;
+      const playerStartY = config.height / 2;
+
+      // Helper function to check if a position is valid
+      const isPositionValid = (
+        x: number,
+        y: number,
+        existingTulips: Array<{ x: number; y: number }>
+      ): boolean => {
+        // Check distance from player starting position
+        const distToPlayer = Math.sqrt(
+          Math.pow(x - playerStartX, 2) + Math.pow(y - playerStartY, 2)
+        );
+        if (distToPlayer < PLAYER_SAFE_ZONE_RADIUS) {
+          return false;
+        }
+
+        // Check distance from zones
+        for (const zone of config.zones) {
+          const distToZone = Math.sqrt(
+            Math.pow(x - zone.x, 2) + Math.pow(y - zone.y, 2)
+          );
+          if (distToZone < SAFE_ZONE_RADIUS) {
+            return false;
+          }
+        }
+
+        // Check distance from mobile joystick (bottom-right corner)
+        const distToJoystick = Math.sqrt(
+          Math.pow(x - MOBILE_JOYSTICK_SAFE_ZONE.x, 2) +
+            Math.pow(y - MOBILE_JOYSTICK_SAFE_ZONE.y, 2)
+        );
+        if (distToJoystick < MOBILE_JOYSTICK_SAFE_ZONE.radius) {
+          return false;
+        }
+
+        // Check distance from other tulips
+        for (const tulip of existingTulips) {
+          const distToTulip = Math.sqrt(
+            Math.pow(x - tulip.x, 2) + Math.pow(y - tulip.y, 2)
+          );
+          if (distToTulip < MIN_TULIP_DISTANCE) {
+            return false;
+          }
+        }
+
+        return true;
+      };
+
+      // Generate tulips with collision detection
+      const flowers: Array<{
+        id: number;
+        x: number;
+        y: number;
+        color: "red" | "pink" | "yellow" | "purple";
+        swaySpeed: number;
+        growDelay: number;
+      }> = [];
+
+      let attempts = 0;
+      const maxAttempts = tulipCount * 50; // Prevent infinite loop
+
+      while (flowers.length < tulipCount && attempts < maxAttempts) {
+        const x = 100 + Math.random() * (config.width - 200);
+        const y = 100 + Math.random() * (config.height - 200);
+
+        if (isPositionValid(x, y, flowers)) {
+          flowers.push({
+            id: flowers.length,
+            x,
+            y,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            swaySpeed: 2 + Math.random() * 2,
+            growDelay: Math.random() * 2,
+          });
+        }
+
+        attempts++;
+      }
+
+      setTulips(flowers);
+    } else {
+      setTulips([]);
+    }
+  }, [
+    currentSeason.showSnowflakes,
+    currentSeason.showFlowers,
+    config.width,
+    config.height,
+    config.zones,
+    isMobile,
+  ]);
 
   // Initialize viewport and detect mobile
   useEffect(() => {
@@ -398,8 +528,11 @@ export default function PixelPortfolio() {
         </div>
       )}
 
+      {/* Spring Tulips */}
+      {/* Tulips are now inside the game world map, not here */}
+
       {/* Future seasonal effects can be added here */}
-      {/* Example: {currentSeason.showFlowers && <FloatingFlowers />} */}
+      {/* Example: {currentSeason.showSunRays && <SunRays />} */}
       {/* Example: {currentSeason.showLeaves && <FallingLeaves />} */}
 
       {/* Game World */}
@@ -417,6 +550,11 @@ export default function PixelPortfolio() {
           backgroundColor: "#222",
         }}
       >
+        {/* Spring Tulips - In the game world so they scroll with camera */}
+        {currentSeason.showFlowers && tulips.length > 0 && (
+          <Tulips tulips={tulips} />
+        )}
+
         {/* Zones */}
         {config.zones.map((zone) => (
           <Zone key={zone.id} zone={zone} isActive={activeZone === zone.id} />

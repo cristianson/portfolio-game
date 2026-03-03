@@ -36,7 +36,7 @@ export const Player = forwardRef<HTMLDivElement, PlayerProps>(
         }}
       >
         {/* Name Tag */}
-        <div className="absolute -top-4 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
+        <div className="absolute -top-8 bg-black/50 px-2 py-0.5 rounded text-[8px] text-white whitespace-nowrap z-20">
           Player 1
         </div>
 
@@ -57,6 +57,29 @@ export const Player = forwardRef<HTMLDivElement, PlayerProps>(
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-3 bg-white pixel-border-sm"></div>
             </div>
           )}
+
+          {showAccessory &&
+            currentSeason.playerAccessory === "flower-crown" && (
+              <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-12 h-4 z-30 flex justify-around items-center">
+                {/* Pink Flower - Left */}
+                <div className="relative w-3 h-3">
+                  <div className="absolute inset-0 bg-pink-400 rounded-full"></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-yellow-300 rounded-full"></div>
+                </div>
+                {/* Yellow Flower - Center */}
+                <div className="relative w-3 h-3">
+                  <div className="absolute inset-0 bg-yellow-300 rounded-full"></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-orange-400 rounded-full"></div>
+                </div>
+                {/* Red Flower - Right */}
+                <div className="relative w-3 h-3">
+                  <div className="absolute inset-0 bg-red-400 rounded-full"></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-yellow-300 rounded-full"></div>
+                </div>
+                {/* Green leaves connecting the flowers */}
+                <div className="absolute top-2 left-0 right-0 h-0.5 bg-green-500 -z-10"></div>
+              </div>
+            )}
 
           {/* Head */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-6 z-20">
