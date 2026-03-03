@@ -613,24 +613,11 @@ export default function PixelPortfolio() {
 
         {/* Interaction Prompt */}
         {showInstructions && !isModalOpen && (
-          <>
-            {/* Desktop Prompt */}
-            <PixelTooltip className="hidden md:block bottom-24 left-1/2 -translate-x-1/2 pointer-events-none">
-              <div className="px-6 py-3 text-base">
-                <span className="animate-pulse">MOVE AROUND TO EXPLORE</span>
-              </div>
-            </PixelTooltip>
-
-            {/* Mobile Prompt (Pointing to Joystick) */}
-            <PixelTooltip
-              className="md:hidden bottom-16 right-44 pointer-events-none"
-              arrow="right"
-              arrowPosition="-right-3"
-              animate="slide-horizontal"
-            >
-              <div className="px-3 py-2 text-[10px]">MOVE TO EXPLORE</div>
-            </PixelTooltip>
-          </>
+          <PixelTooltip className="hidden md:block bottom-24 left-1/2 -translate-x-1/2 pointer-events-none">
+            <div className="px-6 py-3 text-base">
+              <span className="animate-pulse">MOVE AROUND TO EXPLORE</span>
+            </div>
+          </PixelTooltip>
         )}
 
         {activeZone && !isModalOpen && (
@@ -643,34 +630,53 @@ export default function PixelPortfolio() {
             </div>
           </PixelTooltip>
         )}
+      </div>
 
-        {/* Mobile Controls */}
-        <div className="absolute bottom-8 right-8 pointer-events-auto md:hidden">
-          <Joystick onMove={handleJoystickMove} onStop={handleJoystickStop} />
-        </div>
+      {/* Mobile Controls — fixed to viewport so they're always visible regardless of browser chrome */}
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 pointer-events-none"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="relative h-36">
+          {/* Joystick — bottom right */}
+          <div className="absolute bottom-4 right-8 pointer-events-auto">
+            <Joystick onMove={handleJoystickMove} onStop={handleJoystickStop} />
+          </div>
 
-        {/* Mobile Interact Button */}
-        {activeZone && !isModalOpen && (
-          <>
-            {/* Mobile-specific tooltip with arrow */}
+          {/* "MOVE TO EXPLORE" hint pointing toward the joystick */}
+          {showInstructions && !isModalOpen && (
             <PixelTooltip
-              className="md:hidden bottom-28 left-6 pointer-events-none"
-              arrow="bottom"
-              arrowPosition="left-9"
+              className="bottom-16 right-44 pointer-events-none"
+              arrow="right"
+              arrowPosition="-right-3"
+              animate="slide-horizontal"
             >
-              <div className="px-3 py-2 text-[10px]">PRESS TO INTERACT</div>
+              <div className="px-3 py-2 text-[10px]">MOVE TO EXPLORE</div>
             </PixelTooltip>
+          )}
 
-            <div className="absolute bottom-8 left-8 pointer-events-auto md:hidden">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="w-16 h-16 bg-yellow-400 rounded-full pixel-border flex items-center justify-center active:bg-yellow-500"
+          {/* Interact button + hint — bottom left, only when near a zone */}
+          {activeZone && !isModalOpen && (
+            <>
+              <PixelTooltip
+                className="bottom-[5.5rem] left-6 pointer-events-none"
+                arrow="bottom"
+                arrowPosition="left-9"
               >
-                A
-              </button>
-            </div>
-          </>
-        )}
+                <div className="px-3 py-2 text-[10px]">PRESS TO INTERACT</div>
+              </PixelTooltip>
+
+              <div className="absolute bottom-4 left-8 pointer-events-auto">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-16 h-16 bg-yellow-400 rounded-full pixel-border flex items-center justify-center active:bg-yellow-500"
+                >
+                  A
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Modal */}
