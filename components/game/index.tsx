@@ -577,7 +577,10 @@ export default function PixelPortfolio() {
       {/* HUD / UI Layer */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Top Bar */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+        <div
+          className="absolute left-4 right-4 flex justify-between items-start"
+          style={{ top: "calc(1rem + env(safe-area-inset-top))" }}
+        >
           <div className="bg-white text-black px-4 py-2 pixel-border pointer-events-auto">
             <h1 className="text-pixel-sm md:text-pixel-base font-bold">
               Cristian's_Portfolio.EXE
