@@ -126,12 +126,6 @@ export default function PixelPortfolio() {
 
   const { trigger: triggerHaptic } = useWebHaptics();
 
-  // Fire a heavy haptic on mobile when the "Press to interact" button appears
-  useEffect(() => {
-    if (activeZone && isMobile) {
-      triggerHaptic("heavy");
-    }
-  }, [activeZone, isMobile, triggerHaptic]);
 
   // Refs for loop
   const requestRef = useRef<number>(0);
@@ -668,7 +662,10 @@ export default function PixelPortfolio() {
 
               <div className="absolute bottom-4 left-8 pointer-events-auto">
                 <button
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => {
+                    triggerHaptic("heavy");
+                    setIsModalOpen(true);
+                  }}
                   className="w-16 h-16 bg-yellow-400 rounded-full pixel-border flex items-center justify-center active:bg-yellow-500"
                 >
                   A
