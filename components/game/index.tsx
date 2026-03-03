@@ -23,6 +23,7 @@ import { Zone } from "./zone";
 import { Modal } from "./modal";
 import { PixelTooltip } from "./pixel-tooltip";
 import { getCurrentSeason } from "./seasons";
+import { useWebHaptics } from "web-haptics/react";
 import { Tulips } from "./tulips";
 
 const SNOWFLAKE_COUNT = 30;
@@ -122,6 +123,15 @@ export default function PixelPortfolio() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+
+  const { trigger: triggerHaptic } = useWebHaptics();
+
+  // Fire a heavy haptic on mobile when the "Press to interact" button appears
+  useEffect(() => {
+    if (activeZone && isMobile) {
+      triggerHaptic("heavy");
+    }
+  }, [activeZone, isMobile, triggerHaptic]);
 
   // Refs for loop
   const requestRef = useRef<number>(0);
