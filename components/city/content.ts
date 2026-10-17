@@ -94,6 +94,7 @@ export const PROJECTS: Project[] = [
       "A minimal website where I collect public transport tickets from places I've visited. It's my playground for experimenting with UI, motion and front-end craft.",
     url: "https://tickets-phi-one.vercel.app/",
     cta: "Visit Ticket Gallery",
+    cover: "/projects/ticket-gallery.webp",
   },
 ];
 
