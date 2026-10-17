@@ -6,8 +6,8 @@
  */
 
 export const ABOUT_PARAGRAPHS = [
-  "I'm a product designer who loves building thoughtful digital experiences, building design, AI and code.",
-  "I've been designing for the past 5 years and worked with AI startups, fintech, and B2B SaaS companies.",
+  "I'm a product designer who loves building thoughtful digital experiences at the intersection of design, AI and code.",
+  "I've been designing for the past 5 years and have worked with AI startups, fintech and B2B SaaS companies.",
 ];
 
 export interface Job {
@@ -26,20 +26,20 @@ export const JOBS: Job[] = [
     company: "Lette AI",
     url: "https://www.lette.ai/",
     description:
-      "A solution for orchestrating AI agents that streamline property management operations, from leasing, maintenance, tenant support and more.",
+      "A platform that orchestrates AI agents to streamline property management, from leasing and maintenance to tenant support.",
     isCurrent: true,
   },
   {
     title: "Product Design Lead",
-    period: "Aug 2024 - Jul 2025",
+    period: "Aug 2024 – Jul 2025",
     company: "FULLY AI (Acquired by Circus Group)",
     url: "https://www.gofully.ai/",
     description:
-      "A no-code multi-agent platform to create brand-ready AI agents embedded in your product that learn, adapt, and improve across every stage of the customer lifecycle.",
+      "A no-code, multi-agent platform for creating brand-ready AI agents that live inside your product and learn, adapt and improve across every stage of the customer lifecycle.",
   },
   {
     title: "Product Designer",
-    period: "Feb 2023 - Mar 2024",
+    period: "Feb 2023 – Mar 2024",
     company: "Spoke.ai (Acquired by Slack)",
     url: "https://www.spoke.ai/",
     description:
@@ -47,11 +47,11 @@ export const JOBS: Job[] = [
   },
   {
     title: "Product Designer",
-    period: "Oct 2021 - Jan 2023",
+    period: "Oct 2021 – Jan 2023",
     company: "Sortlist",
     url: "https://www.sortlist.com/",
     description:
-      "A matchmaking B2B SaaS platform that allows companies to find the most relevant digital agencies for their projects.",
+      "A B2B SaaS matchmaking platform that helps companies find the most relevant digital agencies for their projects.",
   },
 ];
 
@@ -78,7 +78,7 @@ export const PROJECTS: Project[] = [
     title: "Airbnb Listing Comparer",
     kind: "Chrome extension",
     description:
-      "An AI-powered Chrome extension that helps travelers compare and decide on the most relevant Airbnb listings, saving their time and reducing decision fatigue.",
+      "An AI-powered Chrome extension that helps travelers compare Airbnb listings and pick the most relevant one, saving time and reducing decision fatigue.",
     url: "https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe",
     cta: "View Extension",
   },
@@ -86,7 +86,7 @@ export const PROJECTS: Project[] = [
     title: "Public Transport Ticket Gallery",
     kind: "Website",
     description:
-      "A minimal website where I collect public transport tickets from places I visited. It's designed as a playground for myself to experiment with UI, motion, and front-end craft.",
+      "A minimal website where I collect public transport tickets from places I've visited. It's my playground for experimenting with UI, motion and front-end craft.",
     url: "https://tickets-phi-one.vercel.app/",
     cta: "Visit Ticket Gallery",
   },
@@ -104,7 +104,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     company: "Spoke.ai",
     summary:
-      "I helped redesign an AI inbox for Slack into a native macOS app so it fits naturally into people’s daily workflow. By bringing AI summaries, a priority sidebar, and native notifications closer to where work happens, time spent focused in the app tripled and DAU grew by 147%.",
+      "I helped turn an AI inbox for Slack into a native macOS app that fits naturally into people’s daily workflow. By bringing AI summaries, a priority sidebar and native notifications closer to where work happens, focused time in the app tripled and DAU grew by 147%.",
     url: "https://www.figma.com/deck/XzPSjhrtDVSIyqK6fkwZP9/Spoke.ai",
     metrics: [
       { value: "3×", label: "Focused time in the app" },

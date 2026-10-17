@@ -48,7 +48,7 @@ function About({ accent }: { accent: string }) {
   const acquisitions = JOBS.filter((j) => /acquired/i.test(j.company)).length;
   const stats = [
     { value: "5+", label: "Years designing" },
-    { value: String(JOBS.length), label: "Product teams" },
+    { value: String(JOBS.length), label: "Companies" },
     { value: String(acquisitions), label: "Acquisitions" },
   ];
   return (
@@ -249,7 +249,7 @@ function Socials({ accent }: { accent: string }) {
 
 export const SECTION_SUBTITLE: Record<ZoneId, string> = {
   ABOUT: "Product designer · design, AI and code",
-  CASE_STUDIES: "Selected work and the results it drove",
+  CASE_STUDIES: "Selected work and the impact it had",
   PROJECTS: "Things I designed and built",
   SOCIALS: "Say hi",
 };
