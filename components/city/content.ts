@@ -6,7 +6,7 @@
  */
 
 export const ABOUT_PARAGRAPHS = [
-  "I'm a product designer who loves building thoughtful digital experiences at the intersection of design, AI and code.",
+  "I'm a product designer who loves building thoughtful digital experiences and working across design, AI and code.",
   "I've been designing for the past 5 years and have worked with AI startups, fintech and B2B SaaS companies.",
 ];
 
