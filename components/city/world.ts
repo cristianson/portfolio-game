@@ -145,16 +145,11 @@ export interface CarDef {
 }
 
 export const PARKED_CARS: CarDef[] = [
-  { x: 3.9, z: -21, rot: Math.PI, color: "#8e3a33" },
   { x: 3.9, z: -13, rot: Math.PI, color: "#d9b13a", taxi: true },
-  { x: 3.9, z: -1, rot: Math.PI, color: "#4f6a94", van: true },
   { x: 3.9, z: 9.5, rot: Math.PI, color: "#cfcbc2", van: true },
-  { x: 3.9, z: 20.5, rot: Math.PI, color: "#3a3a3a" },
   { x: -3.9, z: -22, rot: 0, color: "#3f6b5c" },
-  { x: -3.9, z: -13, rot: 0, color: "#b8a9a6" },
   { x: -3.9, z: 1, rot: 0, color: "#d9b13a", taxi: true },
-  { x: -3.9, z: 8, rot: 0, color: "#5a7d86" },
-  { x: -3.9, z: 20, rot: 0, color: "#7d5a6e" },
+  { x: -3.9, z: 20, rot: 0, color: "#8e3a33" },
 ];
 
 export type PropKind = "signal" | "lamp" | "hydrant" | "tree" | "bench" | "trash" | "booth" | "newsbox" | "barrier" | "mailbox";
