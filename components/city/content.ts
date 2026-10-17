@@ -127,12 +127,16 @@ export const SOCIALS_INTRO = "Feel free to connect with me on social media or ch
 
 export interface Social {
   name: string;
+  /** Short name for buttons, e.g. "Go to X". */
+  short: string;
   handle: string;
   url: string;
+  /** Bright brand color (readable on the dark street), used for the icon tile and the pickup. */
+  color: string;
 }
 
 export const SOCIALS: Social[] = [
-  { name: "LinkedIn", handle: "in/crisiordan", url: "https://www.linkedin.com/in/crisiordan/" },
-  { name: "Twitter(X)", handle: "@CristianIordan_", url: "https://x.com/CristianIordan_" },
-  { name: "GitHub", handle: "cristianson", url: "https://github.com/cristianson" },
+  { name: "LinkedIn", short: "LinkedIn", handle: "in/crisiordan", url: "https://www.linkedin.com/in/crisiordan/", color: "#0a66c2" },
+  { name: "Twitter(X)", short: "X", handle: "@CristianIordan_", url: "https://x.com/CristianIordan_", color: "#1d9bf0" },
+  { name: "GitHub", short: "GitHub", handle: "cristianson", url: "https://github.com/cristianson", color: "#8250df" },
 ];

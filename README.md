@@ -7,7 +7,7 @@ A playful and interactive product design portfolio presented as a **3D open-worl
 
 ## 🎮 Overview
 
-This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. You walk down a small daytime street as a low-poly version of me, find the glowing markers in front of each building and step in to open a section: About Me, Case Studies, Built Projects and Socials.
+This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. You walk down a small daytime street as a low-poly version of me, step into the glowing markers in front of the buildings to open About Me, Case Studies and Built Projects, and grab the spinning pickups on the street to find my socials.
 
 **The main goal:** Make portfolio exploration fun and delightful for users, turning the typical portfolio browsing experience into an interactive adventure.
 
@@ -15,7 +15,8 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 
 - **Early-2000s 3D Look**: A low-poly city street with parked cars, pedestrians, fire escapes and shop signs
 - **GTA 3 style HUD**: Rotating radar with section blips, clock, cash and stars that track visited sections (progress is saved locally)
-- **Mission markers**: Each section has a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
+- **Mission markers**: About Me, Case Studies and Built Projects each have a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
+- **Social pickups**: LinkedIn, X and GitHub spin on the street like GTA 3 health/cash pickups; walk into one for a card with a "Go to …" link (or press Enter)
 - **Pause menu**: Jump straight to any section without walking there
 - **Mobile first**: Portrait layout with an on-screen joystick and an ENTER button near markers
 - **No 3D assets to download**: Every model is built from primitives and every texture is painted on a canvas at runtime
@@ -47,8 +48,11 @@ pnpm install
 # Run development server
 pnpm dev
 
-# Build for production
+# Build for production (also type-checks)
 pnpm build
+
+# Lint
+pnpm lint
 ```
 
 Add `?debug` to the URL to expose the game store as `window.__dd` in the console.
@@ -70,10 +74,12 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 │   ├── world.ts            # Street layout: buildings, markers, cars, pedestrians
 │   ├── scene.tsx           # Canvas, lights, fog
 │   ├── buildings.tsx       # Buildings, signs, fire escapes
+│   ├── pedestrians.tsx     # Locals who step around you
 │   ├── props.tsx           # Street furniture and parked cars
 │   ├── character.tsx       # Characters (PLAYER_LOOK is me)
 │   ├── player.tsx          # Movement, collisions, chase camera
-│   ├── hud.tsx / radar.tsx # HUD
+│   ├── pickups.tsx         # Spinning social pickups on the street
+│   ├── hud.tsx / radar.tsx # HUD (incl. the pickup card)
 │   └── panel.tsx           # Section panel + pause menu
 └── public/                 # Favicon and avatar images
 ```

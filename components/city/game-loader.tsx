@@ -9,7 +9,7 @@
 
 "use client";
 
-import React, { Component, useCallback, useEffect, useState } from "react";
+import React, { Component, useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 
 // three.js needs the browser, so the game itself is client-only
@@ -48,15 +48,19 @@ class GameErrorBoundary extends Component<{ onError: () => void; children: React
   }
 }
 
+// Probed once per page load; null on the server so the first render matches the HTML
+let webglSupport: boolean | undefined;
+const getWebGLSupport = () => (webglSupport ??= hasWebGL());
+const getServerSupport = () => null;
+const subscribeNever = () => () => {};
+
 type Mode = "checking" | "game" | "no-webgl" | "crashed";
 
 export function GameLoader() {
-  const [mode, setMode] = useState<Mode>("checking");
-  const fallback = useCallback(() => setMode("crashed"), []);
-
-  useEffect(() => {
-    setMode(hasWebGL() ? "game" : "no-webgl");
-  }, []);
+  const supported = useSyncExternalStore(subscribeNever, getWebGLSupport, getServerSupport);
+  const [crashed, setCrashed] = useState(false);
+  const fallback = useCallback(() => setCrashed(true), []);
+  const mode: Mode = supported === null ? "checking" : crashed ? "crashed" : supported ? "game" : "no-webgl";
 
   useEffect(() => {
     const portfolio = document.getElementById("static-portfolio");

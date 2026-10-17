@@ -14,7 +14,8 @@ import { Scene } from "./scene";
 import { createStore, type Phase } from "./store";
 import { ZONES, type ZoneId } from "./world";
 import { Radar } from "./radar";
-import { AreaName, HelpBox, Key, MissionPassed, Stats, TouchControls } from "./hud";
+import { AreaName, HelpBox, Key, MissionPassed, PickupCard, Stats, TouchControls } from "./hud";
+import { SOCIALS } from "./content";
 import { ContentPanel, PauseMenu } from "./panel";
 import { TitleScreen } from "./title-screen";
 
@@ -72,7 +73,7 @@ const STARTUP_TIMEOUT_MS = 15000;
 const STARTUP_TICK_MS = 500;
 
 export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
-  const store = useRef(createStore()).current;
+  const [store] = useState(createStore);
   const { trigger: haptic } = useWebHaptics();
   const { compact, touch } = useCompactLayout();
 
@@ -94,13 +95,13 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const [phase, setPhaseState] = useState<Phase>("title");
   const [nearZone, setNearZone] = useState<ZoneId | null>(null);
   const [panelZone, setPanelZone] = useState<ZoneId | null>(null);
-  const [visited, setVisited] = useState<Set<ZoneId>>(() => new Set());
+  const [nearPickup, setNearPickup] = useState<string | null>(null);
+  // Client-only component, so localStorage can be read up front
+  const [visited, setVisited] = useState<Set<ZoneId>>(loadVisited);
   const [passed, setPassed] = useState<ZoneId | null>(null);
   const [introHelp, setIntroHelp] = useState(false);
   const [areaName, setAreaName] = useState(false);
   const passedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => setVisited(loadVisited()), []);
 
   // `?debug` exposes the store for poking at things from the console
   useEffect(() => {
@@ -138,24 +139,49 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     [setPhase, haptic]
   );
 
-  const closePanel = useCallback(() => {
-    const zone = panelZone;
-    setPanelZone(null);
-    setPhase("play");
-    if (zone && !visited.has(zone)) {
+  /** First visit to a section pays out the MISSION PASSED splash. */
+  const markVisited = useCallback(
+    (zone: ZoneId) => {
+      if (visited.has(zone)) return;
       const next = new Set(visited).add(zone);
       setVisited(next);
       saveVisited(next);
       setPassed(zone);
+      // The splash takes the help box's place so the two never overlap
+      setIntroHelp(false);
       haptic("success");
       clearTimeout(passedTimer.current);
       passedTimer.current = setTimeout(() => setPassed(null), 3500);
-    }
-  }, [panelZone, visited, setPhase, haptic]);
+    },
+    [visited, haptic]
+  );
+
+  const closePanel = useCallback(() => {
+    const zone = panelZone;
+    setPanelZone(null);
+    setPhase("play");
+    if (zone) markVisited(zone);
+  }, [panelZone, setPhase, markVisited]);
 
   const interact = useCallback(() => {
-    if (store.phase === "play" && store.nearZone) openZone(store.nearZone);
+    if (store.phase !== "play") return;
+    if (store.nearZone) openZone(store.nearZone);
+    else if (store.nearPickup) {
+      const social = SOCIALS.find((s) => s.name === store.nearPickup);
+      if (social) window.open(social.url, "_blank", "noopener,noreferrer");
+    }
   }, [store, openZone]);
+
+  // Grabbing any social pickup counts as finding the Socials section
+  const onPickupChange = useCallback(
+    (name: string | null) => {
+      setNearPickup(name);
+      if (!name) return;
+      haptic("nudge");
+      markVisited("SOCIALS");
+    },
+    [haptic, markVisited]
+  );
 
   const onZoneChange = useCallback(
     (zone: ZoneId | null) => {
@@ -240,8 +266,8 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     help = (
       <>
         Explore the street. The glowing markers lead to my <span className="text-[#ff4fa3]">About Me</span>,{" "}
-        <span className="text-[#ffb020]">Case Studies</span>, <span className="text-[#b36bff]">Built Projects</span> and{" "}
-        <span className="text-[#3ddc84]">Socials</span>.
+        <span className="text-[#ffb020]">Case Studies</span> and <span className="text-[#b36bff]">Built Projects</span>.
+        Grab the spinning pickups to find my <span className="text-[#3ddc84]">Socials</span>.
         <span className="block mt-1.5 text-white/70 font-medium">
           {touch ? "Use the joystick to move, drag the street to look around." : <>Use <Key>WASD</Key> or arrows to move, <Key>Shift</Key> to sprint, drag to look around.</>}
         </span>
@@ -251,7 +277,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black select-none touch-none overscroll-none">
-      <Scene store={store} onZoneChange={onZoneChange} onReady={() => setReady(true)} />
+      <Scene store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} onReady={() => setReady(true)} />
 
       {phase === "title" && <TitleScreen ready={ready} isTouch={touch} onStart={start} />}
 
@@ -282,6 +308,8 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
           </div>
 
           <MissionPassed zone={passed} allDone={visited.size === ZONES.length} />
+
+          {playing && nearPickup && <PickupCard name={nearPickup} touch={touch} compact={compact} />}
 
           {touch && playing && <TouchControls store={store} nearZone={nearZone} onInteract={interact} />}
         </div>

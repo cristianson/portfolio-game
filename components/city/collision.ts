@@ -43,6 +43,7 @@ export function resolveCircle(p: { x: number; z: number }, r: number, boxes: Box
 export function resolveCircles(p: { x: number; z: number }, r: number, others: { x: number; z: number }[], otherR: number) {
   const min = r + otherR;
   for (const o of others) {
+    if (!o) continue;
     const dx = p.x - o.x;
     const dz = p.z - o.z;
     const d2 = dx * dx + dz * dz;

@@ -13,7 +13,7 @@ import React, { useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Character, PLAYER_LOOK, type Motion } from "./character";
-import { COLLIDERS, groundHeight, ZONES, type ZoneId } from "./world";
+import { COLLIDERS, groundHeight, MARKER_ZONES, PICKUP_RADIUS, PICKUPS, type ZoneId } from "./world";
 import { resolveCircle, resolveCircles, segmentHit } from "./collision";
 import { angleDiff, type GameStore } from "./store";
 
@@ -24,9 +24,10 @@ const SPRINT_SPEED = 8.5;
 interface PlayerProps {
   store: GameStore;
   onZoneChange: (zone: ZoneId | null) => void;
+  onPickupChange: (name: string | null) => void;
 }
 
-export function Player({ store, onZoneChange }: PlayerProps) {
+export function Player({ store, onZoneChange, onPickupChange }: PlayerProps) {
   const group = useRef<THREE.Group>(null!);
   const motion = useRef<Motion>({ speed: 0 });
   const camPos = useRef(new THREE.Vector3(0, 8, -48));
@@ -78,12 +79,20 @@ export function Player({ store, onZoneChange }: PlayerProps) {
 
     // ── Zones ─────────────────────────────────────────────────
     let near: ZoneId | null = null;
-    for (const z of ZONES) {
+    for (const z of MARKER_ZONES) {
       if (Math.hypot(p.x - z.x, p.z - z.z) < z.radius) near = z.id;
     }
     if (near !== store.nearZone) {
       store.nearZone = near;
       onZoneChange(near);
+    }
+    let pickup: string | null = null;
+    for (const s of PICKUPS) {
+      if (Math.hypot(p.x - s.x, p.z - s.z) < PICKUP_RADIUS) pickup = s.name;
+    }
+    if (pickup !== store.nearPickup) {
+      store.nearPickup = pickup;
+      onPickupChange(pickup);
     }
 
     // ── Camera ────────────────────────────────────────────────

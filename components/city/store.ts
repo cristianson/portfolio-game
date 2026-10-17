@@ -27,6 +27,8 @@ export interface GameStore {
   /** Timestamp (ms) until which the camera won't auto-swing behind the player. */
   manualCamUntil: number;
   nearZone: ZoneId | null;
+  /** Name of the social pickup the player is standing on. */
+  nearPickup: string | null;
   pedestrians: { x: number; z: number }[];
 }
 
@@ -38,6 +40,7 @@ export function createStore(): GameStore {
     camYaw: SPAWN.heading,
     manualCamUntil: 0,
     nearZone: null,
+    nearPickup: null,
     pedestrians: [],
   };
 }

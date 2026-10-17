@@ -276,6 +276,14 @@ function Building({ b }: { b: BuildingDef }) {
   );
 }
 
+/** Deterministic pseudo random sequence so the city looks the same every visit. */
+function seededRandom(seed: number) {
+  return () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+}
+
 /** Window AC units scattered over the street-facing facades (one draw call). */
 function AirConditioners() {
   const mesh = useMemo(() => {
@@ -283,11 +291,7 @@ function AirConditioners() {
     const q = new THREE.Quaternion();
     const one = new THREE.Vector3(1, 1, 1);
     const spots: THREE.Matrix4[] = [];
-    let seed = 7;
-    const rand = () => {
-      seed = (seed * 16807) % 2147483647;
-      return seed / 2147483647;
-    };
+    const rand = seededRandom(7);
     for (const b of BUILDINGS) {
       if (b.style === "glass" || b.floors < 2) continue;
       const f = facadeFrame(b);

@@ -11,7 +11,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Joystick } from "./joystick";
+import { ArrowUpRight } from "lucide-react";
 import { ZONES, type ZoneId } from "./world";
+import { SOCIALS } from "./content";
+import { SOCIAL_ICON } from "./icons";
+
+const SOCIALS_ACCENT = ZONES.find((z) => z.id === "SOCIALS")!.color;
 import type { GameStore } from "./store";
 
 export const CASH_PER_SECTION = 250;
@@ -125,11 +130,57 @@ export function MissionPassed({ zone, allDone }: { zone: ZoneId | null; allDone:
   if (!zone) return null;
   const label = ZONES.find((z) => z.id === zone)?.label;
   return (
-    <div className="absolute inset-x-0 top-[22%] flex flex-col items-center text-center pointer-events-none animate-in zoom-in-95 fade-in duration-300 px-4">
+    <div className="absolute inset-x-0 top-[30%] md:top-[22%] flex flex-col items-center text-center pointer-events-none animate-in zoom-in-95 fade-in duration-300 px-4">
       <div className="font-gta gta-stroke text-[40px] md:text-[64px] text-[#f0b53b] leading-none">MISSION PASSED!</div>
       <div className="font-gta gta-stroke text-[26px] md:text-[36px] text-white mt-2">${CASH_PER_SECTION}</div>
       <div className="font-gta gta-stroke text-[18px] md:text-[22px] text-[#e9e2c8] mt-1">
         {allDone ? "All sections found. Thanks for visiting!" : `${label} unlocked`}
+      </div>
+    </div>
+  );
+}
+
+/** Card shown while standing on a social pickup, with a link straight to the profile. */
+export function PickupCard({ name, touch, compact }: { name: string; touch: boolean; compact: boolean }) {
+  const social = SOCIALS.find((s) => s.name === name);
+  if (!social) return null;
+  const Icon = SOCIAL_ICON[social.name];
+  return (
+    <div
+      className={`absolute pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200 ${
+        compact ? "left-4 right-4 bottom-[176px]" : "left-1/2 -translate-x-1/2 bottom-10 w-[380px]"
+      }`}
+    >
+      <div className="bg-black/85 border-2 border-black shadow-[0_8px_24px_rgba(0,0,0,0.5)] font-sans">
+        <div className="h-1" style={{ background: SOCIALS_ACCENT }} />
+        <div className="flex items-center gap-3 p-4">
+          <span
+            className="w-14 h-14 shrink-0 flex items-center justify-center text-white border border-white/20"
+            style={{ background: social.color }}
+          >
+            <Icon size={28} />
+          </span>
+          <div className="min-w-0">
+            <div className="font-gta text-[12px] tracking-[0.22em] text-[#8f8a80]">SOCIALS PICKUP</div>
+            <div className="font-gta text-[28px] leading-none text-white">{social.name}</div>
+            <div className="mt-1 font-mono text-[13px] text-[#a8a297] truncate">{social.handle}</div>
+          </div>
+        </div>
+        <a
+          href={social.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 mx-4 mb-4 py-3 font-gta text-[20px] tracking-[0.06em] uppercase text-black border-2 border-black shadow-[3px_3px_0_#000] active:translate-y-px"
+          style={{ background: SOCIALS_ACCENT }}
+        >
+          Go to {social.short}
+          <ArrowUpRight size={20} strokeWidth={2.5} />
+        </a>
+        {!touch && (
+          <div className="-mt-2 pb-3 text-center text-[12px] text-white/50">
+            or press <Key>ENTER</Key>
+          </div>
+        )}
       </div>
     </div>
   );

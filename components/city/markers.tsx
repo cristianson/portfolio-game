@@ -10,7 +10,7 @@
 import React, { useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { SIDEWALK_HEIGHT, ZONES, type ZoneDef } from "./world";
+import { MARKER_ZONES, SIDEWALK_HEIGHT, type ZoneDef } from "./world";
 import { markerTexture } from "./textures";
 import type { GameStore } from "./store";
 
@@ -65,7 +65,7 @@ function Marker({ zone, store }: { zone: ZoneDef; store: GameStore }) {
 export function Markers({ store }: { store: GameStore }) {
   return (
     <group>
-      {ZONES.map((z) => (
+      {MARKER_ZONES.map((z) => (
         <Marker key={z.id} zone={z} store={store} />
       ))}
     </group>

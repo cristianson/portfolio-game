@@ -8,8 +8,9 @@
 
 "use client";
 
-import React from "react";
+import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import { PARK_TREES, PARKED_CARS, PROPS, SIDEWALK_HEIGHT, type CarDef, type PropDef } from "./world";
 import { blobShadowTexture, signTexture } from "./textures";
 
@@ -141,7 +142,31 @@ function Hydrant() {
   );
 }
 
+const FADED_OPACITY = 0.28;
+const canopyCenter = new THREE.Vector3();
+
+/** Low-poly street tree. The canopy fades out while the camera is inside it. */
 export function Tree({ scale = 1 }: { scale?: number }) {
+  const canopy = useRef<THREE.Group>(null!);
+  const mats = useMemo(() => [M.leaves.clone(), M.leavesLight.clone()], []);
+
+  useFrame(({ camera }) => {
+    canopy.current.getWorldPosition(canopyCenter);
+    const near = camera.position.distanceTo(canopyCenter) < 2.1 * scale;
+    for (const m of mats) {
+      const target = near ? FADED_OPACITY : 1;
+      if (m.opacity === target) continue;
+      m.opacity += (target - m.opacity) * 0.25;
+      if (Math.abs(m.opacity - target) < 0.02) m.opacity = target;
+      const see = m.opacity < 1;
+      if (m.transparent !== see) {
+        m.transparent = see;
+        m.depthWrite = !see;
+        m.needsUpdate = true;
+      }
+    }
+  });
+
   return (
     <group scale={scale}>
       <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={M.dirt}>
@@ -150,15 +175,17 @@ export function Tree({ scale = 1 }: { scale?: number }) {
       <mesh position={[0, 1.4, 0]} material={M.trunk}>
         <cylinderGeometry args={[0.1, 0.16, 2.8, 6]} />
       </mesh>
-      <mesh position={[0, 3.3, 0]} material={M.leaves}>
-        <icosahedronGeometry args={[1.35, 0]} />
-      </mesh>
-      <mesh position={[0.5, 3.9, 0.3]} material={M.leavesLight}>
-        <icosahedronGeometry args={[0.95, 0]} />
-      </mesh>
-      <mesh position={[-0.5, 2.9, -0.4]} material={M.leavesLight}>
-        <icosahedronGeometry args={[0.8, 0]} />
-      </mesh>
+      <group ref={canopy} position={[0, 3.3, 0]}>
+        <mesh material={mats[0]}>
+          <icosahedronGeometry args={[1.35, 0]} />
+        </mesh>
+        <mesh position={[0.5, 0.6, 0.3]} material={mats[1]}>
+          <icosahedronGeometry args={[0.95, 0]} />
+        </mesh>
+        <mesh position={[-0.5, -0.4, -0.4]} material={mats[1]}>
+          <icosahedronGeometry args={[0.8, 0]} />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -208,7 +235,7 @@ function NewsBox({ material }: { material: THREE.Material }) {
 }
 
 function PhoneBooth() {
-  const { texture, aspect } = signTexture("SOCIALS", "#1b5e3a", "#ffffff");
+  const { texture, aspect } = signTexture("PHONE", "#1b5e3a", "#ffffff");
   return (
     <group>
       <mesh position={[0, 0.05, 0]} material={M.boothFrame}>

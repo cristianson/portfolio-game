@@ -18,7 +18,7 @@ import {
   SOCIALS,
   SOCIALS_INTRO,
 } from "./content";
-import { GithubIcon, LinkedinIcon, TwitterIcon } from "./icons";
+import { SOCIAL_ICON } from "./icons";
 import type { ZoneId } from "./world";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
@@ -210,19 +210,13 @@ function Projects({ accent }: { accent: string }) {
 
 // ── Socials ─────────────────────────────────────────────────────────────────
 
-const SOCIAL_LOOK: Record<string, { icon: React.ReactNode; bg: string }> = {
-  LinkedIn: { icon: <LinkedinIcon size={26} />, bg: "#0a66c2" },
-  "Twitter(X)": { icon: <TwitterIcon size={26} />, bg: "#000000" },
-  GitHub: { icon: <GithubIcon size={26} />, bg: "#2b3137" },
-};
-
 function Socials({ accent }: { accent: string }) {
   return (
     <div className="space-y-6">
       <p className="text-[18px] md:text-[20px] leading-relaxed text-[#ece7dd]">{SOCIALS_INTRO}</p>
       <ul className="border-t border-white/10">
         {SOCIALS.map((s) => {
-          const look = SOCIAL_LOOK[s.name];
+          const Icon = SOCIAL_ICON[s.name];
           return (
             <li key={s.name} className="border-b border-white/10">
               <a
@@ -231,8 +225,8 @@ function Socials({ accent }: { accent: string }) {
                 rel="noopener noreferrer"
                 className="group flex items-center gap-4 py-4 px-2 -mx-2 hover:bg-white/[0.04] transition-colors"
               >
-                <span className="w-14 h-14 shrink-0 flex items-center justify-center text-white border border-white/15" style={{ background: look.bg }}>
-                  {look.icon}
+                <span className="w-14 h-14 shrink-0 flex items-center justify-center text-white border border-white/15" style={{ background: s.color }}>
+                  <Icon size={26} />
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block font-gta text-[28px] leading-none text-white">{s.name}</span>

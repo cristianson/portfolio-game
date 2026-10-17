@@ -16,16 +16,18 @@ import { Props } from "./props";
 import { Markers } from "./markers";
 import { Pedestrians } from "./pedestrians";
 import { Player } from "./player";
+import { Pickups } from "./pickups";
 import type { GameStore } from "./store";
 import type { ZoneId } from "./world";
 
 interface SceneProps {
   store: GameStore;
   onZoneChange: (zone: ZoneId | null) => void;
+  onPickupChange: (name: string | null) => void;
   onReady: () => void;
 }
 
-export function Scene({ store, onZoneChange, onReady }: SceneProps) {
+export function Scene({ store, onZoneChange, onPickupChange, onReady }: SceneProps) {
   const wrapper = useRef<HTMLDivElement>(null);
 
   // Drag anywhere on the 3D view to rotate the camera
@@ -83,8 +85,9 @@ export function Scene({ store, onZoneChange, onReady }: SceneProps) {
         <Buildings />
         <Props />
         <Markers store={store} />
+        <Pickups store={store} />
         <Pedestrians store={store} />
-        <Player store={store} onZoneChange={onZoneChange} />
+        <Player store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} />
       </Canvas>
     </div>
   );

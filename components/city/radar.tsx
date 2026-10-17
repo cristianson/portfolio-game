@@ -9,7 +9,8 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { BUILDINGS, PARK, ROAD_HALF, SIDEWALK_OUTER, ZONES } from "./world";
+import { BUILDINGS, MARKER_ZONES, PARK, PICKUPS, ROAD_HALF, SIDEWALK_OUTER, ZONES } from "./world";
+import { SOCIALS } from "./content";
 import type { GameStore } from "./store";
 
 const RANGE = 48; // meters from centre to rim
@@ -19,6 +20,7 @@ const RIM = 84;
 export function Radar({ store, className = "" }: { store: GameStore; className?: string }) {
   const map = useRef<SVGGElement>(null);
   const blips = useRef<(SVGGElement | null)[]>([]);
+  const pickupBlips = useRef<(SVGGElement | null)[]>([]);
   const north = useRef<SVGGElement>(null);
   const arrow = useRef<SVGPolygonElement>(null);
 
@@ -38,7 +40,17 @@ export function Radar({ store, className = "" }: { store: GameStore; className?:
       const f = -(b * px + d * pz);
       map.current?.setAttribute("transform", `matrix(${a} ${b} ${c} ${d} ${e} ${f})`);
 
-      ZONES.forEach((zone, i) => {
+      // Pickups only show up when they're within range, like the real thing
+      PICKUPS.forEach((pk, i) => {
+        const u = a * pk.x + c * pk.z + e;
+        const v = b * pk.x + d * pk.z + f;
+        const el = pickupBlips.current[i];
+        if (!el) return;
+        el.setAttribute("transform", `translate(${u} ${v})`);
+        el.setAttribute("visibility", Math.hypot(u, v) < RIM ? "visible" : "hidden");
+      });
+
+      MARKER_ZONES.forEach((zone, i) => {
         let u = a * zone.x + c * zone.z + e;
         let v = b * zone.x + d * zone.z + f;
         const len = Math.hypot(u, v);
@@ -95,7 +107,12 @@ export function Radar({ store, className = "" }: { store: GameStore; className?:
             );
           })}
         </g>
-        {ZONES.map((zone, i) => (
+        {PICKUPS.map((pk, i) => (
+          <g key={pk.name} ref={(el) => { pickupBlips.current[i] = el; }}>
+            <circle r={6} fill={SOCIALS.find((s) => s.name === pk.name)?.color} stroke="#fff" strokeWidth={2} />
+          </g>
+        ))}
+        {MARKER_ZONES.map((zone, i) => (
           <g key={zone.id} ref={(el) => { blips.current[i] = el; }}>
             <rect x={-9} y={-9} width={18} height={18} fill={zone.color} stroke="#000" strokeWidth={2.5} />
             <text y={6} textAnchor="middle" fontSize={15} fontWeight={900} fill="#000" fontFamily="Arial Black, Arial, sans-serif">

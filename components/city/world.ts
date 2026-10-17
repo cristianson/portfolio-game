@@ -71,12 +71,34 @@ export interface ZoneDef {
   radius: number;
 }
 
+/** Every section; Socials has no marker (see PICKUPS) but still shows in the menu and radar legend. */
 export const ZONES: ZoneDef[] = [
   { id: "ABOUT", label: "About Me", blip: "A", color: "#ff4fa3", x: 7.3, z: -26, radius: 1.2 },
   { id: "PROJECTS", label: "Built Projects", blip: "P", color: "#b36bff", x: -7.3, z: -12, radius: 1.2 },
   { id: "CASE_STUDIES", label: "Case Studies", blip: "C", color: "#ffb020", x: 7.3, z: 5, radius: 1.2 },
   { id: "SOCIALS", label: "Socials", blip: "S", color: "#3ddc84", x: -6.9, z: 22, radius: 1.2 },
 ];
+
+/** Sections you walk into a glowing marker for. */
+export const MARKER_ZONES = ZONES.filter((z) => z.id !== "SOCIALS");
+
+/**
+ * Socials live on the street as spinning pickups, like the health and cash
+ * pickups lying around in GTA 3. `name` matches SOCIALS in content.ts.
+ */
+export interface PickupDef {
+  name: string;
+  x: number;
+  z: number;
+}
+
+export const PICKUPS: PickupDef[] = [
+  { name: "LinkedIn", x: -7.1, z: 20.5 },
+  { name: "Twitter(X)", x: 7.1, z: 17.5 },
+  { name: "GitHub", x: 0, z: 38 },
+];
+
+export const PICKUP_RADIUS = 1.0;
 
 const E = SIDEWALK_OUTER;
 

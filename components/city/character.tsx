@@ -8,7 +8,7 @@
 
 "use client";
 
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { BlobShadow } from "./props";
@@ -100,7 +100,12 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
   const legR = useRef<THREE.Group>(null!);
   const armL = useRef<THREE.Group>(null!);
   const armR = useRef<THREE.Group>(null!);
-  const phase = useRef(Math.random() * 10);
+  const phase = useRef(0);
+
+  // Start everyone at a different point of their stride
+  useEffect(() => {
+    phase.current = Math.random() * 10;
+  }, []);
 
   useFrame((state, dt) => {
     const speed = motion.current?.speed ?? 0;

@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   // Old addresses: the 3D preview lived at /3d, the retired 2D version at /classic
   async redirects() {
     return [
