@@ -20,6 +20,7 @@ import {
 } from "./world";
 import { FACE_INDEX, facadeFrame, worldBox } from "./geometry";
 import {
+  bladeSignTexture,
   facadeTexture,
   garageDoorTexture,
   paletteFor,
@@ -32,6 +33,8 @@ const DOOR = new THREE.MeshLambertMaterial({ color: "#2a1d16" });
 const DARK_METAL = new THREE.MeshLambertMaterial({ color: "#2f3236" });
 const WOOD = new THREE.MeshLambertMaterial({ color: "#7a5534" });
 const WOOD_DARK = new THREE.MeshLambertMaterial({ color: "#5a3b22" });
+const FIRE_ESCAPE = new THREE.MeshLambertMaterial({ color: "#26282a" });
+const AC_UNIT = new THREE.MeshLambertMaterial({ color: "#a6a399" });
 
 function Sign({ text, bg, fg, width, y, x = 0 }: { text: string; bg: string; fg: string; width?: number; y: number; x?: number }) {
   const { texture, aspect } = signTexture(text, bg, fg);
@@ -46,6 +49,71 @@ function Sign({ text, bg, fg, width, y, x = 0 }: { text: string; bg: string; fg:
       <mesh>
         <planeGeometry args={[w, h]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+function BladeSign({ text, bg, fg, x, y }: { text: string; bg: string; fg: string; x: number; y: number }) {
+  const { texture, aspect } = bladeSignTexture(text, bg, fg);
+  const w = 1.0;
+  const h = w / aspect;
+  return (
+    <group position={[x, y, 0.95]} rotation={[0, Math.PI / 2, 0]}>
+      <mesh material={DARK_METAL}>
+        <boxGeometry args={[w + 0.12, h + 0.12, 0.1]} />
+      </mesh>
+      {[1, -1].map((s) => (
+        <mesh key={s} position={[0, 0, s * 0.055]} rotation={[0, s > 0 ? 0 : Math.PI, 0]}>
+          <planeGeometry args={[w, h]} />
+          <meshBasicMaterial map={texture} toneMapped={false} />
+        </mesh>
+      ))}
+      {[h / 2 - 0.2, -h / 2 + 0.2].map((by) => (
+        <mesh key={by} position={[0.6, by, 0]} material={DARK_METAL}>
+          <boxGeometry args={[0.4, 0.06, 0.06]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Zig-zag iron fire escape: a balcony per floor linked by diagonal stairs. */
+function FireEscape({ x, floors, base }: { x: number; floors: number; base: number }) {
+  const w = 3.4;
+  const levels = Array.from({ length: floors - 1 }, (_, i) => base + GROUND_FLOOR_HEIGHT + i * FLOOR_HEIGHT + 0.6);
+  const stair = Math.hypot(w - 1, FLOOR_HEIGHT);
+  const angle = Math.atan2(FLOOR_HEIGHT, w - 1);
+  return (
+    <group position={[x, 0, 0]}>
+      {levels.map((y, i) => (
+        <group key={i} position={[0, y, 0]}>
+          <mesh position={[0, 0, 0.55]} material={FIRE_ESCAPE}>
+            <boxGeometry args={[w, 0.06, 1.1]} />
+          </mesh>
+          <mesh position={[0, 0.95, 1.1]} material={FIRE_ESCAPE}>
+            <boxGeometry args={[w, 0.05, 0.05]} />
+          </mesh>
+          {[-w / 2, -w / 4, 0, w / 4, w / 2].map((px) => (
+            <mesh key={px} position={[px, 0.48, 1.1]} material={FIRE_ESCAPE}>
+              <boxGeometry args={[0.04, 0.95, 0.04]} />
+            </mesh>
+          ))}
+          {[-w / 2, w / 2].map((px) => (
+            <mesh key={px} position={[px, 0.95, 0.55]} material={FIRE_ESCAPE}>
+              <boxGeometry args={[0.05, 0.05, 1.1]} />
+            </mesh>
+          ))}
+          {i < levels.length - 1 && (
+            <mesh position={[0, FLOOR_HEIGHT / 2, 0.55]} rotation={[0, 0, i % 2 ? angle : -angle]} material={FIRE_ESCAPE}>
+              <boxGeometry args={[stair, 0.08, 0.7]} />
+            </mesh>
+          )}
+        </group>
+      ))}
+      {/* Drop ladder down from the first balcony */}
+      <mesh position={[w / 2 - 0.4, levels[0] - 1.1, 0.9]} material={FIRE_ESCAPE}>
+        <boxGeometry args={[0.5, 2.2, 0.05]} />
       </mesh>
     </group>
   );
@@ -186,6 +254,10 @@ function Building({ b }: { b: BuildingDef }) {
             y={b.zone ? (b.style === "glass" ? 4.5 : b.stoop ? 4.2 : 4.4) : b.awning ? 3.75 : 3.4}
           />
         )}
+        {b.fireEscape && <FireEscape x={-frame.length * 0.22} floors={b.floors} base={0} />}
+        {b.blade && (
+          <BladeSign {...b.blade} x={frame.toLocal(b.blade.at)} y={GROUND_FLOOR_HEIGHT + 2.6} />
+        )}
         {b.style === "glass" && (
           <group position={[doorLocal, 0, 0]}>
             {/* Entrance canopy */}
@@ -203,12 +275,52 @@ function Building({ b }: { b: BuildingDef }) {
   );
 }
 
+/** Window AC units scattered over the street-facing facades (one draw call). */
+function AirConditioners() {
+  const mesh = useMemo(() => {
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const one = new THREE.Vector3(1, 1, 1);
+    const spots: THREE.Matrix4[] = [];
+    let seed = 7;
+    const rand = () => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+    for (const b of BUILDINGS) {
+      if (b.style === "glass" || b.floors < 2) continue;
+      const f = facadeFrame(b);
+      const cols = Math.floor(f.length / 3);
+      for (let floor = 0; floor < b.floors - 1; floor++) {
+        for (let k = 0; k < cols; k++) {
+          if (rand() > 0.16) continue;
+          const lx = -f.length / 2 + (k + 0.5) * 3;
+          const y = SIDEWALK_HEIGHT + GROUND_FLOOR_HEIGHT + floor * FLOOR_HEIGHT + 0.95;
+          // Local facade frame → world
+          const ox = Math.sin(f.rot) * 0.22;
+          const oz = Math.cos(f.rot) * 0.22;
+          const wx = f.x + Math.cos(f.rot) * lx + ox;
+          const wz = f.z - Math.sin(f.rot) * lx + oz;
+          q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), f.rot);
+          spots.push(m.clone().compose(new THREE.Vector3(wx, y, wz), q, one));
+        }
+      }
+    }
+    const inst = new THREE.InstancedMesh(new THREE.BoxGeometry(0.75, 0.45, 0.5), AC_UNIT, spots.length);
+    spots.forEach((mat, i) => inst.setMatrixAt(i, mat));
+    inst.instanceMatrix.needsUpdate = true;
+    return inst;
+  }, []);
+  return <primitive object={mesh} />;
+}
+
 export function Buildings() {
   return (
     <group>
       {BUILDINGS.map((b) => (
         <Building key={b.id} b={b} />
       ))}
+      <AirConditioners />
     </group>
   );
 }

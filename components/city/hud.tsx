@@ -52,37 +52,46 @@ function useCountUp(target: number) {
   return value;
 }
 
-export function Stats({ visited, showAvatar }: { visited: Set<ZoneId>; showAvatar: boolean }) {
+/** Classic top-right block: clock, cash, health, stars and the "weapon" slot (your face). */
+export function Stats({ visited, compact }: { visited: Set<ZoneId>; compact: boolean }) {
   const clock = useGameClock();
   const cash = useCountUp(visited.size * CASH_PER_SECTION);
+  const big = compact ? "text-[24px]" : "text-[34px]";
   return (
     <div className="flex items-start gap-2 md:gap-3">
-      {showAvatar && (
-      <div className="w-16 h-16 shrink-0 border-[3px] border-black bg-[#c9d7e3] overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
-        <Image src="/avatar.webp" alt="" width={64} height={64} className="w-full h-full object-cover" />
-      </div>
-      )}
-      <div className="flex flex-col items-end leading-none font-gta gta-stroke">
-        <span className="text-[22px] md:text-[30px] text-[#f0b53b]">{clock}</span>
-        <span className="text-[22px] md:text-[30px] text-[#7fc76b] tracking-wide">${pad(cash, 8)}</span>
-        <span className="text-[18px] md:text-[24px] text-[#ff7aa8] flex items-center gap-1">
-          <svg viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5" aria-hidden>
-            <path d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.4 2.5.8-1.3 2.3-2.5 4.4-2.5 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z" fill="currentColor" stroke="#000" strokeWidth="1.6" />
+      <div className="flex flex-col items-end leading-[0.95] font-hud gta-stroke tracking-[0.04em]">
+        <span className={`${big} text-[#dcc58e]`}>{clock}</span>
+        <span className={`${big} text-[#8db6e4]`}>${pad(cash, 8)}</span>
+        <span className={`${compact ? "text-[20px]" : "text-[28px]"} text-[#e9a04e] flex items-center gap-1`}>
+          <svg viewBox="0 0 24 24" className={compact ? "w-[18px] h-[18px]" : "w-6 h-6"} aria-hidden>
+            <path d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.4 2.5.8-1.3 2.3-2.5 4.4-2.5 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z" fill="currentColor" stroke="#000" strokeWidth="1.8" />
           </svg>
           100
         </span>
-        <span className="flex gap-0.5 mt-0.5" aria-label={`${visited.size} of ${ZONES.length} sections visited`}>
+        <span className="flex gap-0.5 mt-1" aria-label={`${visited.size} of ${ZONES.length} sections visited`}>
           {ZONES.map((z, i) => (
-            <svg key={z.id} viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5" aria-hidden>
+            <svg key={z.id} viewBox="0 0 24 24" className={compact ? "w-[18px] h-[18px]" : "w-6 h-6"} aria-hidden>
+              {/* Sheriff badge star */}
               <path
-                d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"
-                fill={i < visited.size ? "#f6d04d" : "rgba(0,0,0,0.35)"}
-                stroke="#000"
-                strokeWidth="1.6"
+                d="M12 1.5l2.6 5 5.6-.9-2.2 5.3 3.6 4.1-5.5 1.1-.6 5.6L12 18.6l-3.5 3.1-.6-5.6-5.5-1.1 3.6-4.1-2.2-5.3 5.6.9z"
+                fill={i < visited.size ? "#f2c94c" : "#141414"}
+                stroke={i < visited.size ? "#000" : "#5a5a5a"}
+                strokeWidth="1.4"
               />
             </svg>
           ))}
         </span>
+      </div>
+      <div
+        className={`${compact ? "w-[58px] h-[58px]" : "w-[92px] h-[92px]"} shrink-0 rounded-[6px] border-[3px] border-black bg-[#f2c418] p-[3px] shadow-[0_2px_6px_rgba(0,0,0,0.45)]`}
+      >
+        <Image
+          src="/avatar.webp"
+          alt=""
+          width={92}
+          height={92}
+          className="w-full h-full object-cover rounded-[3px] grayscale-[0.2] contrast-[1.05]"
+        />
       </div>
     </div>
   );

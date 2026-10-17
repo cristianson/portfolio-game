@@ -59,15 +59,37 @@ interface StylePalette {
   brick?: boolean;
 }
 
+// Grimy, slightly desaturated tones of an early-2000s east coast city
 const PALETTES: Record<BuildingStyle, StylePalette> = {
-  brick: { wall: "#8e3b2a", trim: "#d8cbb3", glass: "#2c3e50", brick: true },
-  brownstone: { wall: "#6b3f2a", trim: "#c9a77c", glass: "#25303b", brick: true },
-  concrete: { wall: "#9a9a92", trim: "#c8c8c0", glass: "#34495e" },
-  glass: { wall: "#5f7d95", trim: "#c7d3db", glass: "#7fa6c4" },
-  beige: { wall: "#cdb48e", trim: "#f2e6cf", glass: "#2f3d4a" },
-  teal: { wall: "#4e8a83", trim: "#d8e8e2", glass: "#22343d" },
-  garage: { wall: "#7d7364", trim: "#b3a993", glass: "#2b3640" },
+  brick: { wall: "#7d4a3c", trim: "#b8ad9b", glass: "#26303a", brick: true },
+  brownstone: { wall: "#6e5040", trim: "#b09878", glass: "#222a33", brick: true },
+  concrete: { wall: "#8f8a81", trim: "#b4afa5", glass: "#2b3540" },
+  glass: { wall: "#6c7b86", trim: "#b3bcc2", glass: "#7f97a8" },
+  beige: { wall: "#a89a82", trim: "#cfc6b4", glass: "#29323b" },
+  teal: { wall: "#647d77", trim: "#bcc6c0", glass: "#202c33" },
+  garage: { wall: "#77705f", trim: "#a39b88", glass: "#262f37" },
 };
+
+/** Dirt: rain streaks running down from the sills and darker blotches. */
+function grime(ctx: CanvasRenderingContext2D, w: number, h: number, seed: number, strength = 1) {
+  const r = rng(seed);
+  for (let i = 0; i < 10; i++) {
+    const x = r() * w;
+    const y = r() * h * 0.6;
+    const len = h * (0.2 + r() * 0.5);
+    const g = ctx.createLinearGradient(0, y, 0, y + len);
+    g.addColorStop(0, `rgba(30,24,18,${0.18 * strength})`);
+    g.addColorStop(1, "rgba(30,24,18,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, 1 + r() * 3, len);
+  }
+  for (let i = 0; i < 6; i++) {
+    ctx.fillStyle = `rgba(40,32,24,${0.06 * strength})`;
+    ctx.beginPath();
+    ctx.ellipse(r() * w, r() * h, 4 + r() * 10, 3 + r() * 8, r() * 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
 
 export function paletteFor(style: BuildingStyle) {
   return PALETTES[style];
@@ -124,7 +146,14 @@ export function facadeTexture(style: BuildingStyle) {
       ctx.fillStyle = p.trim;
       ctx.fillRect(31, 16, 2, 34);
       ctx.fillRect(17, 31, 30, 2);
+      // Streaks under the sill
+      const s = ctx.createLinearGradient(0, 54, 0, 64);
+      s.addColorStop(0, "rgba(25,20,15,0.22)");
+      s.addColorStop(1, "rgba(25,20,15,0)");
+      ctx.fillStyle = s;
+      ctx.fillRect(15, 54, 34, 10);
     }
+    grime(ctx, 64, 64, style.length * 13 + 5, style === "glass" ? 0.4 : 1);
     return toTexture(c);
   });
 }
@@ -158,6 +187,13 @@ export function storefrontTexture(style: BuildingStyle) {
       ctx.fillRect(13 + r() * 98, 40 + r() * 8, 4 + r() * 6, 6);
     }
     noise(ctx, 128, 64, 0.06, 99);
+    grime(ctx, 128, 64, style.length * 3 + 1, 0.8);
+    // Dirt kicked up along the pavement
+    const dirt = ctx.createLinearGradient(0, 44, 0, 64);
+    dirt.addColorStop(0, "rgba(40,32,24,0)");
+    dirt.addColorStop(1, "rgba(40,32,24,0.35)");
+    ctx.fillStyle = dirt;
+    ctx.fillRect(0, 44, 128, 20);
     return toTexture(c);
   });
 }
@@ -194,18 +230,18 @@ export function garageDoorTexture() {
 export function roadTexture() {
   return cached("road", () => {
     const [c, ctx] = canvas(256, 256);
-    ctx.fillStyle = "#3d3f42";
+    ctx.fillStyle = "#6c6b66";
     ctx.fillRect(0, 0, 256, 256);
-    noise(ctx, 256, 256, 0.12, 3);
+    noise(ctx, 256, 256, 0.1, 3);
     const r = rng(17);
     for (let i = 0; i < 6; i++) {
-      ctx.fillStyle = "rgba(0,0,0,0.12)";
+      ctx.fillStyle = "rgba(30,28,24,0.14)";
       ctx.beginPath();
       ctx.ellipse(r() * 256, r() * 256, 10 + r() * 30, 6 + r() * 14, r() * 3, 0, Math.PI * 2);
       ctx.fill();
     }
     // Centre double yellow (x = 128 ± 3)
-    ctx.fillStyle = "#e0b532";
+    ctx.fillStyle = "#d6b24a";
     ctx.fillRect(122, 0, 4, 256);
     ctx.fillRect(130, 0, 4, 256);
     // Parking lane edges at ±3m from centre → 128 ± 77
@@ -222,10 +258,11 @@ export function roadTexture() {
 export function sidewalkTexture() {
   return cached("sidewalk", () => {
     const [c, ctx] = canvas(64, 64);
-    ctx.fillStyle = "#a9a59c";
+    ctx.fillStyle = "#c4c1ba";
     ctx.fillRect(0, 0, 64, 64);
-    noise(ctx, 64, 64, 0.12, 8);
-    ctx.fillStyle = "rgba(0,0,0,0.22)";
+    noise(ctx, 64, 64, 0.1, 8);
+    grime(ctx, 64, 64, 21, 0.5);
+    ctx.fillStyle = "rgba(0,0,0,0.12)";
     ctx.fillRect(0, 0, 64, 1);
     ctx.fillRect(0, 0, 1, 64);
     ctx.fillRect(0, 32, 64, 1);
@@ -288,6 +325,39 @@ export function signTexture(text: string, bg: string, fg: string) {
   return { texture: tex, aspect: tex.userData.aspect as number };
 }
 
+/** Vertical "blade" sign hung perpendicular to a facade (letters stacked). */
+export function bladeSignTexture(text: string, bg: string, fg: string) {
+  const key = `blade-${text}-${bg}-${fg}`;
+  const tex = cached(key, () => {
+    const letters = [...text];
+    const cell = 72;
+    const w = 96;
+    const h = letters.length * cell + 24;
+    const [c, ctx] = canvas(w, h);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = fg;
+    ctx.globalAlpha = 0.6;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(8, 8, w - 16, h - 16);
+    ctx.globalAlpha = 1;
+    ctx.font = `900 60px Impact, "Arial Black", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    letters.forEach((l, i) => {
+      const y = 12 + cell * i + cell / 2;
+      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.fillText(l, w / 2 + 3, y + 4);
+      ctx.fillStyle = fg;
+      ctx.fillText(l, w / 2, y);
+    });
+    const t = toTexture(c, false);
+    t.userData.aspect = w / h;
+    return t;
+  });
+  return { texture: tex, aspect: tex.userData.aspect as number };
+}
+
 /** Soft round blob used as a fake shadow under characters & cars. */
 export function blobShadowTexture() {
   return cached("blob", () => {
@@ -320,10 +390,11 @@ export function skyTexture() {
   return cached("sky", () => {
     const [c, ctx] = canvas(4, 256);
     const g = ctx.createLinearGradient(0, 0, 0, 256);
-    g.addColorStop(0, "#5a8fc7");
-    g.addColorStop(0.45, "#9cc0de");
-    g.addColorStop(0.52, "#d9d6c4");
-    g.addColorStop(1, "#d9d6c4");
+    g.addColorStop(0, "#7c9cc2");
+    g.addColorStop(0.35, "#aebfd3");
+    g.addColorStop(0.47, "#d9c3c3");
+    g.addColorStop(0.52, "#d4cbc6");
+    g.addColorStop(1, "#d4cbc6");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 4, 256);
     return toTexture(c, false);

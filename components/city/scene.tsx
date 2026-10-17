@@ -63,7 +63,7 @@ export function Scene({ store, onZoneChange, onReady }: SceneProps) {
   }, [store]);
 
   return (
-    <div ref={wrapper} className="absolute inset-0 touch-none">
+    <div ref={wrapper} className="absolute inset-0 touch-none city-grade">
       <Canvas
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
@@ -74,9 +74,10 @@ export function Scene({ store, onZoneChange, onReady }: SceneProps) {
         }}
       >
         <color attach="background" args={[FOG_COLOR]} />
-        <fog attach="fog" args={[FOG_COLOR, 45, 150]} />
-        <hemisphereLight args={["#eaf1fb", "#8a7a62", 1.9]} />
-        <directionalLight position={[-30, 60, -25]} intensity={1.6} color="#fff1d6" />
+        <fog attach="fog" args={[FOG_COLOR, 30, 130]} />
+        {/* Flat, bright overcast light: lots of ambient, a soft warm sun */}
+        <hemisphereLight args={["#f2eee8", "#9a8f80", 2.3]} />
+        <directionalLight position={[-30, 60, -25]} intensity={1.15} color="#fff0e0" />
         <Sky />
         <Ground />
         <Buildings />

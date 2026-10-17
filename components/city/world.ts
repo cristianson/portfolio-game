@@ -56,6 +56,9 @@ export interface BuildingDef {
   door?: number;
   waterTower?: boolean;
   stoop?: boolean;
+  fireEscape?: boolean;
+  /** Vertical sign sticking out of the facade, at a world position along it. */
+  blade?: SignDef & { at: number };
   zone?: ZoneId;
 }
 
@@ -83,18 +86,18 @@ export const BUILDINGS: BuildingDef[] = [
   // ── East side (facade faces -x) ─────────────────────────────
   { id: "e1", x0: E, x1: E + 12, z0: -50, z1: -34, floors: 2, style: "beige", facing: "-x", sign: { text: "24/7 DELI", bg: "#1d6b3a", fg: "#fff6d5" }, awning: "#1d6b3a", door: -42 },
   { id: "about", x0: E, x1: E + 12, z0: -34, z1: -18, floors: 3, style: "brownstone", facing: "-x", sign: { text: "ABOUT ME", bg: "#2a1a12", fg: "#ff8fc6", width: 5 }, door: -26, stoop: true, zone: "ABOUT" },
-  { id: "e3", x0: E, x1: E + 12, z0: -18, z1: -6, floors: 5, style: "brick", facing: "-x", sign: { text: "LAUNDROMAT", bg: "#1f4e8c", fg: "#ffffff" }, awning: "#c0392b", door: -12, waterTower: true },
+  { id: "e3", x0: E, x1: E + 12, z0: -18, z1: -6, floors: 5, style: "brick", facing: "-x", sign: { text: "LAUNDROMAT", bg: "#1f4e8c", fg: "#ffffff" }, awning: "#c0392b", door: -12, waterTower: true, fireEscape: true, blade: { text: "24HR", bg: "#c0221a", fg: "#ffe14d", at: -17.2 } },
   { id: "case", x0: E, x1: E + 14, z0: -6, z1: 16, floors: 9, style: "glass", facing: "-x", sign: { text: "CASE STUDIES", bg: "#101418", fg: "#ffb020", width: 8 }, door: 5, zone: "CASE_STUDIES" },
   { id: "e5", x0: E, x1: E + 12, z0: 16, z1: 30, floors: 4, style: "teal", facing: "-x", sign: { text: "PIXEL PHARMACY", bg: "#ffffff", fg: "#0a8a5f" }, awning: "#0a8a5f", door: 23 },
-  { id: "e6", x0: E, x1: E + 12, z0: 30, z1: 50, floors: 6, style: "brick", facing: "-x", sign: { text: "HOTEL GRID", bg: "#5a0e0e", fg: "#ffd34d" }, door: 40, waterTower: true },
+  { id: "e6", x0: E, x1: E + 12, z0: 30, z1: 50, floors: 6, style: "brick", facing: "-x", sign: { text: "HOTEL GRID", bg: "#5a0e0e", fg: "#ffd34d" }, door: 40, waterTower: true, fireEscape: true, blade: { text: "HOTEL", bg: "#1d2f4f", fg: "#ff5a5a", at: 33 } },
 
   // ── West side (facade faces +x) ─────────────────────────────
-  { id: "w1", x0: -E - 12, x1: -E, z0: -50, z1: -34, floors: 4, style: "concrete", facing: "+x", sign: { text: "BOOKS & VINYL", bg: "#3b2a6b", fg: "#ffe9a8" }, awning: "#3b2a6b", door: -42, waterTower: true },
+  { id: "w1", x0: -E - 12, x1: -E, z0: -50, z1: -34, floors: 4, style: "concrete", facing: "+x", sign: { text: "BOOKS & VINYL", bg: "#3b2a6b", fg: "#ffe9a8" }, awning: "#3b2a6b", door: -42, waterTower: true, fireEscape: true },
   { id: "w2", x0: -E - 12, x1: -E, z0: -34, z1: -20, floors: 2, style: "beige", facing: "+x", sign: { text: "JOE'S DINER", bg: "#c0392b", fg: "#ffffff" }, awning: "#e74c3c", door: -27 },
   { id: "projects", x0: -E - 12, x1: -E, z0: -20, z1: -4, floors: 2, style: "garage", facing: "+x", sign: { text: "BUILT PROJECTS", bg: "#1b1b1b", fg: "#c58bff", width: 7 }, door: -12, zone: "PROJECTS" },
-  { id: "w4", x0: -E - 12, x1: -E, z0: -4, z1: 14, floors: 7, style: "brick", facing: "+x", sign: { text: "PAPER CO.", bg: "#2c3e50", fg: "#f1c40f" }, door: 5 },
+  { id: "w4", x0: -E - 12, x1: -E, z0: -4, z1: 14, floors: 7, style: "brick", facing: "+x", sign: { text: "PAPER CO.", bg: "#2c3e50", fg: "#f1c40f" }, door: 5, fireEscape: true, blade: { text: "BAR", bg: "#16302a", fg: "#4dffb8", at: 12 } },
   // z 14..30 on the west side is a small park (see PARK)
-  { id: "w6", x0: -E - 12, x1: -E, z0: 30, z1: 50, floors: 5, style: "beige", facing: "+x", sign: { text: "CORNER CAFE", bg: "#6b3e1f", fg: "#fff0d0" }, awning: "#8e5a2e", door: 40 },
+  { id: "w6", x0: -E - 12, x1: -E, z0: 30, z1: 50, floors: 5, style: "beige", facing: "+x", sign: { text: "CORNER CAFE", bg: "#6b3e1f", fg: "#fff0d0" }, awning: "#8e5a2e", door: 40, blade: { text: "CAFE", bg: "#e8d9b0", fg: "#7a1f1f", at: 47 } },
 
   // ── Backdrops closing the street at both ends ───────────────
   { id: "n1", x0: -30, x1: 30, z0: 56, z1: 66, floors: 8, style: "concrete", facing: "-z", waterTower: true },
@@ -112,22 +115,23 @@ export interface CarDef {
   rot: number;
   color: string;
   taxi?: boolean;
+  van?: boolean;
 }
 
 export const PARKED_CARS: CarDef[] = [
-  { x: 3.9, z: -40, rot: Math.PI, color: "#b3261e" },
-  { x: 3.9, z: -18, rot: Math.PI, color: "#f4c20d", taxi: true },
-  { x: 3.9, z: -11, rot: Math.PI, color: "#2b4c7e" },
-  { x: 3.9, z: 20, rot: Math.PI, color: "#e8e8e8" },
+  { x: 3.9, z: -40, rot: Math.PI, color: "#8e3a33" },
+  { x: 3.9, z: -18, rot: Math.PI, color: "#d9b13a", taxi: true },
+  { x: 3.9, z: -11, rot: Math.PI, color: "#4f6a94", van: true },
+  { x: 3.9, z: 20, rot: Math.PI, color: "#cfcbc2", van: true },
   { x: 3.9, z: 33, rot: Math.PI, color: "#3a3a3a" },
-  { x: -3.9, z: -44, rot: 0, color: "#1f6f50" },
-  { x: -3.9, z: -24, rot: 0, color: "#d35400" },
-  { x: -3.9, z: 0, rot: 0, color: "#f4c20d", taxi: true },
-  { x: -3.9, z: 9, rot: 0, color: "#6c3483" },
-  { x: -3.9, z: 38, rot: 0, color: "#7f8c8d" },
+  { x: -3.9, z: -44, rot: 0, color: "#3f6b5c" },
+  { x: -3.9, z: -24, rot: 0, color: "#b8a9a6" },
+  { x: -3.9, z: 0, rot: 0, color: "#d9b13a", taxi: true },
+  { x: -3.9, z: 9, rot: 0, color: "#5a7d86" },
+  { x: -3.9, z: 38, rot: 0, color: "#7d5a6e" },
 ];
 
-export type PropKind = "lamp" | "hydrant" | "tree" | "bench" | "trash" | "booth" | "newsbox" | "barrier" | "mailbox";
+export type PropKind = "signal" | "lamp" | "hydrant" | "tree" | "bench" | "trash" | "booth" | "newsbox" | "barrier" | "mailbox";
 
 export interface PropDef {
   kind: PropKind;
@@ -141,6 +145,10 @@ const lampZs = [-42, -30, -16, -2, 12, 28, 44];
 export const PROPS: PropDef[] = [
   ...lampZs.map((z) => ({ kind: "lamp" as const, x: 5.45, z, rot: Math.PI })),
   ...lampZs.filter((z) => z < 40).map((z) => ({ kind: "lamp" as const, x: -5.45, z: z + 6, rot: 0 })),
+  { kind: "signal", x: 5.45, z: -6.9 },
+  { kind: "signal", x: -5.45, z: -3.1 },
+  { kind: "signal", x: 5.45, z: 25.1 },
+  { kind: "signal", x: -5.45, z: 28.9 },
   { kind: "tree", x: 5.9, z: -36 },
   { kind: "tree", x: 5.9, z: -6 },
   { kind: "tree", x: 5.9, z: 25 },
@@ -201,6 +209,7 @@ export interface Box2 {
 
 const PROP_RADIUS: Partial<Record<PropKind, number>> = {
   lamp: 0.18,
+  signal: 0.18,
   hydrant: 0.25,
   tree: 0.3,
   trash: 0.35,

@@ -24,6 +24,8 @@ export interface Look {
   mustache?: boolean;
   glasses?: boolean;
   cap?: string;
+  /** Cargo pants with thigh pockets. */
+  cargo?: boolean;
 }
 
 export interface Motion {
@@ -33,24 +35,46 @@ export interface Motion {
 
 /** Cristian: brunet, mustache, glasses. Tweak freely. */
 export const PLAYER_LOOK: Look = {
-  skin: "#e0ac85",
-  hair: "#3a2619",
+  skin: "#d9a582",
+  hair: "#2e1f15",
   hairStyle: "short",
-  shirt: "#f2f2ee",
-  jacket: "#2d3640",
-  pants: "#3c5a82",
-  shoes: "#f5f5f5",
+  shirt: "#3b3b3d",
+  jacket: "#1d1d20",
+  pants: "#5d6243",
+  shoes: "#2a2520",
   mustache: true,
   glasses: true,
+  cargo: true,
 };
 
 export const PEDESTRIAN_LOOKS: Look[] = [
-  { skin: "#8d5a3b", hair: "#111111", hairStyle: "short", shirt: "#c0392b", pants: "#2b2b2b", shoes: "#222222" },
-  { skin: "#f1c7a5", hair: "#d9b26a", hairStyle: "long", shirt: "#7d5ba6", jacket: "#e8e1d0", pants: "#4b4b6b", shoes: "#5a3b22" },
-  { skin: "#c58c62", hair: "#2a1a10", hairStyle: "cap", cap: "#1f6f50", shirt: "#f4c20d", pants: "#56606b", shoes: "#ffffff" },
-  { skin: "#e8b896", hair: "#7a7a7a", hairStyle: "bald", shirt: "#4a6d8c", jacket: "#5b4636", pants: "#2e2e2e", shoes: "#151515", glasses: true },
-  { skin: "#6b4429", hair: "#0d0d0d", hairStyle: "long", shirt: "#e67e22", pants: "#1d3557", shoes: "#e5e5e5" },
+  { skin: "#8d5a3b", hair: "#111111", hairStyle: "short", shirt: "#8e3a33", jacket: "#2b2b2b", pants: "#2b2b2b", shoes: "#222222" },
+  { skin: "#f1c7a5", hair: "#c9a76a", hairStyle: "long", shirt: "#6c5a80", jacket: "#5a3a2e", pants: "#3e3e4e", shoes: "#3a2a1c" },
+  { skin: "#c58c62", hair: "#2a1a10", hairStyle: "cap", cap: "#8a8a86", shirt: "#7f7f7a", jacket: "#6e6e6a", pants: "#6e6e6a", shoes: "#c9c2b0" },
+  { skin: "#e8b896", hair: "#7a7a7a", hairStyle: "bald", shirt: "#4a5d70", jacket: "#5b4636", pants: "#2e2e2e", shoes: "#151515", glasses: true },
+  { skin: "#6b4429", hair: "#0d0d0d", hairStyle: "cap", cap: "#7a2a7a", shirt: "#7a2a7a", jacket: "#7a2a7a", pants: "#7a2a7a", shoes: "#1a1a1a" },
 ];
+
+const taperCache = new Map<string, THREE.BufferGeometry>();
+
+/** Box that is wider at the top than at the bottom (shoulders, thighs, forearms). */
+function taper(wTop: number, wBottom: number, h: number, dTop: number, dBottom: number) {
+  const key = [wTop, wBottom, h, dTop, dBottom].join();
+  let geo = taperCache.get(key);
+  if (!geo) {
+    geo = new THREE.BoxGeometry(wTop, h, dTop);
+    const pos = geo.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      if (pos.getY(i) < 0) {
+        pos.setX(i, pos.getX(i) * (wBottom / wTop));
+        pos.setZ(i, pos.getZ(i) * (dBottom / dTop));
+      }
+    }
+    geo.computeVertexNormals();
+    taperCache.set(key, geo);
+  }
+  return geo;
+}
 
 function useMats(look: Look) {
   return useMemo(() => {
@@ -106,9 +130,12 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
           [legR, 0.12],
         ].map(([ref, x]) => (
           <group key={x as number} ref={ref as React.RefObject<THREE.Group>} position={[x as number, 0.9, 0]}>
-            <mesh position={[0, -0.42, 0]} material={mats.pants}>
-              <boxGeometry args={[0.2, 0.84, 0.24]} />
-            </mesh>
+            <mesh position={[0, -0.42, 0]} material={mats.pants} geometry={taper(0.23, 0.18, 0.84, 0.26, 0.21)} />
+            {look.cargo && (
+              <mesh position={[x as number > 0 ? 0.115 : -0.115, -0.38, 0.01]} material={mats.pants}>
+                <boxGeometry args={[0.05, 0.2, 0.16]} />
+              </mesh>
+            )}
             <mesh position={[0, -0.84, 0.05]} material={mats.shoes}>
               <boxGeometry args={[0.22, 0.12, 0.34]} />
             </mesh>
@@ -116,17 +143,22 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
         ))}
 
         {/* Torso */}
-        <mesh position={[0, 1.2, 0]} material={torso}>
-          <boxGeometry args={[0.5, 0.62, 0.28]} />
-        </mesh>
+        <mesh position={[0, 1.2, 0]} material={torso} geometry={taper(0.58, 0.44, 0.62, 0.31, 0.26)} />
         {look.jacket && (
-          <mesh position={[0, 1.22, 0.142]} material={mats.shirt}>
-            <boxGeometry args={[0.16, 0.56, 0.01]} />
-          </mesh>
+          <>
+            <mesh position={[0, 1.27, 0.15]} material={mats.shirt} geometry={taper(0.16, 0.1, 0.42, 0.01, 0.01)} />
+            {/* Collar + hem */}
+            <mesh position={[0, 1.52, -0.02]} material={mats.jacket}>
+              <boxGeometry args={[0.36, 0.08, 0.3]} />
+            </mesh>
+            <mesh position={[0, 0.93, 0]} material={mats.jacket}>
+              <boxGeometry args={[0.47, 0.08, 0.29]} />
+            </mesh>
+          </>
         )}
-        {/* Belt */}
-        <mesh position={[0, 0.92, 0]} material={mats.dark}>
-          <boxGeometry args={[0.46, 0.06, 0.26]} />
+        {/* Belt / hips */}
+        <mesh position={[0, 0.88, 0]} material={look.jacket ? mats.pants : mats.dark}>
+          <boxGeometry args={[0.44, 0.1, 0.25]} />
         </mesh>
 
         {/* Arms (pivot at shoulder) */}
@@ -134,12 +166,10 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
           [armL, -0.33],
           [armR, 0.33],
         ].map(([ref, x]) => (
-          <group key={x as number} ref={ref as React.RefObject<THREE.Group>} position={[x as number, 1.47, 0]}>
-            <mesh position={[0, -0.28, 0]} material={torso}>
-              <boxGeometry args={[0.15, 0.58, 0.17]} />
-            </mesh>
-            <mesh position={[0, -0.63, 0]} material={mats.skin}>
-              <boxGeometry args={[0.12, 0.13, 0.13]} />
+          <group key={x as number} ref={ref as React.RefObject<THREE.Group>} position={[(x as number) * 1.04, 1.46, 0]}>
+            <mesh position={[0, -0.28, 0]} material={torso} geometry={taper(0.18, 0.13, 0.58, 0.19, 0.15)} />
+            <mesh position={[0, -0.63, 0.01]} material={mats.skin}>
+              <boxGeometry args={[0.11, 0.14, 0.13]} />
             </mesh>
           </group>
         ))}

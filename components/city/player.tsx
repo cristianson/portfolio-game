@@ -110,8 +110,9 @@ export function Player({ store, onZoneChange }: PlayerProps) {
         const follow = Math.max(0, Math.cos(diff)) * (p.speed / RUN_SPEED);
         store.camYaw += diff * Math.min(1, dt * 1.6 * follow);
       }
-      const dist = portrait ? 6.6 : 5.6;
-      const height = portrait ? 3.1 : 2.5;
+      // High-ish chase cam looking down at the player, like the reference
+      const dist = portrait ? 6.8 : 6.0;
+      const height = portrait ? 3.6 : 3.1;
       const bx = p.x - Math.sin(store.camYaw) * dist;
       const bz = p.z - Math.cos(store.camYaw) * dist;
       const hit = segmentHit(p.x, p.z, bx, bz, COLLIDERS);
@@ -124,7 +125,10 @@ export function Player({ store, onZoneChange }: PlayerProps) {
         const have = Math.hypot(camPos.current.x - p.x, camPos.current.z - p.z);
         if (have > want) camPos.current.copy(tmp.current);
       }
-      lookAt.current.lerp(tmp.current.set(p.x, g.position.y + 1.45, p.z), 1 - Math.exp(-dt * 14));
+      lookAt.current.lerp(
+        tmp.current.set(p.x + Math.sin(store.camYaw) * 1.2, g.position.y + 1.5, p.z + Math.cos(store.camYaw) * 1.2),
+        1 - Math.exp(-dt * 14)
+      );
     }
     camera.position.copy(camPos.current);
     camera.lookAt(lookAt.current);

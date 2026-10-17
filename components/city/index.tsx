@@ -241,15 +241,15 @@ export default function DesignDistrict() {
             <div>{compact ? <Radar store={store} className="w-[92px] h-[92px]" /> : <HelpBox>{help}</HelpBox>}</div>
             <button
               onClick={() => setPhase("menu")}
-              className={`pointer-events-auto absolute top-[max(12px,env(safe-area-inset-top))] bg-black/70 text-white font-gta text-[15px] tracking-wider px-3 py-1 border-2 border-black hover:text-[#f0b53b] ${compact ? "left-[116px]" : "left-1/2 -translate-x-1/2"}`}
+              className={`pointer-events-auto absolute bg-black/70 text-white font-gta text-[15px] tracking-wider px-3 py-1 border-2 border-black hover:text-[#f0b53b] ${compact ? "left-3 top-[calc(max(12px,env(safe-area-inset-top))+100px)]" : "left-1/2 -translate-x-1/2 top-[max(12px,env(safe-area-inset-top))]"}`}
             >
               {compact ? "MENU" : "ESC · MENU"}
             </button>
-            <Stats visited={visited} showAvatar={!compact} />
+            <Stats visited={visited} compact={compact} />
           </div>
 
           {compact && help && (
-            <div className="absolute left-3 right-3 top-[calc(max(12px,env(safe-area-inset-top))+104px)]">
+            <div className="absolute left-3 right-3 top-[calc(max(12px,env(safe-area-inset-top))+140px)]">
               <HelpBox>{help}</HelpBox>
             </div>
           )}

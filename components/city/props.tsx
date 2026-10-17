@@ -40,6 +40,10 @@ const M = {
   chrome: mat("#5a5d61"),
   headlight: new THREE.MeshBasicMaterial({ color: "#fffbe6" }),
   taillight: new THREE.MeshBasicMaterial({ color: "#c0221a" }),
+  signalPole: mat("#4a4c4a"),
+  signalBox: mat("#c9a227"),
+  lightRed: new THREE.MeshBasicMaterial({ color: "#ff3b2e" }),
+  lightOff: mat("#3a3a30"),
   shadow: new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false }),
 };
 
@@ -78,6 +82,44 @@ function Lamp({ x }: { x: number }) {
       </mesh>
       <mesh position={[dir * 1.55, 5.75, 0]} material={M.lampGlass}>
         <boxGeometry args={[0.55, 0.04, 0.25]} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Traffic light on a mast arm reaching over the road, GTA 3 street-corner style. */
+function Signal({ x, z }: { x: number; z: number }) {
+  const dir = x > 0 ? -1 : 1;
+  // Face the traffic approaching this side of the crosswalk
+  const face = z < -5 || (z > 20 && z < 27) ? Math.PI : 0;
+  const head = (
+    <group>
+      <mesh material={M.signalBox}>
+        <boxGeometry args={[0.36, 1.0, 0.3]} />
+      </mesh>
+      {[0.3, 0, -0.3].map((y, i) => (
+        <mesh key={y} position={[0, y, 0.16]} material={i === 0 ? M.lightRed : M.lightOff}>
+          <circleGeometry args={[0.11, 10]} />
+        </mesh>
+      ))}
+    </group>
+  );
+  return (
+    <group>
+      <mesh position={[0, 2.9, 0]} material={M.signalPole}>
+        <cylinderGeometry args={[0.09, 0.12, 5.8, 8]} />
+      </mesh>
+      <mesh position={[dir * 2.6, 5.5, 0]} rotation={[0, 0, Math.PI / 2]} material={M.signalPole}>
+        <cylinderGeometry args={[0.06, 0.08, 5.2, 6]} />
+      </mesh>
+      <group rotation={[0, face, 0]}>
+        <group position={[dir * (face ? -1 : 1) * 2.4, 4.95, 0]}>{head}</group>
+        <group position={[dir * (face ? -1 : 1) * 4.6, 4.95, 0]}>{head}</group>
+        <group position={[0, 3.0, 0.2]} scale={0.7}>{head}</group>
+      </group>
+      {/* Pedestrian signal */}
+      <mesh position={[dir * -0.25, 2.6, 0]} material={M.signalBox}>
+        <boxGeometry args={[0.3, 0.35, 0.3]} />
       </mesh>
     </group>
   );
@@ -238,6 +280,9 @@ function Prop({ p }: { p: PropDef }) {
     case "lamp":
       node = <Lamp x={p.x} />;
       break;
+    case "signal":
+      node = <Signal x={p.x} z={p.z} />;
+      break;
     case "hydrant":
       node = <Hydrant />;
       break;
@@ -264,7 +309,7 @@ function Prop({ p }: { p: PropDef }) {
       break;
   }
   const y = Math.abs(p.x) > 5 ? SIDEWALK_HEIGHT : 0;
-  const rot = p.kind === "barrier" ? (p.z > 0 ? Math.PI : 0) : p.kind === "lamp" ? 0 : p.rot ?? 0;
+  const rot = p.kind === "barrier" ? (p.z > 0 ? Math.PI : 0) : p.kind === "lamp" || p.kind === "signal" ? 0 : p.rot ?? 0;
   return (
     <group position={[p.x, y, p.z]} rotation={[0, rot, 0]}>
       {node}
@@ -282,7 +327,60 @@ function bodyMat(color: string) {
   return m;
 }
 
+function Van({ c }: { c: CarDef }) {
+  const body = bodyMat(c.color);
+  return (
+    <group position={[c.x, 0, c.z]} rotation={[0, c.rot, 0]}>
+      <BlobShadow w={2.5} d={5.4} />
+      <mesh position={[0, 1.25, -0.25]} material={body}>
+        <boxGeometry args={[1.95, 1.75, 4.0]} />
+      </mesh>
+      {/* Sloped nose */}
+      <mesh position={[0, 0.85, 1.95]} material={body}>
+        <boxGeometry args={[1.9, 0.9, 0.9]} />
+      </mesh>
+      <mesh position={[0, 1.55, 1.72]} rotation={[-0.5, 0, 0]} material={M.glass}>
+        <boxGeometry args={[1.75, 0.8, 0.06]} />
+      </mesh>
+      {/* Side windows strip */}
+      {[-0.98, 0.98].map((x) => (
+        <mesh key={x} position={[x, 1.6, 0.1]} material={M.glass}>
+          <boxGeometry args={[0.02, 0.5, 2.6]} />
+        </mesh>
+      ))}
+      {[2.42, -2.28].map((z) => (
+        <mesh key={z} position={[0, 0.45, z]} material={M.chrome}>
+          <boxGeometry args={[1.98, 0.2, 0.12]} />
+        </mesh>
+      ))}
+      {[-0.65, 0.65].map((x) => (
+        <group key={x}>
+          <mesh position={[x, 0.85, 2.41]} material={M.headlight}>
+            <boxGeometry args={[0.32, 0.18, 0.04]} />
+          </mesh>
+          <mesh position={[x, 0.95, -2.27]} material={M.taillight}>
+            <boxGeometry args={[0.2, 0.3, 0.04]} />
+          </mesh>
+        </group>
+      ))}
+      {[-0.88, 0.88].flatMap((x) =>
+        [1.55, -1.45].map((z) => (
+          <group key={`${x}${z}`} position={[x, 0.38, z]} rotation={[0, 0, Math.PI / 2]}>
+            <mesh material={M.tire}>
+              <cylinderGeometry args={[0.38, 0.38, 0.26, 12]} />
+            </mesh>
+            <mesh position={[0, x > 0 ? 0.135 : -0.135, 0]} material={M.rim}>
+              <cylinderGeometry args={[0.2, 0.2, 0.02, 8]} />
+            </mesh>
+          </group>
+        ))
+      )}
+    </group>
+  );
+}
+
 export function Car({ c }: { c: CarDef }) {
+  if (c.van) return <Van c={c} />;
   const body = bodyMat(c.color);
   const taxi = c.taxi ? signTexture("TAXI", "#111111", "#f4c20d") : null;
   return (

@@ -71,12 +71,13 @@ export function Radar({ store, className = "" }: { store: GameStore; className?:
       </defs>
       <circle r="98" fill="#0d0d0d" />
       <g clipPath="url(#radar-clip)">
-        <circle r="96" fill="#1b2a38" />
+        {/* Classic palette: yellow city blocks, dark streets */}
+        <circle r="96" fill="#5c5544" />
         <g ref={map}>
-          <rect x={-40} y={-70} width={80} height={140} fill="#56606a" />
-          <rect x={PARK.x0} y={PARK.z0} width={PARK.x1 - PARK.x0} height={PARK.z1 - PARK.z0} fill="#3f6f3a" />
-          <rect x={-SIDEWALK_OUTER} y={-56} width={SIDEWALK_OUTER * 2} height={112} fill="#7b838b" />
-          <rect x={-ROAD_HALF} y={-56} width={ROAD_HALF * 2} height={112} fill="#a7adb3" />
+          <rect x={-40} y={-70} width={80} height={140} fill="#e6b84f" />
+          <rect x={PARK.x0} y={PARK.z0} width={PARK.x1 - PARK.x0} height={PARK.z1 - PARK.z0} fill="#9fb052" />
+          <rect x={-SIDEWALK_OUTER} y={-56} width={SIDEWALK_OUTER * 2} height={112} fill="#8a7d5c" />
+          <rect x={-ROAD_HALF} y={-56} width={ROAD_HALF * 2} height={112} fill="#5c5544" />
           {BUILDINGS.map((b) => {
             const zone = ZONES.find((z) => z.id === b.zone);
             return (
@@ -86,8 +87,10 @@ export function Radar({ store, className = "" }: { store: GameStore; className?:
                 y={b.z0 + 0.3}
                 width={b.x1 - b.x0 - 0.6}
                 height={b.z1 - b.z0 - 0.6}
-                fill={zone ? zone.color : "#2c343c"}
-                fillOpacity={zone ? 0.45 : 1}
+                fill={zone ? zone.color : "#e6b84f"}
+                fillOpacity={zone ? 0.55 : 1}
+                stroke="#a9802e"
+                strokeWidth={0.5}
               />
             );
           })}
@@ -100,12 +103,11 @@ export function Radar({ store, className = "" }: { store: GameStore; className?:
             </text>
           </g>
         ))}
-        <polygon ref={arrow} points="0,-10 7,8 0,4 -7,8" fill="#ffffff" stroke="#000" strokeWidth={2} />
+        <polygon ref={arrow} points="0,-11 7,7 0,3 -7,7" fill="#ffffff" stroke="#000" strokeWidth={2} />
       </g>
-      <circle r="97" fill="none" stroke="#000" strokeWidth={4} />
-      <circle r="94" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={1.5} />
+      <circle r="96" fill="none" stroke="#000" strokeWidth={7} />
       <g ref={north}>
-        <circle r={9} fill="#0d0d0d" stroke="#fff" strokeWidth={1.5} />
+        <circle r={10} fill="#0d0d0d" />
         <text y={5} textAnchor="middle" fontSize={13} fontWeight={900} fill="#fff" fontFamily="Arial Black, Arial, sans-serif">
           N
         </text>

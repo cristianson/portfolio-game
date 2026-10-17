@@ -20,10 +20,10 @@ import {
   skyTexture,
 } from "./textures";
 
-export const FOG_COLOR = "#d9d6c4";
+export const FOG_COLOR = "#d4cbc6";
 
 const LENGTH = 112;
-const CURB = new THREE.MeshLambertMaterial({ color: "#8f8b83" });
+const CURB = new THREE.MeshLambertMaterial({ color: "#a8a49b" });
 
 function Sidewalk({ side }: { side: 1 | -1 }) {
   const w = SIDEWALK_OUTER - ROAD_HALF;
@@ -93,7 +93,7 @@ export function Ground() {
       {/* Base plane far below everything so no gaps show */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <planeGeometry args={[400, 400]} />
-        <meshLambertMaterial color="#6e6c64" />
+        <meshLambertMaterial color="#8a877f" />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={roadMat}>
         <planeGeometry args={[ROAD_HALF * 2, LENGTH]} />
