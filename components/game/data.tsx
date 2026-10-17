@@ -97,6 +97,23 @@ export const ZONE_CONTENT = {
       body: (
         <div className="grid gap-6">
           <div className="border-2 border-black p-4 bg-white text-black">
+            <h3 className="text-pixel-lg mb-2">Draw a Run</h3>
+            <p className="text-mono-base leading-relaxed">
+              Draw a shape or pick one from the list, and the app finds
+              runnable routes on real streets that trace it at the distance
+              you want. Routes export as GPX for Strava, Garmin, Coros or any
+              sport watch.
+            </p>
+            <a
+              href="https://drawarun.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary mt-6"
+            >
+              Visit Draw a Run &gt;
+            </a>
+          </div>
+          <div className="border-2 border-black p-4 bg-white text-black">
             <h3 className="text-pixel-lg mb-2">Airbnb Listing Comparer</h3>
             <p className="text-mono-base leading-relaxed">
               An AI-powered Chrome extension that helps travelers compare and

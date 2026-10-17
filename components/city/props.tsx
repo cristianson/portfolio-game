@@ -233,9 +233,9 @@ function PhoneBooth() {
       <mesh position={[0, 2.45, 0]} material={M.boothFrame}>
         <boxGeometry args={[1.15, 0.3, 1.15]} />
       </mesh>
-      <mesh position={[0, 2.45, 0.58]}>
+      <mesh position={[0, 2.45, 0.6]}>
         <planeGeometry args={[0.3 * aspect * 0.8, 0.24]} />
-        <meshBasicMaterial map={texture} toneMapped={false} />
+        <meshBasicMaterial map={texture} toneMapped={false} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
       </mesh>
       {/* The phone itself */}
       <mesh position={[0, 1.35, -0.4]} material={M.iron}>
@@ -267,7 +267,7 @@ function Barrier({ sign }: { sign: boolean }) {
       {closed && (
         <mesh position={[0, 1.45, 0.04]}>
           <planeGeometry args={[0.55 * closed.aspect, 0.55]} />
-          <meshBasicMaterial map={closed.texture} toneMapped={false} side={THREE.DoubleSide} />
+          <meshBasicMaterial map={closed.texture} toneMapped={false} side={THREE.DoubleSide} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
       )}
     </group>
@@ -442,9 +442,9 @@ export function Car({ c }: { c: CarDef }) {
             <boxGeometry args={[0.7, 0.22, 0.3]} />
           </mesh>
           {[0.16, -0.16].map((z) => (
-            <mesh key={z} position={[0, 0, z]} rotation={[0, z > 0 ? 0 : Math.PI, 0]}>
+            <mesh key={z} position={[0, 0, z * 1.1]} rotation={[0, z > 0 ? 0 : Math.PI, 0]}>
               <planeGeometry args={[0.66, 0.66 / taxi.aspect]} />
-              <meshBasicMaterial map={taxi.texture} toneMapped={false} />
+              <meshBasicMaterial map={taxi.texture} toneMapped={false} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
             </mesh>
           ))}
         </group>

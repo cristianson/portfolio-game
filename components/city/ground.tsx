@@ -99,13 +99,13 @@ export function Ground() {
         <planeGeometry args={[ROAD_HALF * 2, LENGTH]} />
       </mesh>
       {[-5, 27].map((z) => (
-        <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, z]}>
+        <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, z]}>
           <planeGeometry args={[ROAD_HALF * 2, 3]} />
-          <meshLambertMaterial map={crosswalkTexture()} transparent depthWrite={false} />
+          <meshLambertMaterial map={crosswalkTexture()} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       ))}
       {[-20, 14].map((z) => (
-        <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[1.6, 0.012, z]}>
+        <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[1.6, 0.02, z]}>
           <circleGeometry args={[0.45, 12]} />
           <meshLambertMaterial color="#2a2b2d" />
         </mesh>

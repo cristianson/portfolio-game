@@ -41,14 +41,15 @@ function Sign({ text, bg, fg, width, y, x = 0 }: { text: string; bg: string; fg:
   const h = width ? width / aspect : 0.8;
   const w = width ?? 0.8 * aspect;
   return (
-    <group position={[x, y, 0.2]}>
-      <mesh position={[0, 0, -0.05]}>
-        <boxGeometry args={[w + 0.15, h + 0.15, 0.1]} />
+    <group position={[x, y, 0.35]}>
+      {/* Backing box sits well behind the face so the two never z-fight on mobile GPUs */}
+      <mesh position={[0, 0, -0.12]}>
+        <boxGeometry args={[w + 0.15, h + 0.15, 0.12]} />
         <meshLambertMaterial color="#1b1b1b" />
       </mesh>
-      <mesh>
+      <mesh renderOrder={1}>
         <planeGeometry args={[w, h]} />
-        <meshBasicMaterial map={texture} toneMapped={false} />
+        <meshBasicMaterial map={texture} toneMapped={false} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
       </mesh>
     </group>
   );
@@ -61,12 +62,12 @@ function BladeSign({ text, bg, fg, x, y }: { text: string; bg: string; fg: strin
   return (
     <group position={[x, y, 0.95]} rotation={[0, Math.PI / 2, 0]}>
       <mesh material={DARK_METAL}>
-        <boxGeometry args={[w + 0.12, h + 0.12, 0.1]} />
+        <boxGeometry args={[w + 0.12, h + 0.12, 0.06]} />
       </mesh>
       {[1, -1].map((s) => (
-        <mesh key={s} position={[0, 0, s * 0.055]} rotation={[0, s > 0 ? 0 : Math.PI, 0]}>
+        <mesh key={s} position={[0, 0, s * 0.08]} rotation={[0, s > 0 ? 0 : Math.PI, 0]}>
           <planeGeometry args={[w, h]} />
-          <meshBasicMaterial map={texture} toneMapped={false} />
+          <meshBasicMaterial map={texture} toneMapped={false} polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2} />
         </mesh>
       ))}
       {[h / 2 - 0.2, -h / 2 + 0.2].map((by) => (
@@ -291,7 +292,8 @@ function AirConditioners() {
       if (b.style === "glass" || b.floors < 2) continue;
       const f = facadeFrame(b);
       const cols = Math.floor(f.length / 3);
-      for (let floor = 0; floor < b.floors - 1; floor++) {
+      // Start one floor up: the first upper floor carries the shop & section signs
+      for (let floor = 1; floor < b.floors - 1; floor++) {
         for (let k = 0; k < cols; k++) {
           if (rand() > 0.16) continue;
           const lx = -f.length / 2 + (k + 0.5) * 3;

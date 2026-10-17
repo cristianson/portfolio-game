@@ -67,7 +67,7 @@ export function Scene({ store, onZoneChange, onReady }: SceneProps) {
       <Canvas
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
-        camera={{ fov: 55, near: 0.1, far: 400, position: [0, 8, -48] }}
+        camera={{ fov: 55, near: 0.3, far: 400, position: [0, 8, -48] }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.NoToneMapping;
           onReady();
