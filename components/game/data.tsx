@@ -1,15 +1,22 @@
 /**
  * Game Data & Content
  *
- * This file contains the static content for the portfolio game.
- * It defines the text, images, links, and specific configuration for each interaction zone (About, Projects, etc.).
- * It serves as the content management file for the game.
+ * This file defines how each interaction zone (About, Projects, etc.) looks in the 2D game:
+ * labels, colors, icons and the JSX for each modal. The text and links themselves live in
+ * content.ts, which the 3D version reads too.
  */
 
 import React from "react";
 import Image from "next/image";
 import { JobEntry } from "./job-entry";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "./icons";
+import { ABOUT_PARAGRAPHS, CASE_STUDIES, JOBS, PROJECTS, SOCIALS, SOCIALS_INTRO } from "./content";
+
+const SOCIAL_STYLE: Record<string, { icon: React.ReactNode; bg: string; hover: string }> = {
+  LinkedIn: { icon: <LinkedinIcon size={24} />, bg: "bg-[#0077b5]", hover: "hover:bg-blue-50" },
+  "Twitter(X)": { icon: <TwitterIcon size={24} />, bg: "bg-black", hover: "hover:bg-gray-50" },
+  GitHub: { icon: <GithubIcon size={24} />, bg: "bg-[#333]", hover: "hover:bg-gray-50" },
+};
 
 export const ZONE_CONTENT = {
   ABOUT: {
@@ -33,54 +40,25 @@ export const ZONE_CONTENT = {
                 />
               </div>
               <div className="space-y-4">
-                <p className="text-mono-base leading-relaxed">
-                  I'm a product designer who loves building thoughtful digital
-                  experiences, building design, AI and code.
-                </p>
-                <p className="text-mono-base leading-relaxed">
-                  I've been designing for the past 5 years and worked with AI
-                  startups, fintech, and B2B SaaS companies.
-                </p>
+                {ABOUT_PARAGRAPHS.map((text) => (
+                  <p key={text} className="text-mono-base leading-relaxed">
+                    {text}
+                  </p>
+                ))}
               </div>
             </div>
 
             {/* Timeline Section */}
             <div className="w-full pt-6 mt-2 border-t-4 border-dashed border-black/10">
               <div className="space-y-8">
-                <JobEntry
-                  title="Founding Product Designer"
-                  period="Dec 2025 – Present"
-                  company="Lette AI"
-                  url="https://www.lette.ai/"
-                  description="A solution for orchestrating AI agents that streamline property management operations, from leasing, maintenance, tenant support and more."
-                  isCurrent={true}
-                  isFirst={true}
-                />
-
-                <JobEntry
-                  title="Product Design Lead"
-                  period="Aug 2024 - Jul 2025"
-                  company="FULLY AI (Acquired by Circus Group)"
-                  url="https://www.gofully.ai/"
-                  description="A no-code multi-agent platform to create brand-ready AI agents embedded in your product that learn, adapt, and improve across every stage of the customer lifecycle."
-                />
-
-                <JobEntry
-                  title="Product Designer"
-                  period="Feb 2023 - Mar 2024"
-                  company="Spoke.ai (Acquired by Slack)"
-                  url="https://www.spoke.ai/"
-                  description="An AI inbox that centralizes notifications from Slack and other work tools, summarizes them, prioritizes tasks, and suggests next actions."
-                />
-
-                <JobEntry
-                  title="Product Designer"
-                  period="Oct 2021 - Jan 2023"
-                  company="Sortlist"
-                  url="https://www.sortlist.com/"
-                  description="A matchmaking B2B SaaS platform that allows companies to find the most relevant digital agencies for their projects."
-                  isLast={true}
-                />
+                {JOBS.map((job, i) => (
+                  <JobEntry
+                    key={job.company}
+                    {...job}
+                    isFirst={i === 0}
+                    isLast={i === JOBS.length - 1}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -96,57 +74,20 @@ export const ZONE_CONTENT = {
       title: "Built Projects",
       body: (
         <div className="grid gap-6">
-          <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-pixel-lg mb-2">Draw a Run</h3>
-            <p className="text-mono-base leading-relaxed">
-              Draw a shape or pick one from the list, and the app finds
-              runnable routes on real streets that trace it at the distance
-              you want. Routes export as GPX for Strava, Garmin, Coros or any
-              sport watch.
-            </p>
-            <a
-              href="https://drawarun.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary mt-6"
-            >
-              Visit Draw a Run &gt;
-            </a>
-          </div>
-          <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-pixel-lg mb-2">Airbnb Listing Comparer</h3>
-            <p className="text-mono-base leading-relaxed">
-              An AI-powered Chrome extension that helps travelers compare and
-              decide on the most relevant Airbnb listings, saving their time and
-              reducing decision fatigue.
-            </p>
-            <a
-              href="https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary mt-6"
-            >
-              View Extension &gt;
-            </a>
-          </div>
-          <div className="border-2 border-black p-4 bg-white text-black">
-            <h3 className="text-pixel-lg mb-2">
-              Public Transport Ticket Gallery
-            </h3>
-            <p className="text-mono-base leading-relaxed">
-              A minimal website where I collect public transport tickets from
-              places I visited. It's designed as a playground for myself to
-              experiment with UI, motion, and front-end craft.
-            </p>
-            <a
-              href="https://tickets-phi-one.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary mt-6"
-            >
-              Visit Ticket Gallery &gt;
-            </a>
-          </div>
+          {PROJECTS.map((project) => (
+            <div key={project.title} className="border-2 border-black p-4 bg-white text-black">
+              <h3 className="text-pixel-lg mb-2">{project.title}</h3>
+              <p className="text-mono-base leading-relaxed">{project.description}</p>
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary mt-6"
+              >
+                {project.cta} &gt;
+              </a>
+            </div>
+          ))}
         </div>
       ),
     },
@@ -159,43 +100,23 @@ export const ZONE_CONTENT = {
       title: "Case Studies",
       body: (
         <div className="space-y-6">
-          <div>
-            <h3 className="text-pixel-lg text-orange-500 mb-2">Spoke.ai</h3>
-            <p className="text-mono-base leading-relaxed">
-              I helped redesign an AI inbox for Slack into a native macOS app so
-              it fits naturally into people’s daily workflow. By bringing AI
-              summaries, a priority sidebar, and native notifications closer to
-              where work happens, time spent focused in the app tripled and DAU
-              grew by 147%.
-            </p>
-            <a
-              href="https://www.figma.com/deck/XzPSjhrtDVSIyqK6fkwZP9/Spoke.ai"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary mt-6"
-            >
-              More info &gt;
-            </a>
-          </div>
-          <hr className="border-zinc-700" />
-          <div>
-            <h3 className="text-pixel-lg text-orange-500 mb-2">FULLY AI</h3>
-            <p className="text-mono-base leading-relaxed">
-              I created the vision and v1 of an AI-driven Bento dashboard that
-              adapts content to each step of the customer journey. With modular
-              blocks built for engagement and clarity, it set clear targets
-              (+30% time on page, 40–60% FAQs resolved) and became a valuable
-              asset in investor and acquisition discussions.
-            </p>
-            <a
-              href="https://www.figma.com/deck/dxL9upoAsEYSZVEJ8eDp7A/FULLY-AI"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary mt-6"
-            >
-              More info &gt;
-            </a>
-          </div>
+          {CASE_STUDIES.map((study, i) => (
+            <React.Fragment key={study.company}>
+              {i > 0 && <hr className="border-zinc-700" />}
+              <div>
+                <h3 className="text-pixel-lg text-orange-500 mb-2">{study.company}</h3>
+                <p className="text-mono-base leading-relaxed">{study.summary}</p>
+                <a
+                  href={study.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary mt-6"
+                >
+                  More info &gt;
+                </a>
+              </div>
+            </React.Fragment>
+          ))}
         </div>
       ),
     },
@@ -208,46 +129,27 @@ export const ZONE_CONTENT = {
       title: "Socials",
       body: (
         <div className="flex flex-col gap-6 items-center justify-center py-8">
-          <p className="text-mono-base text-center max-w-md mb-4">
-            Feel free to connect with me on social media or check out my code
-            repos :)
-          </p>
+          <p className="text-mono-base text-center max-w-md mb-4">{SOCIALS_INTRO}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-2xl">
-            <a
-              href="https://www.linkedin.com/in/crisiordan/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-6 bg-white border-2 border-black hover:bg-blue-50 transition-colors group"
-            >
-              <div className="w-12 h-12 flex items-center justify-center bg-[#0077b5] text-white rounded mb-3 group-hover:scale-110 transition-transform">
-                <LinkedinIcon size={24} />
-              </div>
-              <span className="text-pixel-sm">LinkedIn</span>
-            </a>
-
-            <a
-              href="https://x.com/CristianIordan_"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors group"
-            >
-              <div className="w-12 h-12 flex items-center justify-center bg-black text-white rounded mb-3 group-hover:scale-110 transition-transform">
-                <TwitterIcon size={24} />
-              </div>
-              <span className="text-pixel-sm">Twitter(X)</span>
-            </a>
-
-            <a
-              href="https://github.com/cristianson"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors group"
-            >
-              <div className="w-12 h-12 flex items-center justify-center bg-[#333] text-white rounded mb-3 group-hover:scale-110 transition-transform">
-                <GithubIcon size={24} />
-              </div>
-              <span className="text-pixel-sm">GitHub</span>
-            </a>
+            {SOCIALS.map((social) => {
+              const style = SOCIAL_STYLE[social.name];
+              return (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex flex-col items-center p-6 bg-white border-2 border-black ${style.hover} transition-colors group`}
+                >
+                  <div
+                    className={`w-12 h-12 flex items-center justify-center ${style.bg} text-white rounded mb-3 group-hover:scale-110 transition-transform`}
+                  >
+                    {style.icon}
+                  </div>
+                  <span className="text-pixel-sm">{social.name}</span>
+                </a>
+              );
+            })}
           </div>
         </div>
       ),

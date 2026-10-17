@@ -1,48 +1,67 @@
 /**
  * Content Panel & Pause Menu
  *
- * The panel shows a section's content (the same ZONE_CONTENT used by the 2D
- * version) inside a GTA-style frame. The pause menu is a quick way to jump to
- * any section without walking there.
+ * The panel frames a section page (see sections.tsx) in a dark GTA-style
+ * window. The pause menu is a quick way to jump to any section without
+ * walking there.
  */
 
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { X } from "lucide-react";
-import { ZONE_CONTENT } from "@/components/game/data";
+import { SECTION_SUBTITLE, SectionPage } from "./sections";
 import { ZONES, type ZoneId } from "./world";
 
 export function ContentPanel({ zone, onClose }: { zone: ZoneId; onClose: () => void }) {
-  const data = ZONE_CONTENT[zone];
   const def = ZONES.find((z) => z.id === zone)!;
   return (
-    <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 md:p-6 animate-in fade-in duration-200">
+    <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-[2px] md:p-6 animate-in fade-in duration-200">
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={data.content.title}
-        className="gta-panel w-full h-full md:h-auto md:max-h-[86vh] md:max-w-3xl flex flex-col bg-[#f3efe4] text-black shadow-2xl md:border-4 md:border-black animate-in zoom-in-95 duration-200"
+        aria-label={def.label}
+        className="relative w-full h-full md:h-[88vh] md:max-w-4xl flex flex-col bg-[#111111] text-[#ece7dd] font-sans shadow-[0_30px_80px_rgba(0,0,0,0.6)] md:border md:border-white/10 animate-in slide-in-from-bottom-4 fade-in duration-300"
       >
-        <div className="bg-[#0d0d0d] px-5 pt-[max(16px,env(safe-area-inset-top))] pb-4 flex items-center justify-between gap-4 shrink-0" style={{ borderBottom: `6px solid ${def.color}` }}>
-          <div>
-            <div className="font-gta text-[13px] tracking-[0.2em] text-white/60">DESIGN DISTRICT</div>
-            <h2 className="font-gta gta-stroke text-[34px] md:text-[46px] leading-none" style={{ color: def.color }}>
-              {data.content.title}
-            </h2>
+        {/* Top bar */}
+        <div className="flex items-center justify-between gap-4 px-5 md:px-8 pt-[max(14px,env(safe-area-inset-top))] pb-3 border-b border-white/10 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-7 h-7 shrink-0 border-2 border-black font-gta text-[15px] leading-[24px] text-center text-black" style={{ background: def.color }}>
+              {def.blip}
+            </span>
+            <span className="font-gta text-[14px] tracking-[0.22em] text-[#8f8a80] truncate">
+              DESIGN DISTRICT <span className="text-white/25">/</span> <span className="text-white/80">{def.label.toUpperCase()}</span>
+            </span>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="w-11 h-11 shrink-0 flex items-center justify-center bg-white text-black border-[3px] border-black hover:bg-[#f0b53b] transition-colors"
+            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full border border-white/20 text-white hover:text-black hover:bg-[var(--accent)] transition-colors"
+            style={{ ["--accent" as string]: def.color }}
           >
-            <X size={22} strokeWidth={3} />
+            <X size={20} strokeWidth={2.5} />
           </button>
         </div>
-        <div className="p-5 md:p-8 overflow-y-auto flex-1 pb-[max(20px,env(safe-area-inset-bottom))]">{data.content.body}</div>
-        <div className="hidden md:block bg-[#0d0d0d] text-white/70 px-5 py-2 text-right font-gta tracking-wider text-[15px] shrink-0">
-          ESC — BACK TO THE STREET
+
+        <div className="overflow-y-auto flex-1 overscroll-contain">
+          {/* Title */}
+          <header className="px-5 md:px-10 pt-8 md:pt-10 pb-6">
+            <h2 className="font-gta gta-stroke-lg text-[52px] md:text-[84px] leading-[0.9] uppercase" style={{ color: def.color }}>
+              {def.label}
+            </h2>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="h-1 w-12" style={{ background: def.color }} />
+              <span className="text-[15px] md:text-[16px] text-[#a8a297]">{SECTION_SUBTITLE[zone]}</span>
+            </div>
+          </header>
+          <div className="px-5 md:px-10 pb-[max(32px,env(safe-area-inset-bottom))]">
+            <SectionPage zone={zone} accent={def.color} />
+          </div>
+        </div>
+
+        <div className="hidden md:flex justify-between items-center bg-black/40 border-t border-white/10 text-white/50 px-8 py-2.5 font-gta tracking-[0.18em] text-[13px] shrink-0">
+          <span>CRISTIAN IORDAN · PRODUCT DESIGNER</span>
+          <span>ESC — BACK TO THE STREET</span>
         </div>
       </div>
     </div>
@@ -80,9 +99,6 @@ export function PauseMenu({ visited, onSelect, onResume, isTouch }: PauseMenuPro
         <button onClick={onResume} className="px-4 py-2 font-gta text-[26px] text-[#f0b53b] hover:text-white text-left">
           Resume
         </button>
-        <Link href="/" className="px-4 py-2 font-gta text-[20px] text-white/60 hover:text-white">
-          Classic 2D version
-        </Link>
       </nav>
       <p className="mt-8 text-white/50 text-[13px] font-sans text-center max-w-xs">
         {isTouch
