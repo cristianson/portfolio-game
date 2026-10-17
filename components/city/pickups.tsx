@@ -77,9 +77,9 @@ function Pickup({ def, store, index }: { def: PickupDef; store: GameStore; index
 
   const { ball, icon } = useMemo(
     () => ({
-      // Pure black (X) would render as a flat hole; lift it just enough to show some shading
+      // Near-black brands (X, GitHub) would render as a flat hole; lift them just enough to show shading
       ball: new THREE.MeshLambertMaterial({
-        color: social.color === "#000000" ? "#2a2a2a" : social.color,
+        color: new THREE.Color(social.color).getHSL({ h: 0, s: 0, l: 0 }).l < 0.1 ? "#2a2a2a" : social.color,
         emissive: social.color,
         emissiveIntensity: 0.25,
       }),

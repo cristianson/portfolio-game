@@ -97,7 +97,8 @@ export interface PickupDef {
 export const PICKUPS: PickupDef[] = [
   { name: "LinkedIn", x: -7.1, z: 13.5 },
   { name: "X", x: 7.1, z: 10.5 },
-  { name: "GitHub", x: 0, z: 19 },
+  // On the light sidewalk so the black pickup stands out
+  { name: "GitHub", x: -7.1, z: 23 },
 ];
 
 export const PICKUP_RADIUS = 1.0;

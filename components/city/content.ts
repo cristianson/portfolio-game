@@ -131,12 +131,12 @@ export interface Social {
   short: string;
   handle: string;
   url: string;
-  /** Bright brand color (readable on the dark street), used for the icon tile and the pickup. */
+  /** Brand color, used for the icon tile and the street pickup. */
   color: string;
 }
 
 export const SOCIALS: Social[] = [
   { name: "LinkedIn", short: "LinkedIn", handle: "in/crisiordan", url: "https://www.linkedin.com/in/crisiordan/", color: "#0a66c2" },
   { name: "X", short: "X", handle: "@CristianIordan_", url: "https://x.com/CristianIordan_", color: "#000000" },
-  { name: "GitHub", short: "GitHub", handle: "cristianson", url: "https://github.com/cristianson", color: "#8250df" },
+  { name: "GitHub", short: "GitHub", handle: "cristianson", url: "https://github.com/cristianson", color: "#181717" },
 ];

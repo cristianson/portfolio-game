@@ -153,7 +153,7 @@ export function Tree({ scale = 1 }: { scale?: number }) {
 
   useFrame(({ camera }) => {
     canopy.current.getWorldPosition(canopyCenter);
-    const near = camera.position.distanceTo(canopyCenter) < 2.1 * scale;
+    const near = camera.position.distanceTo(canopyCenter) < 2.8 * scale;
     for (const m of mats) {
       const target = near ? FADED_OPACITY : 1;
       if (m.opacity === target) continue;
