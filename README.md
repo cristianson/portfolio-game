@@ -20,6 +20,17 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 - **Smooth Animations**: Delightful interactions and transitions throughout the experience
 - **Pixel Tooltips**: Custom-styled tooltips that match the retro aesthetic
 
+## 🏙️ Design District (3D, work in progress)
+
+A GTA 3 inspired 3D version of the portfolio lives at **`/3d`**. Walk down a small daytime street as a low-poly version of me, find the glowing markers in front of each building and step in to open a section.
+
+- **Desktop**: `WASD` / arrow keys to move, `Shift` to sprint, drag to look around, `Enter` / `Space` near a marker, `Esc` for the pause menu
+- **Mobile (portrait)**: on-screen joystick to move, drag the street to look around, tap `ENTER` near a marker
+- HUD with rotating radar, clock, cash and stars that track visited sections; progress is saved locally
+- Built with **three.js** + **@react-three/fiber**; every texture is drawn on a canvas at runtime, so there are no 3D assets to download
+- Code lives in `components/city/`; the street layout (buildings, markers, cars, pedestrians) is defined in `components/city/world.ts`, the character look in `components/city/character.tsx` (`PLAYER_LOOK`)
+- Section content is shared with the 2D version (`components/game/data.tsx`)
+
 ## 🎯 How to Play
 
 - **Desktop**: Use `WASD` or arrow keys to move, `SPACE` to interact with zones, `ESC` to close modals
