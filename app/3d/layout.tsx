@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { preload } from "react-dom";
 import { Anton, Bowlby_One_SC } from "next/font/google";
 import "./city.css";
 
@@ -21,5 +22,8 @@ export const metadata: Metadata = {
 };
 
 export default function CityLayout({ children }: { children: React.ReactNode }) {
+  // Fetch the avatars while the title screen is up so About Me and the HUD show them instantly
+  preload("/avatar-560.webp", { as: "image", type: "image/webp" });
+  preload("/avatar-128.webp", { as: "image", type: "image/webp" });
   return <div className={`${anton.variable} ${hud.variable}`}>{children}</div>;
 }

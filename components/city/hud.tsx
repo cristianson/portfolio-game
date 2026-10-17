@@ -86,7 +86,8 @@ export function Stats({ visited, compact }: { visited: Set<ZoneId>; compact: boo
         className={`${compact ? "w-[58px] h-[58px]" : "w-[92px] h-[92px]"} shrink-0 rounded-[6px] border-[3px] border-black bg-[#f2c418] p-[3px] shadow-[0_2px_6px_rgba(0,0,0,0.45)]`}
       >
         <Image
-          src="/avatar.webp"
+          src="/avatar-128.webp"
+          unoptimized
           alt=""
           width={92}
           height={92}
