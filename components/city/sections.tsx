@@ -58,7 +58,7 @@ function About({ accent }: { accent: string }) {
         <figure className="relative w-[220px] md:w-full -rotate-2">
           <div className="absolute inset-0 translate-x-2 translate-y-2" style={{ background: accent }} />
           <div className="relative border-[3px] border-black bg-[#e9e4d8] p-2">
-            {/* Pre-sized file served straight from the CDN (preloaded in app/3d/layout.tsx) */}
+            {/* Pre-sized file served straight from the CDN (preloaded in app/(city)/layout.tsx) */}
             <Image
               src="/avatar-560.webp"
               alt="Cristian Iordan"

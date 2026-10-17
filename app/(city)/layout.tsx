@@ -17,8 +17,9 @@ const hud = Bowlby_One_SC({
 });
 
 export const metadata: Metadata = {
-  title: "Cristian Iordan — Design District",
-  description: "Walk the streets of Design District: a 3D, early-2000s open-world take on my product design portfolio.",
+  title: "Cristian Iordan's Portfolio",
+  description:
+    "Product designer portfolio as a 3D open-world game: walk the streets of Design District to explore my case studies, projects and more.",
 };
 
 export default function CityLayout({ children }: { children: React.ReactNode }) {
