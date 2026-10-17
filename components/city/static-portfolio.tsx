@@ -42,9 +42,15 @@ export function StaticPortfolio() {
           <p className="inline-block mt-4 bg-[#ff4fa3] border-[3px] border-black px-3 py-1 font-gta text-[20px] md:text-[26px] text-black">
             PRODUCT DESIGNER
           </p>
-          <p className="fallback-only mt-6 max-w-xl text-[15px] leading-relaxed text-[#a8a297]">
+          <p className="fallback-note fallback-no-webgl mt-6 max-w-xl text-[15px] leading-relaxed text-[#a8a297]">
             You're seeing the text version of my portfolio. The 3D street needs WebGL, which isn't available in this
             browser right now.
+          </p>
+          <p className="fallback-note fallback-crashed mt-6 max-w-xl text-[15px] leading-relaxed text-[#a8a297]">
+            You're seeing the text version of my portfolio because the 3D street couldn't start on this device.{" "}
+            <a href="/" className="underline underline-offset-2 text-[#ece7dd] hover:text-white">
+              Try the 3D version again
+            </a>
           </p>
           <nav aria-label="Sections" className="mt-8 flex flex-wrap gap-2">
             {ZONES.map((z) => (

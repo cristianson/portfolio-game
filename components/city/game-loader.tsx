@@ -48,20 +48,21 @@ class GameErrorBoundary extends Component<{ onError: () => void; children: React
   }
 }
 
-type Mode = "checking" | "game" | "fallback";
+type Mode = "checking" | "game" | "no-webgl" | "crashed";
 
 export function GameLoader() {
   const [mode, setMode] = useState<Mode>("checking");
-  const fallback = useCallback(() => setMode("fallback"), []);
+  const fallback = useCallback(() => setMode("crashed"), []);
 
   useEffect(() => {
-    setMode(hasWebGL() ? "game" : "fallback");
+    setMode(hasWebGL() ? "game" : "no-webgl");
   }, []);
 
   useEffect(() => {
     const portfolio = document.getElementById("static-portfolio");
-    if (mode === "fallback") {
-      document.documentElement.setAttribute("data-fallback", "");
+    if (mode === "no-webgl" || mode === "crashed") {
+      // The value picks which explanation the text version shows (city.css)
+      document.documentElement.setAttribute("data-fallback", mode);
       portfolio?.removeAttribute("inert");
     } else if (mode === "game") {
       // Hidden copy stays readable for crawlers, but keyboard focus shouldn't land in it
@@ -69,7 +70,7 @@ export function GameLoader() {
     }
   }, [mode]);
 
-  if (mode === "fallback") return null;
+  if (mode === "no-webgl" || mode === "crashed") return null;
   return (
     <div className="game-root">
       {mode === "checking" ? (

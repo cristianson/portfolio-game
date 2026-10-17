@@ -66,8 +66,10 @@ const MOVE_KEYS: Record<string, [number, number]> = {
   ArrowRight: [1, 0],
 };
 
-// If the 3D canvas hasn't started by then, assume the GPU can't run it
+// If the 3D canvas hasn't started after this much *visible* time, assume the GPU can't run it.
+// Only visible time counts: background tabs don't render, so the canvas can't start there.
 const STARTUP_TIMEOUT_MS = 15000;
+const STARTUP_TICK_MS = 500;
 
 export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const store = useRef(createStore()).current;
@@ -78,8 +80,16 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   useEffect(() => {
     if (ready || !onFatal) return;
-    const id = setTimeout(onFatal, STARTUP_TIMEOUT_MS);
-    return () => clearTimeout(id);
+    let visibleMs = 0;
+    const id = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      visibleMs += STARTUP_TICK_MS;
+      if (visibleMs >= STARTUP_TIMEOUT_MS) {
+        clearInterval(id);
+        onFatal();
+      }
+    }, STARTUP_TICK_MS);
+    return () => clearInterval(id);
   }, [ready, onFatal]);
   const [phase, setPhaseState] = useState<Phase>("title");
   const [nearZone, setNearZone] = useState<ZoneId | null>(null);

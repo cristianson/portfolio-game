@@ -5,7 +5,7 @@ import { StaticPortfolio } from "@/components/city/static-portfolio";
 const NO_JS_STYLES = `<style>
   .game-root { display: none !important; }
   .static-portfolio { position: fixed; inset: 0; width: auto; height: auto; margin: 0; overflow-y: auto; clip-path: none; white-space: normal; }
-  .fallback-only { display: none !important; }
+  .fallback-note { display: none !important; }
 </style>`;
 
 export default function CityPage() {

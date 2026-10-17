@@ -54,10 +54,11 @@ html[data-fallback] .static-portfolio {
   white-space: normal;
 }
 
-.fallback-only {
+.fallback-note {
   display: none;
 }
 
-html[data-fallback] .fallback-only {
+html[data-fallback="no-webgl"] .fallback-no-webgl,
+html[data-fallback="crashed"] .fallback-crashed {
   display: block;
 }
