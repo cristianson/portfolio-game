@@ -12,6 +12,9 @@ import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { BlobShadow } from "./props";
+import { registerNightGlow, unregisterNightGlow } from "./daylight";
+import type { Season } from "./season";
+import { hawaiianTexture } from "./textures";
 
 export interface Look {
   skin: string;
@@ -26,6 +29,15 @@ export interface Look {
   cap?: string;
   /** Cargo pants with thigh pockets. */
   cargo?: boolean;
+  // Seasonal outfit pieces (see dressFor)
+  shortSleeves?: boolean;
+  shorts?: boolean;
+  /** Shirt colour becomes the base of a Hawaiian print. */
+  hawaiian?: boolean;
+  sunglasses?: boolean;
+  beanie?: string;
+  scarf?: string;
+  santaHat?: boolean;
 }
 
 export interface Motion {
@@ -55,6 +67,30 @@ export const PEDESTRIAN_LOOKS: Look[] = [
   { skin: "#6b4429", hair: "#0d0d0d", hairStyle: "cap", cap: "#7a2a7a", shirt: "#7a2a7a", jacket: "#7a2a7a", pants: "#7a2a7a", shoes: "#1a1a1a" },
 ];
 
+/**
+ * Seasonal outfit on top of someone's usual look: Hawaiian shirts and shorts in
+ * summer, beanies and scarves in winter, Santa hats over Christmas.
+ * `who` is "player" or a pedestrian index, so everyone dresses a bit differently.
+ */
+export function dressFor(look: Look, season: Season, christmas: boolean, who: "player" | number): Look {
+  if (season === "summer") {
+    const summer: Look = { ...look, jacket: undefined, shortSleeves: true };
+    if (who === "player") return { ...summer, shirt: "#2b86b0", hawaiian: true, shorts: true, pants: "#c9b48a", sunglasses: true };
+    if (who === 3) return { ...summer, shirt: "#d6553f", hawaiian: true, shorts: true, pants: "#3e4a5e", sunglasses: true };
+    if (who % 2 === 0) return { ...summer, shorts: true, sunglasses: who === 2 };
+    return summer;
+  }
+  if (season === "winter") {
+    const winter: Look = { ...look, jacket: look.jacket ?? "#2e3440" };
+    if (who === "player") return { ...winter, scarf: "#b8322a", beanie: christmas ? undefined : "#2f3e52", santaHat: christmas };
+    const santa = christmas && who === 1;
+    const hats = ["#c0392b", "#6a4c8a", undefined, "#e0b43a", undefined];
+    const scarves = [undefined, "#2f6b4f", "#c9c2b0", "#7a2a2a", "#e8e2d4"];
+    return { ...winter, beanie: santa ? undefined : hats[who % hats.length], scarf: scarves[who % scarves.length], santaHat: santa };
+  }
+  return look;
+}
+
 const taperCache = new Map<string, THREE.BufferGeometry>();
 
 /** Box that is wider at the top than at the bottom (shoulders, thighs, forearms). */
@@ -79,22 +115,51 @@ function taper(wTop: number, wBottom: number, h: number, dTop: number, dBottom: 
 function useMats(look: Look) {
   return useMemo(() => {
     const m = (c: string) => new THREE.MeshLambertMaterial({ color: c });
+    const shirt = look.hawaiian ? new THREE.MeshLambertMaterial({ map: hawaiianTexture(look.shirt) }) : m(look.shirt);
     return {
       skin: m(look.skin),
       hair: m(look.hair),
-      shirt: m(look.shirt),
+      shirt,
       jacket: m(look.jacket ?? look.shirt),
       pants: m(look.pants),
       shoes: m(look.shoes),
       cap: m(look.cap ?? look.hair),
       dark: m("#141414"),
       eye: m("#1a1a1a"),
+      lens: m("#0e1216"),
+      beanie: m(look.beanie ?? "#c0392b"),
+      scarf: m(look.scarf ?? "#b8322a"),
+      santa: m("#c8202a"),
+      fur: m("#f4f1ea"),
     };
   }, [look]);
 }
 
-export function Character({ look, motion }: { look: Look; motion: React.RefObject<Motion> }) {
+const SHORT_LEG = taper(0.24, 0.21, 0.38, 0.27, 0.24);
+const CALF = taper(0.16, 0.14, 0.48, 0.17, 0.15);
+const SLEEVE = taper(0.19, 0.17, 0.24, 0.2, 0.18);
+const FOREARM = taper(0.14, 0.12, 0.36, 0.14, 0.13);
+
+/** `glow` lifts the character out of the dark at night (0 = off). */
+export function Character({ look, motion, glow = 0 }: { look: Look; motion: React.RefObject<Motion>; glow?: number }) {
   const mats = useMats(look);
+
+  // At night each part glows faintly in its own colour, like a soft fill light on the character
+  useEffect(() => {
+    if (!glow) return;
+    const list = Object.values(mats);
+    for (const m of list) {
+      if (m.map) {
+        m.emissive.set("#ffffff");
+        m.emissiveMap = m.map;
+        m.needsUpdate = true;
+      } else {
+        m.emissive.copy(m.color);
+      }
+      registerNightGlow(m, glow);
+    }
+    return () => list.forEach(unregisterNightGlow);
+  }, [mats, glow]);
   const body = useRef<THREE.Group>(null!);
   const legL = useRef<THREE.Group>(null!);
   const legR = useRef<THREE.Group>(null!);
@@ -124,6 +189,7 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
   });
 
   const torso = look.jacket ? mats.jacket : mats.shirt;
+  const hat = Boolean(look.beanie || look.santaHat);
 
   return (
     <group>
@@ -135,10 +201,17 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
           [legR, 0.12],
         ].map(([ref, x]) => (
           <group key={x as number} ref={ref as React.RefObject<THREE.Group>} position={[x as number, 0.9, 0]}>
-            <mesh position={[0, -0.42, 0]} material={mats.pants} geometry={taper(0.23, 0.18, 0.84, 0.26, 0.21)} />
+            {look.shorts ? (
+              <>
+                <mesh position={[0, -0.19, 0]} material={mats.pants} geometry={SHORT_LEG} />
+                <mesh position={[0, -0.6, 0]} material={mats.skin} geometry={CALF} />
+              </>
+            ) : (
+              <mesh position={[0, -0.42, 0]} material={mats.pants} geometry={taper(0.23, 0.18, 0.84, 0.26, 0.21)} />
+            )}
             {look.cargo && (
-              <mesh position={[x as number > 0 ? 0.115 : -0.115, -0.38, 0.01]} material={mats.pants}>
-                <boxGeometry args={[0.05, 0.2, 0.16]} />
+              <mesh position={[x as number > 0 ? 0.115 : -0.115, look.shorts ? -0.22 : -0.38, 0.01]} material={mats.pants}>
+                <boxGeometry args={[0.05, look.shorts ? 0.15 : 0.2, 0.16]} />
               </mesh>
             )}
             <mesh position={[0, -0.84, 0.05]} material={mats.shoes}>
@@ -172,7 +245,14 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
           [armR, 0.33],
         ].map(([ref, x]) => (
           <group key={x as number} ref={ref as React.RefObject<THREE.Group>} position={[(x as number) * 1.04, 1.46, 0]}>
-            <mesh position={[0, -0.28, 0]} material={torso} geometry={taper(0.18, 0.13, 0.58, 0.19, 0.15)} />
+            {look.shortSleeves && !look.jacket ? (
+              <>
+                <mesh position={[0, -0.12, 0]} material={mats.shirt} geometry={SLEEVE} />
+                <mesh position={[0, -0.41, 0]} material={mats.skin} geometry={FOREARM} />
+              </>
+            ) : (
+              <mesh position={[0, -0.28, 0]} material={torso} geometry={taper(0.18, 0.13, 0.58, 0.19, 0.15)} />
+            )}
             <mesh position={[0, -0.63, 0.01]} material={mats.skin}>
               <boxGeometry args={[0.11, 0.14, 0.13]} />
             </mesh>
@@ -183,6 +263,16 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
         <mesh position={[0, 1.55, 0]} material={mats.skin}>
           <boxGeometry args={[0.13, 0.08, 0.13]} />
         </mesh>
+        {look.scarf && (
+          <>
+            <mesh position={[0, 1.56, -0.01]} material={mats.scarf}>
+              <boxGeometry args={[0.36, 0.12, 0.33]} />
+            </mesh>
+            <mesh position={[0.08, 1.38, 0.17]} rotation={[0.12, 0, 0]} material={mats.scarf}>
+              <boxGeometry args={[0.1, 0.3, 0.04]} />
+            </mesh>
+          </>
+        )}
         <group position={[0, 1.73, 0]}>
           <mesh material={mats.skin}>
             <boxGeometry args={[0.3, 0.32, 0.3]} />
@@ -207,7 +297,7 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
               <boxGeometry args={[0.15, 0.04, 0.025]} />
             </mesh>
           )}
-          {look.glasses && (
+          {(look.glasses || look.sunglasses) && (
             <group position={[0, 0.03, 0.163]}>
               {[-0.07, 0.07].map((x) => (
                 <group key={x} position={[x, 0, 0]}>
@@ -228,6 +318,12 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
               <mesh position={[0, 0.01, 0]} material={mats.dark}>
                 <boxGeometry args={[0.04, 0.012, 0.012]} />
               </mesh>
+              {look.sunglasses &&
+                [-0.07, 0.07].map((x) => (
+                  <mesh key={x} position={[x, 0, -0.002]} material={mats.lens}>
+                    <boxGeometry args={[0.085, 0.06, 0.006]} />
+                  </mesh>
+                ))}
               {/* Temples */}
               {[-0.155, 0.155].map((x) => (
                 <mesh key={x} position={[x, 0.02, -0.08]} material={mats.dark}>
@@ -250,9 +346,36 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
                 </mesh>
               ))}
               {/* Quiff */}
-              <mesh position={[0.03, 0.22, 0.08]} rotation={[0.3, 0, 0]} material={mats.hair}>
+              {!hat && <mesh position={[0.03, 0.22, 0.08]} rotation={[0.3, 0, 0]} material={mats.hair}>
                 <boxGeometry args={[0.24, 0.06, 0.14]} />
+              </mesh>}
+            </>
+          )}
+          {look.beanie && !look.santaHat && (
+            <>
+              <mesh position={[0, 0.2, -0.01]} material={mats.beanie}>
+                <boxGeometry args={[0.345, 0.15, 0.35]} />
               </mesh>
+              {/* Folded brim */}
+              <mesh position={[0, 0.14, -0.01]} material={mats.beanie}>
+                <boxGeometry args={[0.36, 0.06, 0.365]} />
+              </mesh>
+            </>
+          )}
+          {look.santaHat && (
+            <>
+              <mesh position={[0, 0.17, -0.01]} material={mats.fur}>
+                <boxGeometry args={[0.36, 0.08, 0.37]} />
+              </mesh>
+              {/* Floppy red cone leaning back, with a pompom at the tip */}
+              <group position={[0, 0.2, -0.02]} rotation={[-0.55, 0, 0]}>
+                <mesh position={[0, 0.17, 0]} material={mats.santa}>
+                  <cylinderGeometry args={[0.03, 0.17, 0.34, 8]} />
+                </mesh>
+                <mesh position={[0, 0.35, 0]} material={mats.fur}>
+                  <icosahedronGeometry args={[0.055, 0]} />
+                </mesh>
+              </group>
             </>
           )}
           {look.hairStyle === "long" && (
@@ -270,7 +393,7 @@ export function Character({ look, motion }: { look: Look; motion: React.RefObjec
               ))}
             </>
           )}
-          {look.hairStyle === "cap" && (
+          {look.hairStyle === "cap" && !hat && (
             <>
               <mesh position={[0, 0.17, 0]} material={mats.cap}>
                 <boxGeometry args={[0.33, 0.1, 0.33]} />

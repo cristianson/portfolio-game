@@ -4,42 +4,58 @@
  * The street follows the visitor's own clock: the HUD shows their local time
  * and the sky, lights and windows go from day to dusk to night with it.
  * Local time comes from the device (already in the visitor's time zone), so no
- * location permission is needed; sunrise and sunset are approximated as
- * ~5:30–7:00 and ~18:30–20:30.
+ * location permission is needed. Sunrise and sunset follow the time of year
+ * (northern hemisphere, roughly a European city): dark by ~17:30 in December,
+ * light until ~21:30 in June.
  *
- * Add `?time=22:30` to the URL to preview any time of day.
+ * Add `?time=22:30` and/or `?date=2026-12-24` to the URL to preview any moment.
  */
 
 import * as THREE from "three";
 
 let offsetMs: number | null = null;
 
-/** The visitor's local time, shifted by `?time=HH:MM` when present. */
+/** The visitor's local time, shifted by `?time=HH:MM` / `?date=YYYY-MM-DD` when present. */
 export function localNow() {
   if (offsetMs === null) {
     offsetMs = 0;
-    const match = /^(\d{1,2}):(\d{2})$/.exec(new URLSearchParams(window.location.search).get("time") ?? "");
-    if (match) {
+    const params = new URLSearchParams(window.location.search);
+    const time = /^(\d{1,2}):(\d{2})$/.exec(params.get("time") ?? "");
+    const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(params.get("date") ?? "");
+    if (time || day) {
       const now = new Date();
       const forced = new Date(now);
-      forced.setHours(Math.min(23, +match[1]), Math.min(59, +match[2]), 0, 0);
+      if (day) forced.setFullYear(+day[1], +day[2] - 1, +day[3]);
+      if (time) forced.setHours(Math.min(23, +time[1]), Math.min(59, +time[2]), 0, 0);
       offsetMs = forced.getTime() - now.getTime();
     }
   }
   return new Date(Date.now() + offsetMs);
 }
 
-const DAWN_START = 5.5;
-const DAWN_END = 7;
-const DUSK_START = 18.5;
-const DUSK_END = 20.5;
+/** Day of the year, 0 = 1 January. */
+export function dayOfYear(date: Date) {
+  return Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 1)) / 864e5);
+}
+
+/** Approximate sunrise and sunset in local hours (longest day ~21 June). */
+export function sunTimes(date: Date) {
+  const summer = Math.cos((2 * Math.PI * (dayOfYear(date) - 171)) / 365);
+  return { sunrise: 6.6 - 1.25 * summer, sunset: 19 + 2.1 * summer };
+}
 
 /** 0 = full night, 1 = full day, in between at dawn and dusk. */
 export function daylightAt(date: Date) {
   const h = date.getHours() + date.getMinutes() / 60;
-  if (h >= DAWN_END && h <= DUSK_START) return 1;
-  if (h <= DAWN_START || h >= DUSK_END) return 0;
-  const t = h < 12 ? (h - DAWN_START) / (DAWN_END - DAWN_START) : 1 - (h - DUSK_START) / (DUSK_END - DUSK_START);
+  const { sunrise, sunset } = sunTimes(date);
+  // Twilight runs from a little before sunrise and lasts about an hour after sunset
+  const dawnStart = sunrise - 0.75;
+  const dawnEnd = sunrise + 0.75;
+  const duskStart = sunset - 0.75;
+  const duskEnd = sunset + 1;
+  if (h >= dawnEnd && h <= duskStart) return 1;
+  if (h <= dawnStart || h >= duskEnd) return 0;
+  const t = h < 12 ? (h - dawnStart) / (dawnEnd - dawnStart) : 1 - (h - duskStart) / (duskEnd - duskStart);
   // Ease so the sky lingers a little in its warm twilight colours
   return t * t * (3 - 2 * t);
 }
@@ -92,14 +108,27 @@ const DAY: Look = {
   sunPos: [-30, 60, -25],
 };
 
+// Snowy winter days: a paler, overcast sky
+const WINTER_DAY: Look = {
+  ...DAY,
+  skyTop: "#8d9db2",
+  skyMid: "#bcc6d2",
+  horizon: "#dde1e6",
+  hemiSky: "#eef2f6",
+  hemiGround: "#b9bec4",
+  sun: "#f4f6fa",
+  sunIntensity: 0.9,
+};
+
 const ca = new THREE.Color();
 const cb = new THREE.Color();
 const mix = (a: string, b: string, t: number) => "#" + ca.set(a).lerp(cb.set(b), t).getHexString();
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Sky, fog and light settings for a daylight value. */
-export function environmentFor(daylight: number): Look {
-  const [a, b, t] = daylight < 0.5 ? [NIGHT, TWILIGHT, daylight * 2] : [TWILIGHT, DAY, (daylight - 0.5) * 2];
+export function environmentFor(daylight: number, winter = false): Look {
+  const day = winter ? WINTER_DAY : DAY;
+  const [a, b, t] = daylight < 0.5 ? [NIGHT, TWILIGHT, daylight * 2] : [TWILIGHT, day, (daylight - 0.5) * 2];
   return {
     skyTop: mix(a.skyTop, b.skyTop, t),
     skyMid: mix(a.skyMid, b.skyMid, t),
@@ -134,6 +163,10 @@ function applyGlow(material: THREE.Material, max: number, night: number) {
     material.opacity = max * night;
     material.visible = night > 0.01;
   }
+}
+
+export function unregisterNightGlow(material: THREE.Material) {
+  nightGlow.delete(material);
 }
 
 export function setNight(night: number) {

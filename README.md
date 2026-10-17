@@ -14,7 +14,8 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 ## ✨ Features
 
 - **Early-2000s 3D Look**: A low-poly city street with parked cars, pedestrians, fire escapes and shop signs
-- **Day and night**: The street follows the visitor's local time: daylight, dusk, then a night street with lit windows, shop fronts and lamp light (no location permission; just the device clock)
+- **Day and night**: The street follows the visitor's local time: daylight, dusk, then a night street with lit windows, shop fronts and lamp light (no location permission; just the device clock). Sunrise and sunset move with the time of year
+- **Seasons**: Blossom and flowers in spring; Hawaiian shirts, shorts, café parasols and a gelato cart in summer; yellow trees and falling leaves in autumn; snow on the ground, roofs and cars and in the air in winter. From 1 December to 6 January there's a Christmas tree in the park, fairy lights, wreaths, gifts and a Santa hat
 - **GTA 3 style HUD**: Rotating radar with section blips, the visitor's local time, cash and stars that track visited sections (progress is saved locally)
 - **Mission markers**: About Me, Case Studies and Built Projects each have a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
 - **Social pickups**: LinkedIn, X and GitHub spin on the street like GTA 3 health/cash pickups; walk into one for a card with a "Go to …" link (or press Enter)
@@ -56,7 +57,7 @@ pnpm build
 pnpm lint
 ```
 
-Add `?debug` to the URL to expose the game store as `window.__dd` in the console, and `?time=22:30` to preview any time of day.
+Add `?debug` to the URL to expose the game store as `window.__dd` in the console, `?time=22:30` to preview any time of day and `?date=2026-12-24` to preview any season (they combine).
 
 ## 📁 Project Structure
 
@@ -75,6 +76,8 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 │   ├── world.ts            # Street layout: buildings, markers, cars, pedestrians
 │   ├── scene.tsx           # Canvas, lights, fog
 │   ├── daylight.ts         # Local time → day/dusk/night palettes and night glow
+│   ├── season.ts           # Date → season and Christmas
+│   ├── seasonal.tsx        # Snow, leaves, flowers, Christmas and summer props
 │   ├── buildings.tsx       # Buildings, signs, fire escapes
 │   ├── pedestrians.tsx     # Locals who step around you
 │   ├── props.tsx           # Street furniture and parked cars

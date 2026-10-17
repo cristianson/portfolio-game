@@ -268,6 +268,17 @@ export const COLLIDERS: Box2[] = [
   { x0: -24.5, x1: -24, z0: 8, z1: 22, solid: true },
 ];
 
+/** Seasonal props (Christmas tree, café tables...) collide only while they're out; returns a remover. */
+export function addColliders(boxes: Box2[]) {
+  COLLIDERS.push(...boxes);
+  return () => {
+    for (const b of boxes) {
+      const i = COLLIDERS.indexOf(b);
+      if (i >= 0) COLLIDERS.splice(i, 1);
+    }
+  };
+}
+
 export function groundHeight(x: number, z: number): number {
   const inPark = x < -SIDEWALK_OUTER && z > PARK.z0 && z < PARK.z1;
   return Math.abs(x) > ROAD_HALF || inPark ? SIDEWALK_HEIGHT : 0;

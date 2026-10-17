@@ -12,6 +12,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useWebHaptics } from "web-haptics/react";
 import { Scene } from "./scene";
 import { daylightAt, localNow } from "./daylight";
+import { isChristmas, seasonAt } from "./season";
 import { createStore, type Phase } from "./store";
 import { ZONES, type ZoneId } from "./world";
 import { Radar } from "./radar";
@@ -86,6 +87,8 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     return () => clearInterval(id);
   }, []);
   const daylight = daylightAt(now);
+  const season = seasonAt(now);
+  const christmas = isChristmas(now);
   const onSceneReady = useCallback(() => setReady(true), []);
   const clock = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
@@ -287,7 +290,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black select-none touch-none overscroll-none">
-      <Scene store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} onReady={onSceneReady} daylight={daylight} />
+      <Scene store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} onReady={onSceneReady} daylight={daylight} season={season} christmas={christmas} />
 
       {phase === "title" && <TitleScreen ready={ready} isTouch={touch} onStart={start} />}
 

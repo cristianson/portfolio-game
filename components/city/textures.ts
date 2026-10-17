@@ -468,3 +468,105 @@ export function createSky() {
   };
   return { texture: tex, paint };
 }
+
+// ── Seasons ─────────────────────────────────────────────────────
+
+/** Packed snow over the sidewalk slabs (the joints still show through faintly). */
+export function snowTexture() {
+  return cached("snow", () => {
+    const [c, ctx] = canvas(64, 64);
+    ctx.fillStyle = "#eef1f4";
+    ctx.fillRect(0, 0, 64, 64);
+    noise(ctx, 64, 64, 0.06, 31);
+    const r = rng(77);
+    // Bluish dips and footprints
+    for (let i = 0; i < 18; i++) {
+      ctx.fillStyle = `rgba(150,170,200,${0.08 + r() * 0.1})`;
+      ctx.beginPath();
+      ctx.ellipse(r() * 64, r() * 64, 2 + r() * 4, 1 + r() * 2, r() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = "rgba(120,130,150,0.06)";
+    ctx.fillRect(0, 32, 64, 1);
+    ctx.fillRect(32, 0, 1, 64);
+    return toTexture(c);
+  });
+}
+
+/** Hawaiian shirt: hibiscus flowers and leaves on a bright base. */
+export function hawaiianTexture(base: string) {
+  return cached(`hawaii-${base}`, () => {
+    const [c, ctx] = canvas(64, 64);
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 64, 64);
+    const r = rng(base.length * 97 + 5);
+    for (let i = 0; i < 9; i++) {
+      const x = r() * 64;
+      const y = r() * 64;
+      ctx.fillStyle = "#2f7a3a";
+      ctx.beginPath();
+      ctx.ellipse(x + 4, y + 3, 6, 2.5, r() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    for (let i = 0; i < 8; i++) {
+      const x = r() * 64;
+      const y = r() * 64;
+      ctx.fillStyle = ["#ffffff", "#ffd23f", "#ff7a59"][i % 3];
+      for (let k = 0; k < 5; k++) {
+        const a = (k / 5) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(a) * 2.6, y + Math.sin(a) * 2.6, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = "#c0392b";
+      ctx.fillRect(x - 1, y - 1, 2, 2);
+    }
+    return toTexture(c);
+  });
+}
+
+/** Soft round dot for snowflakes. */
+export function flakeTexture() {
+  return cached("flake", () => {
+    const [c, ctx] = canvas(32, 32);
+    const g = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(0.5, "rgba(255,255,255,0.8)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 32, 32);
+    return toTexture(c, false);
+  });
+}
+
+/** White leaf / petal silhouette, tinted per instance. */
+export function leafTexture() {
+  return cached("leaf", () => {
+    const [c, ctx] = canvas(32, 32);
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(16, 1);
+    ctx.quadraticCurveTo(31, 14, 16, 31);
+    ctx.quadraticCurveTo(1, 14, 16, 1);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.25)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(16, 4);
+    ctx.lineTo(16, 28);
+    ctx.stroke();
+    return toTexture(c, false);
+  });
+}
+
+/** Vertical stripes wrapped around parasols and the ice-cream umbrella. */
+export function stripesTexture(a: string, b: string) {
+  return cached(`stripes-${a}-${b}`, () => {
+    const [c, ctx] = canvas(64, 8);
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = i % 2 ? b : a;
+      ctx.fillRect(i * 8, 0, 8, 8);
+    }
+    return toTexture(c, false);
+  });
+}

@@ -8,17 +8,30 @@
 
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { Character, PEDESTRIAN_LOOKS, type Motion } from "./character";
+import { Character, dressFor, PEDESTRIAN_LOOKS, type Motion } from "./character";
+import type { Season } from "./season";
 import { PEDESTRIANS, SIDEWALK_HEIGHT, type PedestrianDef } from "./world";
 import type { GameStore } from "./store";
 
 const DODGE = 1.1; // how far to step aside, meters
 const DODGE_SPEED = 2.2; // m/s sideways
 
-function Pedestrian({ def, index, store }: { def: PedestrianDef; index: number; store: GameStore }) {
+interface PedestrianProps {
+  def: PedestrianDef;
+  index: number;
+  store: GameStore;
+  season: Season;
+  christmas: boolean;
+}
+
+function Pedestrian({ def, index, store, season, christmas }: PedestrianProps) {
+  const look = useMemo(
+    () => dressFor(PEDESTRIAN_LOOKS[def.look % PEDESTRIAN_LOOKS.length], season, christmas, def.look),
+    [def.look, season, christmas]
+  );
   const group = useRef<THREE.Group>(null!);
   const motion = useRef<Motion>({ speed: 0 });
   const startZ = def.zMin + (def.zMax - def.zMin) * def.start;
@@ -99,16 +112,16 @@ function Pedestrian({ def, index, store }: { def: PedestrianDef; index: number; 
 
   return (
     <group ref={group} position={[def.x, SIDEWALK_HEIGHT, startZ]}>
-      <Character look={PEDESTRIAN_LOOKS[def.look % PEDESTRIAN_LOOKS.length]} motion={motion} />
+      <Character look={look} motion={motion} glow={0.2} />
     </group>
   );
 }
 
-export function Pedestrians({ store }: { store: GameStore }) {
+export function Pedestrians({ store, season, christmas }: { store: GameStore; season: Season; christmas: boolean }) {
   return (
     <group>
       {PEDESTRIANS.map((def, i) => (
-        <Pedestrian key={i} def={def} index={i} store={store} />
+        <Pedestrian key={i} def={def} index={i} store={store} season={season} christmas={christmas} />
       ))}
     </group>
   );

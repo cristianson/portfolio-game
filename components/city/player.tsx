@@ -9,10 +9,11 @@
 
 "use client";
 
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Character, PLAYER_LOOK, type Motion } from "./character";
+import { Character, dressFor, PLAYER_LOOK, type Motion } from "./character";
+import type { Season } from "./season";
 import { COLLIDERS, groundHeight, MARKER_ZONES, PICKUP_RADIUS, PICKUPS, type ZoneId } from "./world";
 import { resolveCircle, resolveCircles, segmentHit } from "./collision";
 import { angleDiff, type GameStore } from "./store";
@@ -25,9 +26,12 @@ interface PlayerProps {
   store: GameStore;
   onZoneChange: (zone: ZoneId | null) => void;
   onPickupChange: (name: string | null) => void;
+  season: Season;
+  christmas: boolean;
 }
 
-export function Player({ store, onZoneChange, onPickupChange }: PlayerProps) {
+export function Player({ store, onZoneChange, onPickupChange, season, christmas }: PlayerProps) {
+  const look = useMemo(() => dressFor(PLAYER_LOOK, season, christmas, "player"), [season, christmas]);
   const group = useRef<THREE.Group>(null!);
   const motion = useRef<Motion>({ speed: 0 });
   const camPos = useRef(new THREE.Vector3(0, 8, -48));
@@ -145,7 +149,8 @@ export function Player({ store, onZoneChange, onPickupChange }: PlayerProps) {
 
   return (
     <group ref={group} position={[store.player.x, 0.15, store.player.z]}>
-      <Character look={PLAYER_LOOK} motion={motion} />
+      {/* Lit a little after dark so you never lose yourself on the street */}
+      <Character look={look} motion={motion} glow={0.55} />
     </group>
   );
 }

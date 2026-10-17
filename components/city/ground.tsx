@@ -2,7 +2,7 @@
  * Ground & Sky
  *
  * Road, raised sidewalks with curbs, crosswalks, the little park and the
- * gradient sky dome. The fog colour matches the sky horizon so the far end
+ * gradient sky dome. In winter the sidewalks and the park are under snow. The fog colour matches the sky horizon so the far end
  * of the street dissolves into haze.
  */
 
@@ -17,6 +17,7 @@ import {
   grassTexture,
   roadTexture,
   sidewalkTexture,
+  snowTexture,
   createSky,
 } from "./textures";
 
@@ -24,15 +25,15 @@ import {
 const LENGTH = STREET_LENGTH;
 const CURB = new THREE.MeshLambertMaterial({ color: "#a8a49b" });
 
-function Sidewalk({ side }: { side: 1 | -1 }) {
+function Sidewalk({ side, winter }: { side: 1 | -1; winter: boolean }) {
   const w = SIDEWALK_OUTER - ROAD_HALF;
   const { geo, mats } = useMemo(() => {
-    const top = new THREE.MeshLambertMaterial({ map: sidewalkTexture() });
+    const top = new THREE.MeshLambertMaterial({ map: winter ? snowTexture() : sidewalkTexture() });
     return {
       geo: worldBox(w, SIDEWALK_HEIGHT, LENGTH, 2, 2),
       mats: [CURB, CURB, top, CURB, CURB, CURB],
     };
-  }, [w]);
+  }, [w, winter]);
   return (
     <mesh
       geometry={geo}
@@ -45,13 +46,13 @@ function Sidewalk({ side }: { side: 1 | -1 }) {
 // Gap in the fence + gravel path, in the middle of the park
 const PARK_GATE = (PARK.z0 + PARK.z1) / 2;
 
-function Park() {
+function Park({ winter }: { winter: boolean }) {
   const w = PARK.x1 - PARK.x0;
   const d = PARK.z1 - PARK.z0;
   const { geo, mats } = useMemo(() => {
-    const top = new THREE.MeshLambertMaterial({ map: grassTexture() });
+    const top = new THREE.MeshLambertMaterial({ map: winter ? snowTexture() : grassTexture() });
     return { geo: worldBox(w, SIDEWALK_HEIGHT, d, 3, 3), mats: [CURB, CURB, top, CURB, CURB, CURB] };
-  }, [w, d]);
+  }, [w, d, winter]);
   return (
     <group>
       <mesh geometry={geo} material={mats} position={[(PARK.x0 + PARK.x1) / 2, SIDEWALK_HEIGHT / 2 + 0.005, (PARK.z0 + PARK.z1) / 2]} />
@@ -82,7 +83,7 @@ function Park() {
   );
 }
 
-export function Ground() {
+export function Ground({ winter }: { winter: boolean }) {
   const roadMat = useMemo(() => {
     const tex = roadTexture().clone();
     tex.repeat.set(1, LENGTH / 10);
@@ -112,9 +113,9 @@ export function Ground() {
           <meshLambertMaterial color="#2a2b2d" />
         </mesh>
       ))}
-      <Sidewalk side={1} />
-      <Sidewalk side={-1} />
-      <Park />
+      <Sidewalk side={1} winter={winter} />
+      <Sidewalk side={-1} winter={winter} />
+      <Park winter={winter} />
     </group>
   );
 }

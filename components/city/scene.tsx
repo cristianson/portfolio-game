@@ -18,6 +18,8 @@ import { Markers } from "./markers";
 import { Pedestrians } from "./pedestrians";
 import { Player } from "./player";
 import { Pickups } from "./pickups";
+import { Seasonal } from "./seasonal";
+import type { Season } from "./season";
 import type { GameStore } from "./store";
 import type { ZoneId } from "./world";
 
@@ -28,12 +30,14 @@ interface SceneProps {
   onReady: () => void;
   /** 0 = night, 1 = day (see daylight.ts). */
   daylight: number;
+  season: Season;
+  christmas: boolean;
 }
 
 /** Sky, fog and lights for the current time of day. */
-function Environment({ daylight }: { daylight: number }) {
+function Environment({ daylight, winter }: { daylight: number; winter: boolean }) {
   const scene = useThree((s) => s.scene);
-  const env = useMemo(() => environmentFor(daylight), [daylight]);
+  const env = useMemo(() => environmentFor(daylight, winter), [daylight, winter]);
   const night = 1 - daylight;
 
   useEffect(() => {
@@ -45,7 +49,8 @@ function Environment({ daylight }: { daylight: number }) {
 
   return (
     <>
-      <fog attach="fog" args={[env.horizon, 30, 130]} />
+      {/* Falling snow thickens the haze */}
+      <fog attach="fog" args={[env.horizon, winter ? 24 : 30, winter ? 105 : 130]} />
       <hemisphereLight args={[env.hemiSky, env.hemiGround, env.hemi]} />
       <directionalLight position={env.sunPos} intensity={env.sunIntensity} color={env.sun} />
       <Sky top={env.skyTop} mid={env.skyMid} horizon={env.horizon} night={night} />
@@ -54,7 +59,7 @@ function Environment({ daylight }: { daylight: number }) {
 }
 
 // Memoised: the HUD clock re-renders the game shell every few seconds, the 3D scene shouldn't follow
-export const Scene = memo(function Scene({ store, onZoneChange, onPickupChange, onReady, daylight }: SceneProps) {
+export const Scene = memo(function Scene({ store, onZoneChange, onPickupChange, onReady, daylight, season, christmas }: SceneProps) {
   const wrapper = useRef<HTMLDivElement>(null);
 
   // Drag anywhere on the 3D view to rotate the camera
@@ -102,14 +107,15 @@ export const Scene = memo(function Scene({ store, onZoneChange, onPickupChange, 
           onReady();
         }}
       >
-        <Environment daylight={daylight} />
-        <Ground />
+        <Environment daylight={daylight} winter={season === "winter"} />
+        <Ground winter={season === "winter"} />
         <Buildings />
-        <Props />
+        <Props season={season} christmas={christmas} />
+        <Seasonal season={season} christmas={christmas} night={1 - daylight} />
         <Markers store={store} />
         <Pickups store={store} />
-        <Pedestrians store={store} />
-        <Player store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} />
+        <Pedestrians store={store} season={season} christmas={christmas} />
+        <Player store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} season={season} christmas={christmas} />
       </Canvas>
     </div>
   );

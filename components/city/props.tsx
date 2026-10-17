@@ -3,7 +3,9 @@
  *
  * Low-poly street furniture (lamps, hydrants, trees, benches, the phone booth
  * for Socials, road-closed barriers) and parked cars, all built from a handful
- * of primitives with shared materials.
+ * of primitives with shared materials. Trees change colour with the season,
+ * cars get snow on the roof in winter and the lamps wear stars and snowflakes
+ * over Christmas (see season.ts).
  */
 
 "use client";
@@ -14,6 +16,7 @@ import { useFrame } from "@react-three/fiber";
 import { PARK_TREES, PARKED_CARS, PROPS, SIDEWALK_HEIGHT, type CarDef, type PropDef } from "./world";
 import { blobShadowTexture, lightPoolTexture, signTexture } from "./textures";
 import { registerNightGlow } from "./daylight";
+import { CANOPY, type Season } from "./season";
 
 const mat = (color: string) => new THREE.MeshLambertMaterial({ color });
 
@@ -23,9 +26,10 @@ const M = {
   hydrant: mat("#c0392b"),
   hydrantCap: mat("#e0e0e0"),
   trunk: mat("#5b3d24"),
-  leaves: new THREE.MeshLambertMaterial({ color: "#4f7f34", flatShading: true }),
-  leavesLight: new THREE.MeshLambertMaterial({ color: "#6a9a3e", flatShading: true }),
   dirt: mat("#4a3b2b"),
+  snow: mat("#f2f5f8"),
+  star: new THREE.MeshBasicMaterial({ color: "#ffd84a", toneMapped: false }),
+  flake: new THREE.MeshBasicMaterial({ color: "#d4ecff", toneMapped: false }),
   bin: mat("#2c4a3a"),
   binLid: mat("#22382c"),
   newsbox: mat("#2463a8"),
@@ -84,11 +88,55 @@ function lightPool() {
   return poolMaterial;
 }
 
-function Lamp({ x }: { x: number }) {
+let starGeo: THREE.BufferGeometry | null = null;
+/** Five-pointed star, slightly extruded so it reads from the side too. */
+export function starGeometry() {
+  if (!starGeo) {
+    const shape = new THREE.Shape();
+    for (let i = 0; i < 10; i++) {
+      const a = Math.PI / 2 + (i * Math.PI) / 5;
+      const r = i % 2 ? 0.17 : 0.42;
+      if (i) shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      else shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    starGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.06, bevelEnabled: false });
+    starGeo.translate(0, 0, -0.03);
+  }
+  return starGeo;
+}
+
+/** Christmas lamp decoration: alternating gold stars and ice-blue snowflakes. */
+function LampOrnament({ star }: { star: boolean }) {
+  // Two copies crossed at right angles so it reads from every direction
+  return (
+    <group>
+      {[0, Math.PI / 2].map((ry) => (
+        <group key={ry} rotation={[0, ry, 0]}>
+          {star ? (
+            <mesh geometry={starGeometry()} material={M.star} />
+          ) : (
+            [0, 1, 2].map((k) => (
+              <mesh key={k} rotation={[0, 0, (k * Math.PI) / 3]} material={M.flake}>
+                <boxGeometry args={[0.8, 0.07, 0.05]} />
+              </mesh>
+            ))
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function Lamp({ x, z, christmas }: { x: number; z: number; christmas: boolean }) {
   // Arm reaches over the road
   const dir = x > 0 ? -1 : 1;
   return (
     <group>
+      {christmas && (
+        <group position={[dir * 0.5, 4.4, 0]}>
+          <LampOrnament star={Math.round(z) % 2 === 0} />
+        </group>
+      )}
       <mesh position={[0, 0.15, 0]} material={M.pole}>
         <cylinderGeometry args={[0.18, 0.22, 0.3, 8]} />
       </mesh>
@@ -170,9 +218,12 @@ const FADED_OPACITY = 0.28;
 const canopyCenter = new THREE.Vector3();
 
 /** Low-poly street tree. The canopy fades out while the camera is inside it. */
-export function Tree({ scale = 1 }: { scale?: number }) {
+export function Tree({ scale = 1, season }: { scale?: number; season: Season }) {
   const canopy = useRef<THREE.Group>(null!);
-  const mats = useMemo(() => [M.leaves.clone(), M.leavesLight.clone()], []);
+  const mats = useMemo(
+    () => CANOPY[season].map((color) => new THREE.MeshLambertMaterial({ color, flatShading: true })),
+    [season]
+  );
 
   useFrame(({ camera }) => {
     canopy.current.getWorldPosition(canopyCenter);
@@ -193,7 +244,7 @@ export function Tree({ scale = 1 }: { scale?: number }) {
 
   return (
     <group scale={scale}>
-      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={M.dirt}>
+      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={season === "winter" ? M.snow : M.dirt}>
         <planeGeometry args={[1.1, 1.1]} />
       </mesh>
       <mesh position={[0, 1.4, 0]} material={M.trunk}>
@@ -325,11 +376,11 @@ function Barrier({ sign }: { sign: boolean }) {
   );
 }
 
-function Prop({ p }: { p: PropDef }) {
+function Prop({ p, season, christmas }: { p: PropDef; season: Season; christmas: boolean }) {
   let node: React.ReactNode = null;
   switch (p.kind) {
     case "lamp":
-      node = <Lamp x={p.x} />;
+      node = <Lamp x={p.x} z={p.z} christmas={christmas} />;
       break;
     case "signal":
       node = <Signal x={p.x} />;
@@ -338,7 +389,7 @@ function Prop({ p }: { p: PropDef }) {
       node = <Hydrant />;
       break;
     case "tree":
-      node = <Tree />;
+      node = <Tree season={season} />;
       break;
     case "bench":
       node = <Bench />;
@@ -378,10 +429,15 @@ function bodyMat(color: string) {
   return m;
 }
 
-function Van({ c }: { c: CarDef }) {
+function Van({ c, snow }: { c: CarDef; snow: boolean }) {
   const body = bodyMat(c.color);
   return (
     <group position={[c.x, 0, c.z]} rotation={[0, c.rot, 0]}>
+      {snow && (
+        <mesh position={[0, 2.18, -0.3]} material={M.snow}>
+          <boxGeometry args={[1.85, 0.12, 3.8]} />
+        </mesh>
+      )}
       <BlobShadow w={2.5} d={5.4} />
       <mesh position={[0, 1.25, -0.25]} material={body}>
         <boxGeometry args={[1.95, 1.75, 4.0]} />
@@ -430,12 +486,24 @@ function Van({ c }: { c: CarDef }) {
   );
 }
 
-export function Car({ c }: { c: CarDef }) {
-  if (c.van) return <Van c={c} />;
+export function Car({ c, snow = false }: { c: CarDef; snow?: boolean }) {
+  if (c.van) return <Van c={c} snow={snow} />;
   const body = bodyMat(c.color);
   const taxi = c.taxi ? signTexture("TAXI", "#111111", "#f4c20d") : null;
   return (
     <group position={[c.x, 0, c.z]} rotation={[0, c.rot, 0]}>
+      {snow && (
+        <>
+          <mesh position={[0, 1.64, -0.3]} material={M.snow}>
+            <boxGeometry args={[1.6, 0.1, 1.7]} />
+          </mesh>
+          {[1.35, -1.75].map((z) => (
+            <mesh key={z} position={[0, z > 0 ? 1.07 : 0.97, z]} rotation={[z > 0 ? 0.08 : 0, 0, 0]} material={M.snow}>
+              <boxGeometry args={[1.7, 0.06, z > 0 ? 1.4 : 0.7]} />
+            </mesh>
+          ))}
+        </>
+      )}
       <BlobShadow w={2.4} d={5} />
       {/* Lower body */}
       <mesh position={[0, 0.62, 0]} material={body}>
@@ -504,19 +572,21 @@ export function Car({ c }: { c: CarDef }) {
   );
 }
 
-export function Props() {
+export const parkTreeScale = (i: number) => 1.15 + (i % 2) * 0.2;
+
+export function Props({ season, christmas }: { season: Season; christmas: boolean }) {
   return (
     <group>
       {PROPS.map((p, i) => (
-        <Prop key={i} p={p} />
+        <Prop key={i} p={p} season={season} christmas={christmas} />
       ))}
       {PARK_TREES.map(([x, z], i) => (
         <group key={i} position={[x, SIDEWALK_HEIGHT, z]}>
-          <Tree scale={1.15 + (i % 2) * 0.2} />
+          <Tree scale={parkTreeScale(i)} season={season} />
         </group>
       ))}
       {PARKED_CARS.map((c, i) => (
-        <Car key={i} c={c} />
+        <Car key={i} c={c} snow={season === "winter"} />
       ))}
     </group>
   );
