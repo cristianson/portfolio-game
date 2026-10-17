@@ -18,8 +18,8 @@ import { resolveCircle, resolveCircles, segmentHit } from "./collision";
 import { angleDiff, type GameStore } from "./store";
 
 const RADIUS = 0.35;
-const RUN_SPEED = 5.6;
-const SPRINT_SPEED = 8.5;
+const RUN_SPEED = 6.4;
+const SPRINT_SPEED = 9.5;
 
 interface PlayerProps {
   store: GameStore;
@@ -107,7 +107,7 @@ export function Player({ store, onZoneChange, onPickupChange }: PlayerProps) {
     const ease = 1 - Math.exp(-dt * 7);
     if (store.phase === "title") {
       const t = state.clock.elapsedTime;
-      const z = -40 + 32 * (1 - Math.cos(t * 0.06));
+      const z = -26 + 20 * (1 - Math.cos(t * 0.06));
       tmp.current.set(Math.sin(t * 0.13) * 2.5, 8 + Math.sin(t * 0.09) * 1.5, z);
       camPos.current.lerp(tmp.current, 1 - Math.exp(-dt * 2));
       lookAt.current.lerp(tmp.current.set(0, 4, z + 14), 1 - Math.exp(-dt * 2));

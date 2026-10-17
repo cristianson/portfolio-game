@@ -10,7 +10,7 @@
 
 import React, { useMemo } from "react";
 import * as THREE from "three";
-import { PARK, ROAD_HALF, SIDEWALK_HEIGHT, SIDEWALK_OUTER } from "./world";
+import { CROSSWALKS, PARK, ROAD_HALF, SIDEWALK_HEIGHT, SIDEWALK_OUTER, STREET_LENGTH } from "./world";
 import { worldBox } from "./geometry";
 import {
   crosswalkTexture,
@@ -22,7 +22,7 @@ import {
 
 export const FOG_COLOR = "#d4cbc6";
 
-const LENGTH = 112;
+const LENGTH = STREET_LENGTH;
 const CURB = new THREE.MeshLambertMaterial({ color: "#a8a49b" });
 
 function Sidewalk({ side }: { side: 1 | -1 }) {
@@ -43,6 +43,9 @@ function Sidewalk({ side }: { side: 1 | -1 }) {
   );
 }
 
+// Gap in the fence + gravel path, in the middle of the park
+const PARK_GATE = (PARK.z0 + PARK.z1) / 2;
+
 function Park() {
   const w = PARK.x1 - PARK.x0;
   const d = PARK.z1 - PARK.z0;
@@ -55,8 +58,8 @@ function Park() {
       <mesh geometry={geo} material={mats} position={[(PARK.x0 + PARK.x1) / 2, SIDEWALK_HEIGHT / 2 + 0.005, (PARK.z0 + PARK.z1) / 2]} />
       {/* Iron fence along the sidewalk edge, with a gap for the path */}
       {[
-        [PARK.z0, 19],
-        [25, PARK.z1],
+        [PARK.z0, PARK_GATE - 2.5],
+        [PARK_GATE + 2.5, PARK.z1],
       ].map(([z0, z1]) => (
         <group key={z0}>
           <mesh position={[-SIDEWALK_OUTER - 0.1, 0.65, (z0 + z1) / 2]}>
@@ -72,7 +75,7 @@ function Park() {
         </group>
       ))}
       {/* Gravel path */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-15, SIDEWALK_HEIGHT + 0.02, 22]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-15, SIDEWALK_HEIGHT + 0.02, PARK_GATE]}>
         <planeGeometry args={[12, 2.4]} />
         <meshLambertMaterial color="#b8a988" />
       </mesh>
@@ -98,13 +101,13 @@ export function Ground() {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} material={roadMat}>
         <planeGeometry args={[ROAD_HALF * 2, LENGTH]} />
       </mesh>
-      {[-5, 27].map((z) => (
+      {CROSSWALKS.map((z) => (
         <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, z]}>
           <planeGeometry args={[ROAD_HALF * 2, 3]} />
           <meshLambertMaterial map={crosswalkTexture()} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       ))}
-      {[-20, 14].map((z) => (
+      {[-20, 9].map((z) => (
         <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[1.6, 0.02, z]}>
           <circleGeometry args={[0.45, 12]} />
           <meshLambertMaterial color="#2a2b2d" />

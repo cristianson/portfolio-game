@@ -9,7 +9,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { BUILDINGS, MARKER_ZONES, PARK, PICKUPS, ROAD_HALF, SIDEWALK_OUTER, ZONES } from "./world";
+import { BUILDINGS, MARKER_ZONES, PARK, PICKUPS, ROAD_HALF, SIDEWALK_OUTER, STREET_LENGTH, ZONES } from "./world";
 import { SOCIALS } from "./content";
 import type { GameStore } from "./store";
 
@@ -88,8 +88,8 @@ export function Radar({ store, className = "" }: { store: GameStore; className?:
         <g ref={map}>
           <rect x={-40} y={-70} width={80} height={140} fill="#e6b84f" />
           <rect x={PARK.x0} y={PARK.z0} width={PARK.x1 - PARK.x0} height={PARK.z1 - PARK.z0} fill="#9fb052" />
-          <rect x={-SIDEWALK_OUTER} y={-56} width={SIDEWALK_OUTER * 2} height={112} fill="#8a7d5c" />
-          <rect x={-ROAD_HALF} y={-56} width={ROAD_HALF * 2} height={112} fill="#5c5544" />
+          <rect x={-SIDEWALK_OUTER} y={-STREET_LENGTH / 2} width={SIDEWALK_OUTER * 2} height={STREET_LENGTH} fill="#8a7d5c" />
+          <rect x={-ROAD_HALF} y={-STREET_LENGTH / 2} width={ROAD_HALF * 2} height={STREET_LENGTH} fill="#5c5544" />
           {BUILDINGS.map((b) => {
             const zone = ZONES.find((z) => z.id === b.zone);
             return (

@@ -89,10 +89,11 @@ function Lamp({ x }: { x: number }) {
 }
 
 /** Traffic light on a mast arm reaching over the road, GTA 3 street-corner style. */
-function Signal({ x, z }: { x: number; z: number }) {
+function Signal({ x }: { x: number }) {
   const dir = x > 0 ? -1 : 1;
-  // Face the traffic approaching this side of the crosswalk
-  const face = z < -5 || (z > 20 && z < 27) ? Math.PI : 0;
+  // Face the traffic approaching this side of the crosswalk: east lights stand
+  // just south of it (facing south), west lights just north (facing north)
+  const face = x > 0 ? Math.PI : 0;
   const head = (
     <group>
       <mesh material={M.signalBox}>
@@ -308,7 +309,7 @@ function Prop({ p }: { p: PropDef }) {
       node = <Lamp x={p.x} />;
       break;
     case "signal":
-      node = <Signal x={p.x} z={p.z} />;
+      node = <Signal x={p.x} />;
       break;
     case "hydrant":
       node = <Hydrant />;
