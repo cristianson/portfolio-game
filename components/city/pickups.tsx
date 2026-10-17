@@ -12,7 +12,7 @@ import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { SOCIALS } from "./content";
-import { SOCIAL_ICON_PATHS } from "./icons";
+import { FILLED_ICONS, SOCIAL_ICON_PATHS } from "./icons";
 import { groundHeight, PICKUPS, type PickupDef } from "./world";
 import type { GameStore } from "./store";
 
@@ -32,11 +32,17 @@ function iconTexture(name: string) {
     ctx.scale(scale, scale);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    // Dark outline first, then the white glyph, so it reads on any color
-    for (const [color, width] of [["rgba(0,0,0,0.35)", 4], ["#ffffff", 2.4]] as const) {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width;
-      for (const d of SOCIAL_ICON_PATHS[name] ?? []) ctx.stroke(new Path2D(d));
+    const paths = (SOCIAL_ICON_PATHS[name] ?? []).map((d) => new Path2D(d));
+    if (FILLED_ICONS.has(name)) {
+      ctx.fillStyle = "#ffffff";
+      for (const path of paths) ctx.fill(path);
+    } else {
+      // Dark outline first, then the white glyph, so it reads on any color
+      for (const [color, width] of [["rgba(0,0,0,0.35)", 4], ["#ffffff", 2.4]] as const) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        for (const path of paths) ctx.stroke(path);
+      }
     }
     tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -71,7 +77,12 @@ function Pickup({ def, store, index }: { def: PickupDef; store: GameStore; index
 
   const { ball, icon } = useMemo(
     () => ({
-      ball: new THREE.MeshLambertMaterial({ color: social.color, emissive: social.color, emissiveIntensity: 0.25 }),
+      // Pure black (X) would render as a flat hole; lift it just enough to show some shading
+      ball: new THREE.MeshLambertMaterial({
+        color: social.color === "#000000" ? "#2a2a2a" : social.color,
+        emissive: social.color,
+        emissiveIntensity: 0.25,
+      }),
       icon: new THREE.MeshBasicMaterial({ map: iconTexture(def.name), transparent: true, toneMapped: false }),
     }),
     [social.color, def.name]

@@ -94,7 +94,7 @@ export interface PickupDef {
 
 export const PICKUPS: PickupDef[] = [
   { name: "LinkedIn", x: -7.1, z: 20.5 },
-  { name: "Twitter(X)", x: 7.1, z: 17.5 },
+  { name: "X", x: 7.1, z: 17.5 },
   { name: "GitHub", x: 0, z: 38 },
 ];
 

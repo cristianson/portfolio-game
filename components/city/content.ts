@@ -137,6 +137,6 @@ export interface Social {
 
 export const SOCIALS: Social[] = [
   { name: "LinkedIn", short: "LinkedIn", handle: "in/crisiordan", url: "https://www.linkedin.com/in/crisiordan/", color: "#0a66c2" },
-  { name: "Twitter(X)", short: "X", handle: "@CristianIordan_", url: "https://x.com/CristianIordan_", color: "#1d9bf0" },
+  { name: "X", short: "X", handle: "@CristianIordan_", url: "https://x.com/CristianIordan_", color: "#000000" },
   { name: "GitHub", short: "GitHub", handle: "cristianson", url: "https://github.com/cristianson", color: "#8250df" },
 ];
