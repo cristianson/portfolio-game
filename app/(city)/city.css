@@ -28,3 +28,36 @@
   paint-order: stroke fill;
   text-shadow: 4px 4px 0 #000;
 }
+
+/*
+ * Static portfolio (components/city/static-portfolio.tsx): visually hidden
+ * while the game runs, the whole page when the game can't run.
+ */
+.static-portfolio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+html[data-fallback] .static-portfolio {
+  position: fixed;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow-y: auto;
+  clip-path: none;
+  white-space: normal;
+}
+
+.fallback-only {
+  display: none;
+}
+
+html[data-fallback] .fallback-only {
+  display: block;
+}

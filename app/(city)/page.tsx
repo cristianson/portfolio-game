@@ -1,13 +1,19 @@
-"use client";
+import { GameLoader } from "@/components/city/game-loader";
+import { StaticPortfolio } from "@/components/city/static-portfolio";
 
-import dynamic from "next/dynamic";
-
-// three.js needs the browser, so the whole game is client-only
-const DesignDistrict = dynamic(() => import("@/components/city"), {
-  ssr: false,
-  loading: () => <div className="fixed inset-0 bg-black" />,
-});
+// Without JavaScript there is no game: show the text version instead of a black screen
+const NO_JS_STYLES = `<style>
+  .game-root { display: none !important; }
+  .static-portfolio { position: fixed; inset: 0; width: auto; height: auto; margin: 0; overflow-y: auto; clip-path: none; white-space: normal; }
+  .fallback-only { display: none !important; }
+</style>`;
 
 export default function CityPage() {
-  return <DesignDistrict />;
+  return (
+    <>
+      <noscript dangerouslySetInnerHTML={{ __html: NO_JS_STYLES }} />
+      <StaticPortfolio />
+      <GameLoader />
+    </>
+  );
 }

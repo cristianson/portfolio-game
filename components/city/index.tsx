@@ -66,12 +66,21 @@ const MOVE_KEYS: Record<string, [number, number]> = {
   ArrowRight: [1, 0],
 };
 
-export default function DesignDistrict() {
+// If the 3D canvas hasn't started by then, assume the GPU can't run it
+const STARTUP_TIMEOUT_MS = 15000;
+
+export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const store = useRef(createStore()).current;
   const { trigger: haptic } = useWebHaptics();
   const { compact, touch } = useCompactLayout();
 
   const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (ready || !onFatal) return;
+    const id = setTimeout(onFatal, STARTUP_TIMEOUT_MS);
+    return () => clearTimeout(id);
+  }, [ready, onFatal]);
   const [phase, setPhaseState] = useState<Phase>("title");
   const [nearZone, setNearZone] = useState<ZoneId | null>(null);
   const [panelZone, setPanelZone] = useState<ZoneId | null>(null);
@@ -165,7 +174,9 @@ export default function DesignDistrict() {
     };
     const down = (e: KeyboardEvent) => {
       const isAction = e.code === "Enter" || e.code === "Space" || e.code === "KeyE";
-      if (MOVE_KEYS[e.code] || e.code === "Space") e.preventDefault();
+      // Only steal arrows / space while walking; in panels and the menu they scroll and press buttons
+      const steering = store.phase === "play" || store.phase === "title";
+      if (steering && (MOVE_KEYS[e.code] || e.code === "Space")) e.preventDefault();
       if (store.phase === "title") {
         if (ready && (e.code === "Enter" || e.code === "Space")) start();
         return;

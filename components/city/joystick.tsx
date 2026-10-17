@@ -19,36 +19,11 @@ export function Joystick({ onMove, onStop }: JoystickProps) {
   const [active, setActive] = useState(false)
   const joystickRef = useRef<HTMLDivElement>(null)
   const knobRef = useRef<HTMLDivElement>(null)
+  // The finger driving the joystick; other fingers (e.g. dragging the camera) are ignored
   const touchId = useRef<number | null>(null)
-  
-  const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
-    // Prevent default to avoid text selection and scrolling issues
-    e.preventDefault()
-    setActive(true)
-    const touch = 'touches' in e ? e.touches[0] : e as unknown as React.Touch
-    if ('touches' in e) touchId.current = touch.identifier
-  }
 
-  const handleMove = useCallback((e: TouchEvent | MouseEvent) => {
+  const updateFrom = useCallback((clientX: number, clientY: number) => {
     if (!joystickRef.current || !knobRef.current) return
-    
-    // Prevent scrolling while using joystick
-    e.preventDefault()
-    
-    let clientX, clientY
-    if ('touches' in e) {
-      const touch = Array.from(e.touches).find(t => t.identifier === touchId.current)
-      if (!touch) return
-      clientX = touch.clientX
-      clientY = touch.clientY
-    } else {
-      if ((e as MouseEvent).buttons === 0) {
-        handleEnd()
-        return
-      }
-      clientX = (e as MouseEvent).clientX
-      clientY = (e as MouseEvent).clientY
-    }
 
     const rect = joystickRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
@@ -75,7 +50,7 @@ export function Joystick({ onMove, onStop }: JoystickProps) {
     // Apply transform - since knob is centered with inset-0 m-auto,
     // we only need to translate by the offset amount (no -50% needed)
     knobRef.current.style.transform = `translate(${dx}px, ${dy}px)`
-    
+
     // Normalize output to -1 to 1 range
     const normalizedX = maxRadius > 0 ? dx / maxRadius : 0
     const normalizedY = maxRadius > 0 ? dy / maxRadius : 0
@@ -85,37 +60,83 @@ export function Joystick({ onMove, onStop }: JoystickProps) {
   const handleEnd = useCallback(() => {
     setActive(false)
     touchId.current = null
-    
+
     if (knobRef.current) {
       // Reset knob to center position
       knobRef.current.style.transform = 'translate(0px, 0px)'
     }
-    
+
     onStop()
   }, [onStop])
 
+  // Touch start is attached natively: React registers touch listeners as passive,
+  // which would make preventDefault (no scroll / zoom while steering) throw a warning
   useEffect(() => {
-    if (active) {
-      // Use { passive: false } to allow preventDefault on touch events
-      window.addEventListener('touchmove', handleMove, { passive: false })
-      window.addEventListener('touchend', handleEnd)
-      window.addEventListener('mousemove', handleMove)
-      window.addEventListener('mouseup', handleEnd)
+    const el = joystickRef.current
+    if (!el) return
+    const start = (e: TouchEvent) => {
+      e.preventDefault()
+      if (touchId.current !== null) return
+      const touch = e.changedTouches[0]
+      touchId.current = touch.identifier
+      setActive(true)
+      updateFrom(touch.clientX, touch.clientY)
     }
+    el.addEventListener('touchstart', start, { passive: false })
+    return () => el.removeEventListener('touchstart', start)
+  }, [updateFrom])
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Prevent default to avoid text selection
+    e.preventDefault()
+    setActive(true)
+    updateFrom(e.clientX, e.clientY)
+  }
+
+  useEffect(() => {
+    if (!active) return
+    const ownTouch = (list: TouchList) => Array.from(list).find(t => t.identifier === touchId.current)
+    const touchMove = (e: TouchEvent) => {
+      const touch = ownTouch(e.touches)
+      if (!touch) return
+      // Prevent scrolling while using joystick
+      e.preventDefault()
+      updateFrom(touch.clientX, touch.clientY)
+    }
+    // Only our own finger lifting (or the OS cancelling it) releases the stick
+    const touchEnd = (e: TouchEvent) => {
+      if (ownTouch(e.changedTouches)) handleEnd()
+    }
+    const mouseMove = (e: MouseEvent) => {
+      if (touchId.current !== null) return
+      if (e.buttons === 0) handleEnd()
+      else updateFrom(e.clientX, e.clientY)
+    }
+    const mouseUp = () => {
+      if (touchId.current === null) handleEnd()
+    }
+    window.addEventListener('touchmove', touchMove, { passive: false })
+    window.addEventListener('touchend', touchEnd)
+    window.addEventListener('touchcancel', touchEnd)
+    window.addEventListener('mousemove', mouseMove)
+    window.addEventListener('mouseup', mouseUp)
+    // Losing the page (app switch, notification) also lets go
+    window.addEventListener('blur', handleEnd)
     return () => {
-      window.removeEventListener('touchmove', handleMove)
-      window.removeEventListener('touchend', handleEnd)
-      window.removeEventListener('mousemove', handleMove)
-      window.removeEventListener('mouseup', handleEnd)
+      window.removeEventListener('touchmove', touchMove)
+      window.removeEventListener('touchend', touchEnd)
+      window.removeEventListener('touchcancel', touchEnd)
+      window.removeEventListener('mousemove', mouseMove)
+      window.removeEventListener('mouseup', mouseUp)
+      window.removeEventListener('blur', handleEnd)
     }
-  }, [active, handleMove, handleEnd])
+  }, [active, updateFrom, handleEnd])
 
   return (
     <div 
       ref={joystickRef}
       className={`relative w-32 h-32 bg-black/30 rounded-full backdrop-blur-sm border-2 border-white/20 touch-none transition-opacity ${active ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
-      onTouchStart={handleStart}
-      onMouseDown={handleStart}
+      onMouseDown={handleMouseDown}
     >
       {/* 
         Knob positioning explained:

@@ -8,13 +8,61 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { SECTION_SUBTITLE, SectionPage } from "./sections";
 import { ZONES, type ZoneId } from "./world";
 
 export function ContentPanel({ zone, onClose }: { zone: ZoneId; onClose: () => void }) {
   const def = ZONES.find((z) => z.id === zone)!;
+  const scroller = useRef<HTMLDivElement>(null);
+
+  // Scroll with the keyboard ourselves: browsers aim key scrolling at the last clicked node,
+  // which is gone after opening a section from the menu, so native scrolling does nothing
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+      // Space / Enter on a link or button should press it, not scroll
+      if ((e.key === " " || e.key === "Enter") && (e.target as HTMLElement).closest("a, button")) return;
+      const page = el.clientHeight * 0.85;
+      let top: number | null = null;
+      let by = 0;
+      switch (e.key) {
+        case "ArrowDown":
+          by = 80;
+          break;
+        case "ArrowUp":
+          by = -80;
+          break;
+        case "PageDown":
+          by = page;
+          break;
+        case "PageUp":
+          by = -page;
+          break;
+        case " ":
+          by = e.shiftKey ? -page : page;
+          break;
+        case "Home":
+          top = 0;
+          break;
+        case "End":
+          top = el.scrollHeight;
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+      if (top !== null) el.scrollTo({ top, behavior: "smooth" });
+      else el.scrollBy({ top: by, behavior: "smooth" });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zone]);
+
   return (
     <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-[2px] md:p-6 animate-in fade-in duration-200">
       <div
@@ -43,7 +91,7 @@ export function ContentPanel({ zone, onClose }: { zone: ZoneId; onClose: () => v
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-1 overscroll-contain">
+        <div ref={scroller} tabIndex={-1} className="overflow-y-auto flex-1 overscroll-contain outline-none">
           {/* Title */}
           <header className="px-5 md:px-10 pt-8 md:pt-10 pb-6">
             <h2 className="font-gta gta-stroke-lg text-[52px] md:text-[84px] leading-[0.9] uppercase" style={{ color: def.color }}>
