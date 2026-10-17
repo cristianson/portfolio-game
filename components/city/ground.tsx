@@ -107,7 +107,7 @@ export function Ground() {
           <meshLambertMaterial map={crosswalkTexture()} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       ))}
-      {[-20, 9].map((z) => (
+      {[-15, 6].map((z) => (
         <mesh key={z} rotation={[-Math.PI / 2, 0, 0]} position={[1.6, 0.02, z]}>
           <circleGeometry args={[0.45, 12]} />
           <meshLambertMaterial color="#2a2b2d" />

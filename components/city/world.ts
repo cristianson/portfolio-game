@@ -14,8 +14,8 @@ export type ZoneId = "ABOUT" | "PROJECTS" | "CASE_STUDIES" | "SOCIALS";
 export const ROAD_HALF = 5;
 export const SIDEWALK_OUTER = 9;
 export const SIDEWALK_HEIGHT = 0.15;
-/** The street runs from -STREET_HALF to +STREET_HALF along Z (64 m end to end). */
-export const STREET_HALF = 32;
+/** The street runs from -STREET_HALF to +STREET_HALF along Z (50 m end to end). */
+export const STREET_HALF = 25;
 /** Road / sidewalk length, reaching under the backdrop buildings at both ends. */
 export const STREET_LENGTH = (STREET_HALF + 6) * 2;
 export const FLOOR_HEIGHT = 3.2;
@@ -75,10 +75,10 @@ export interface ZoneDef {
 
 /** Every section; Socials has no marker (see PICKUPS) but still shows in the menu and radar legend. */
 export const ZONES: ZoneDef[] = [
-  { id: "ABOUT", label: "About Me", blip: "A", color: "#ff4fa3", x: 7.3, z: -18, radius: 1.2 },
-  { id: "PROJECTS", label: "Built Projects", blip: "P", color: "#b36bff", x: -7.3, z: -5, radius: 1.2 },
-  { id: "CASE_STUDIES", label: "Case Studies", blip: "C", color: "#ffb020", x: 7.3, z: 4, radius: 1.2 },
-  { id: "SOCIALS", label: "Socials", blip: "S", color: "#3ddc84", x: -6.9, z: 18, radius: 1.2 },
+  { id: "ABOUT", label: "About Me", blip: "A", color: "#ff4fa3", x: 7.3, z: -13.5, radius: 1.2 },
+  { id: "PROJECTS", label: "Built Projects", blip: "P", color: "#b36bff", x: -7.3, z: -4, radius: 1.2 },
+  { id: "CASE_STUDIES", label: "Case Studies", blip: "C", color: "#ffb020", x: 7.3, z: 5, radius: 1.2 },
+  { id: "SOCIALS", label: "Socials", blip: "S", color: "#3ddc84", x: -6.9, z: 13.5, radius: 1.2 },
 ];
 
 /** Sections you walk into a glowing marker for. */
@@ -95,9 +95,9 @@ export interface PickupDef {
 }
 
 export const PICKUPS: PickupDef[] = [
-  { name: "LinkedIn", x: -7.1, z: 16.5 },
-  { name: "X", x: 7.1, z: 10 },
-  { name: "GitHub", x: 0, z: 25 },
+  { name: "LinkedIn", x: -7.1, z: 13.5 },
+  { name: "X", x: 7.1, z: 10.5 },
+  { name: "GitHub", x: 0, z: 19 },
 ];
 
 export const PICKUP_RADIUS = 1.0;
@@ -108,31 +108,31 @@ const H = STREET_HALF;
 
 export const BUILDINGS: BuildingDef[] = [
   // ── East side (facade faces -x) ─────────────────────────────
-  { id: "e1", x0: E, x1: E + 12, z0: -H, z1: -24, floors: 2, style: "beige", facing: "-x", sign: { text: "24/7 DELI", bg: "#1d6b3a", fg: "#fff6d5" }, awning: "#1d6b3a", door: -28 },
-  { id: "about", x0: E, x1: E + 12, z0: -24, z1: -12, floors: 3, style: "brownstone", facing: "-x", sign: { text: "ABOUT ME", bg: "#2a1a12", fg: "#ff8fc6", width: 5 }, door: -18, stoop: true, zone: "ABOUT" },
-  { id: "e3", x0: E, x1: E + 12, z0: -12, z1: -4, floors: 5, style: "brick", facing: "-x", sign: { text: "LAUNDROMAT", bg: "#1f4e8c", fg: "#ffffff" }, awning: "#c0392b", door: -8, waterTower: true, fireEscape: true, blade: { text: "24HR", bg: "#c0221a", fg: "#ffe14d", at: -11.3 } },
-  { id: "case", x0: E, x1: E + 14, z0: -4, z1: 12, floors: 9, style: "glass", facing: "-x", sign: { text: "CASE STUDIES", bg: "#101418", fg: "#ffb020", width: 8 }, door: 4, zone: "CASE_STUDIES" },
-  { id: "e6", x0: E, x1: E + 12, z0: 12, z1: H, floors: 6, style: "brick", facing: "-x", sign: { text: "HOTEL GRID", bg: "#5a0e0e", fg: "#ffd34d" }, door: 22, waterTower: true, fireEscape: true, blade: { text: "HOTEL", bg: "#1d2f4f", fg: "#ff5a5a", at: 14 } },
+  { id: "e1", x0: E, x1: E + 12, z0: -H, z1: -19, floors: 2, style: "beige", facing: "-x", sign: { text: "24/7 DELI", bg: "#1d6b3a", fg: "#fff6d5" }, awning: "#1d6b3a", door: -22 },
+  { id: "about", x0: E, x1: E + 12, z0: -19, z1: -8, floors: 3, style: "brownstone", facing: "-x", sign: { text: "ABOUT ME", bg: "#2a1a12", fg: "#ff8fc6", width: 5 }, door: -13.5, stoop: true, zone: "ABOUT" },
+  { id: "e3", x0: E, x1: E + 12, z0: -8, z1: -2, floors: 5, style: "brick", facing: "-x", sign: { text: "LAUNDROMAT", bg: "#1f4e8c", fg: "#ffffff" }, awning: "#c0392b", door: -5, waterTower: true, blade: { text: "24HR", bg: "#c0221a", fg: "#ffe14d", at: -7.3 } },
+  { id: "case", x0: E, x1: E + 14, z0: -2, z1: 12, floors: 9, style: "glass", facing: "-x", sign: { text: "CASE STUDIES", bg: "#101418", fg: "#ffb020", width: 8 }, door: 5, zone: "CASE_STUDIES" },
+  { id: "e6", x0: E, x1: E + 12, z0: 12, z1: H, floors: 6, style: "brick", facing: "-x", sign: { text: "HOTEL GRID", bg: "#5a0e0e", fg: "#ffd34d" }, door: 19, waterTower: true, fireEscape: true, blade: { text: "HOTEL", bg: "#1d2f4f", fg: "#ff5a5a", at: 12.7 } },
 
   // ── West side (facade faces +x) ─────────────────────────────
-  { id: "w1", x0: -E - 12, x1: -E, z0: -H, z1: -22, floors: 4, style: "concrete", facing: "+x", sign: { text: "BOOKS & VINYL", bg: "#3b2a6b", fg: "#ffe9a8" }, awning: "#3b2a6b", door: -27, waterTower: true, fireEscape: true },
-  { id: "w2", x0: -E - 12, x1: -E, z0: -22, z1: -12, floors: 2, style: "beige", facing: "+x", sign: { text: "JOE'S DINER", bg: "#c0392b", fg: "#ffffff" }, awning: "#e74c3c", door: -17 },
-  { id: "projects", x0: -E - 12, x1: -E, z0: -12, z1: 2, floors: 2, style: "garage", facing: "+x", sign: { text: "BUILT PROJECTS", bg: "#1b1b1b", fg: "#c58bff", width: 7 }, door: -5, zone: "PROJECTS" },
-  { id: "w4", x0: -E - 12, x1: -E, z0: 2, z1: 12, floors: 7, style: "brick", facing: "+x", sign: { text: "PAPER CO.", bg: "#2c3e50", fg: "#f1c40f" }, door: 7, fireEscape: true, blade: { text: "BAR", bg: "#16302a", fg: "#4dffb8", at: 11.3 } },
-  // z 12..24 on the west side is a small park (see PARK)
-  { id: "w6", x0: -E - 12, x1: -E, z0: 24, z1: H, floors: 5, style: "beige", facing: "+x", sign: { text: "CORNER CAFE", bg: "#6b3e1f", fg: "#fff0d0" }, awning: "#8e5a2e", door: 28, blade: { text: "CAFE", bg: "#e8d9b0", fg: "#7a1f1f", at: 31.3 } },
+  { id: "w1", x0: -E - 12, x1: -E, z0: -H, z1: -17, floors: 4, style: "concrete", facing: "+x", sign: { text: "BOOKS & VINYL", bg: "#3b2a6b", fg: "#ffe9a8" }, awning: "#3b2a6b", door: -21, waterTower: true, fireEscape: true },
+  { id: "w2", x0: -E - 12, x1: -E, z0: -17, z1: -10, floors: 2, style: "beige", facing: "+x", sign: { text: "JOE'S DINER", bg: "#c0392b", fg: "#ffffff" }, awning: "#e74c3c", door: -13.5 },
+  { id: "projects", x0: -E - 12, x1: -E, z0: -10, z1: 2, floors: 2, style: "garage", facing: "+x", sign: { text: "BUILT PROJECTS", bg: "#1b1b1b", fg: "#c58bff", width: 7 }, door: -4, zone: "PROJECTS" },
+  { id: "w4", x0: -E - 12, x1: -E, z0: 2, z1: 10, floors: 7, style: "brick", facing: "+x", sign: { text: "PAPER CO.", bg: "#2c3e50", fg: "#f1c40f" }, door: 6, blade: { text: "BAR", bg: "#16302a", fg: "#4dffb8", at: 9.3 } },
+  // z 10..20 on the west side is a small park (see PARK)
+  { id: "w6", x0: -E - 12, x1: -E, z0: 20, z1: H, floors: 5, style: "beige", facing: "+x", sign: { text: "CORNER CAFE", bg: "#6b3e1f", fg: "#fff0d0" }, awning: "#8e5a2e", door: 22.5, blade: { text: "CAFE", bg: "#e8d9b0", fg: "#7a1f1f", at: 24.3 } },
 
   // ── Backdrops closing the street at both ends ───────────────
   { id: "n1", x0: -30, x1: 30, z0: H + 6, z1: H + 16, floors: 8, style: "concrete", facing: "-z", waterTower: true },
   { id: "s1", x0: -30, x1: 30, z0: -H - 16, z1: -H - 6, floors: 7, style: "brick", facing: "+z", waterTower: true },
   // Behind the park
-  { id: "pb", x0: -36, x1: -24, z0: 10, z1: 26, floors: 6, style: "teal", facing: "+x" },
+  { id: "pb", x0: -36, x1: -24, z0: 8, z1: 22, floors: 6, style: "teal", facing: "+x" },
 ];
 
-export const PARK = { x0: -24, x1: -E, z0: 12, z1: 24 };
+export const PARK = { x0: -24, x1: -E, z0: 10, z1: 20 };
 
 /** Mid-block crosswalks (z of their centre line). */
-export const CROSSWALKS = [-9, 17];
+export const CROSSWALKS = [-7, 15];
 
 export interface CarDef {
   x: number;
@@ -145,16 +145,16 @@ export interface CarDef {
 }
 
 export const PARKED_CARS: CarDef[] = [
-  { x: 3.9, z: -28, rot: Math.PI, color: "#8e3a33" },
-  { x: 3.9, z: -14, rot: Math.PI, color: "#d9b13a", taxi: true },
-  { x: 3.9, z: -4.5, rot: Math.PI, color: "#4f6a94", van: true },
-  { x: 3.9, z: 12, rot: Math.PI, color: "#cfcbc2", van: true },
-  { x: 3.9, z: 25, rot: Math.PI, color: "#3a3a3a" },
-  { x: -3.9, z: -29, rot: 0, color: "#3f6b5c" },
-  { x: -3.9, z: -17, rot: 0, color: "#b8a9a6" },
-  { x: -3.9, z: 0, rot: 0, color: "#d9b13a", taxi: true },
+  { x: 3.9, z: -21, rot: Math.PI, color: "#8e3a33" },
+  { x: 3.9, z: -13, rot: Math.PI, color: "#d9b13a", taxi: true },
+  { x: 3.9, z: -1, rot: Math.PI, color: "#4f6a94", van: true },
+  { x: 3.9, z: 9.5, rot: Math.PI, color: "#cfcbc2", van: true },
+  { x: 3.9, z: 20.5, rot: Math.PI, color: "#3a3a3a" },
+  { x: -3.9, z: -22, rot: 0, color: "#3f6b5c" },
+  { x: -3.9, z: -13, rot: 0, color: "#b8a9a6" },
+  { x: -3.9, z: 1, rot: 0, color: "#d9b13a", taxi: true },
   { x: -3.9, z: 8, rot: 0, color: "#5a7d86" },
-  { x: -3.9, z: 27, rot: 0, color: "#7d5a6e" },
+  { x: -3.9, z: 20, rot: 0, color: "#7d5a6e" },
 ];
 
 export type PropKind = "signal" | "lamp" | "hydrant" | "tree" | "bench" | "trash" | "booth" | "newsbox" | "barrier" | "mailbox";
@@ -166,33 +166,31 @@ export interface PropDef {
   rot?: number;
 }
 
-const lampZs = [-27, -15, -3, 9, 21];
-
 export const PROPS: PropDef[] = [
-  ...lampZs.map((z) => ({ kind: "lamp" as const, x: 5.45, z, rot: Math.PI })),
-  ...lampZs.map((z) => ({ kind: "lamp" as const, x: -5.45, z: z + 6, rot: 0 })),
+  ...[-22, -4, 9, 21].map((z) => ({ kind: "lamp" as const, x: 5.45, z, rot: Math.PI })),
+  ...[-19, -10, 3, 11, 22].map((z) => ({ kind: "lamp" as const, x: -5.45, z, rot: 0 })),
   // Traffic lights: east one just south of each crosswalk, west one just north
   ...CROSSWALKS.flatMap((z) => [
     { kind: "signal" as const, x: 5.45, z: z - 1.9 },
     { kind: "signal" as const, x: -5.45, z: z + 1.9 },
   ]),
-  { kind: "tree", x: 5.9, z: -22 },
-  { kind: "tree", x: 5.9, z: -6.5 },
+  { kind: "tree", x: 5.9, z: -16.5 },
+  { kind: "tree", x: 5.9, z: 1 },
   { kind: "tree", x: 5.9, z: 17 },
-  { kind: "tree", x: -5.9, z: -25 },
-  { kind: "tree", x: -5.9, z: 0.5 },
-  { kind: "tree", x: -5.9, z: 29 },
-  { kind: "hydrant", x: 5.5, z: -13 },
-  { kind: "hydrant", x: -5.5, z: -19 },
-  { kind: "hydrant", x: 5.5, z: 26.5 },
-  { kind: "trash", x: 8.4, z: -25.5 },
-  { kind: "trash", x: -8.4, z: 1 },
-  { kind: "trash", x: 8.4, z: 19.5 },
-  { kind: "newsbox", x: 8.4, z: 7 },
-  { kind: "newsbox", x: -8.4, z: -20 },
-  { kind: "mailbox", x: 5.6, z: 1 },
-  { kind: "bench", x: -8.3, z: 21.5, rot: Math.PI / 2 },
-  { kind: "booth", x: -8.4, z: 18, rot: Math.PI / 2 },
+  { kind: "tree", x: -5.9, z: -23 },
+  { kind: "tree", x: -5.9, z: -1 },
+  { kind: "tree", x: -5.9, z: 19 },
+  { kind: "hydrant", x: 5.5, z: -11 },
+  { kind: "hydrant", x: -5.5, z: -14 },
+  { kind: "hydrant", x: 5.5, z: 23 },
+  { kind: "trash", x: 8.4, z: -18 },
+  { kind: "trash", x: -8.4, z: 1.5 },
+  { kind: "trash", x: 8.4, z: 14.5 },
+  { kind: "newsbox", x: 8.4, z: 8 },
+  { kind: "newsbox", x: -8.4, z: -15 },
+  { kind: "mailbox", x: 5.6, z: 2.5 },
+  { kind: "bench", x: -8.3, z: 18.6, rot: Math.PI / 2 },
+  { kind: "booth", x: -8.4, z: 11.2, rot: Math.PI / 2 },
   // Road closed at both ends
   ...[-4, 0, 4].map((x) => ({ kind: "barrier" as const, x, z: H - 1 })),
   ...[-4, 0, 4].map((x) => ({ kind: "barrier" as const, x, z: -H + 1 })),
@@ -201,7 +199,7 @@ export const PROPS: PropDef[] = [
 ];
 
 export const PARK_TREES: [number, number][] = [
-  [-12, 13.8], [-18, 14.8], [-14, 22.6], [-21, 21], [-11.2, 22],
+  [-12, 11.3], [-18, 12], [-14, 18.7], [-21, 17.5], [-11.2, 18.4],
 ];
 
 /** Pedestrians walk back and forth along a sidewalk line. */
@@ -215,14 +213,14 @@ export interface PedestrianDef {
 }
 
 export const PEDESTRIANS: PedestrianDef[] = [
-  { x: 7.0, zMin: -30, zMax: -6, speed: 1.3, start: 0.6, look: 0 },
-  { x: 6.6, zMin: 2, zMax: 30, speed: 1.1, start: 0.7, look: 1 },
-  { x: -6.8, zMin: -30, zMax: -8, speed: 1.4, start: 0.5, look: 2 },
-  { x: -7.1, zMin: -2, zMax: 30, speed: 1.2, start: 0.1, look: 3 },
-  { x: 7.6, zMin: 8, zMax: 30, speed: 1.0, start: 0.9, look: 4 },
+  { x: 7.0, zMin: -23, zMax: -4, speed: 1.3, start: 0.6, look: 0 },
+  { x: 6.6, zMin: 2, zMax: 23, speed: 1.1, start: 0.7, look: 1 },
+  { x: -6.8, zMin: -23, zMax: -7, speed: 1.4, start: 0.5, look: 2 },
+  { x: -7.1, zMin: -1, zMax: 23, speed: 1.2, start: 0.1, look: 3 },
+  { x: 7.6, zMin: 7, zMax: 23, speed: 1.0, start: 0.9, look: 4 },
 ];
 
-export const SPAWN = { x: 6.6, z: -29, heading: 0 };
+export const SPAWN = { x: 6.6, z: -20.5, heading: 0 };
 
 /** Axis-aligned box on the ground plane, used for collisions and the radar. */
 export interface Box2 {
@@ -267,11 +265,11 @@ export const COLLIDERS: Box2[] = [
   ...PROPS.map(propBox).filter((b): b is Box2 => b !== null),
   ...PARK_TREES.map(([x, z]) => ({ x0: x - 0.3, x1: x + 0.3, z0: z - 0.3, z1: z + 0.3 })),
   // Brownstone stoop in front of the About Me door
-  { x0: 7.7, x1: SIDEWALK_OUTER, z0: -18.95, z1: -17.05 },
+  { x0: 7.7, x1: SIDEWALK_OUTER, z0: -14.45, z1: -12.55 },
   // Invisible limits: street ends and the back of the park
   { x0: -30, x1: 30, z0: STREET_HALF, z1: STREET_HALF + 6 },
   { x0: -30, x1: 30, z0: -STREET_HALF - 6, z1: -STREET_HALF },
-  { x0: -24.5, x1: -24, z0: 10, z1: 26, solid: true },
+  { x0: -24.5, x1: -24, z0: 8, z1: 22, solid: true },
 ];
 
 export function groundHeight(x: number, z: number): number {
