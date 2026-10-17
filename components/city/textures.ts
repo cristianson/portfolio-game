@@ -358,6 +358,61 @@ export function bladeSignTexture(text: string, bg: string, fg: string) {
   return { texture: tex, aspect: tex.userData.aspect as number };
 }
 
+/**
+ * Emissive mask for the upper floors at night: a 4×4 block of window cells
+ * (matching facadeTexture's layout) where some windows have their lights on.
+ * Used with repeat 0.25 so the pattern spans 4 cells before repeating.
+ */
+export function windowGlowTexture(style: BuildingStyle) {
+  return cached(`glow-${style}`, () => {
+    const [c, ctx] = canvas(256, 256);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 256, 256);
+    const r = rng(style.length * 101 + 3);
+    const share = style === "glass" ? 0.5 : 0.38;
+    for (let cy = 0; cy < 4; cy++) {
+      for (let cx = 0; cx < 4; cx++) {
+        if (r() > share) continue;
+        const warm = 200 + Math.floor(r() * 55);
+        ctx.fillStyle = `rgb(255,${warm},${Math.floor(warm * 0.62)})`;
+        const x = cx * 64;
+        const y = cy * 64;
+        if (style === "glass") ctx.fillRect(x + 2, y + 6, 60, 54);
+        else ctx.fillRect(x + 17, y + 16, 30, 34);
+      }
+    }
+    const tex = toTexture(c);
+    tex.repeat.set(0.25, 0.25);
+    return tex;
+  });
+}
+
+/** Emissive mask for lit shop windows (matches storefrontTexture's glass area). */
+export function storefrontGlowTexture() {
+  return cached("glow-store", () => {
+    const [c, ctx] = canvas(128, 64);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 128, 64);
+    ctx.fillStyle = "#ffe3b0";
+    ctx.fillRect(11, 17, 106, 38);
+    return toTexture(c);
+  });
+}
+
+/** Warm pool of light on the pavement under a street lamp. */
+export function lightPoolTexture() {
+  return cached("light-pool", () => {
+    const [c, ctx] = canvas(128, 128);
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, "rgba(255,214,140,0.9)");
+    g.addColorStop(0.5, "rgba(255,190,110,0.35)");
+    g.addColorStop(1, "rgba(255,180,100,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 128, 128);
+    return toTexture(c, false);
+  });
+}
+
 /** Soft round blob used as a fake shadow under characters & cars. */
 export function blobShadowTexture() {
   return cached("blob", () => {
@@ -386,17 +441,30 @@ export function markerTexture() {
   });
 }
 
-export function skyTexture() {
-  return cached("sky", () => {
-    const [c, ctx] = canvas(4, 256);
+/**
+ * Sky dome gradient, repainted as the day goes by (see daylight.ts). Stars
+ * fade in after dark. Returns the texture plus a function to repaint it.
+ */
+export function createSky() {
+  const [c, ctx] = canvas(256, 256);
+  const tex = toTexture(c, false);
+  const r = rng(77);
+  const stars = Array.from({ length: 140 }, () => [r() * 256, r() * 110, r() * 0.8 + 0.4] as const);
+  const paint = (top: string, mid: string, horizon: string, night: number) => {
     const g = ctx.createLinearGradient(0, 0, 0, 256);
-    g.addColorStop(0, "#7c9cc2");
-    g.addColorStop(0.35, "#aebfd3");
-    g.addColorStop(0.47, "#d9c3c3");
-    g.addColorStop(0.52, "#d4cbc6");
-    g.addColorStop(1, "#d4cbc6");
+    g.addColorStop(0, top);
+    g.addColorStop(0.35, mid);
+    g.addColorStop(0.47, horizon);
+    g.addColorStop(1, horizon);
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 4, 256);
-    return toTexture(c, false);
-  });
+    ctx.fillRect(0, 0, 256, 256);
+    if (night > 0.05) {
+      for (const [x, y, size] of stars) {
+        ctx.fillStyle = `rgba(255,255,240,${night * (0.35 + size * 0.5)})`;
+        ctx.fillRect(x, y, size, size);
+      }
+    }
+    tex.needsUpdate = true;
+  };
+  return { texture: tex, paint };
 }

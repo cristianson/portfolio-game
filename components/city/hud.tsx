@@ -25,16 +25,6 @@ function pad(n: number, len: number) {
   return String(n).padStart(len, "0");
 }
 
-function useGameClock() {
-  // One in-game minute per real second, starting mid-morning
-  const [minutes, setMinutes] = useState(10 * 60 + 24);
-  useEffect(() => {
-    const id = setInterval(() => setMinutes((m) => (m + 1) % (24 * 60)), 1000);
-    return () => clearInterval(id);
-  }, []);
-  return `${pad(Math.floor(minutes / 60), 2)}:${pad(minutes % 60, 2)}`;
-}
-
 function useCountUp(target: number) {
   const [value, setValue] = useState(target);
   const current = useRef(target);
@@ -58,8 +48,7 @@ function useCountUp(target: number) {
 }
 
 /** Classic top-right block: clock, cash, health, stars and the "weapon" slot (your face). */
-export function Stats({ visited, compact }: { visited: Set<ZoneId>; compact: boolean }) {
-  const clock = useGameClock();
+export function Stats({ visited, compact, clock }: { visited: Set<ZoneId>; compact: boolean; clock: string }) {
   const cash = useCountUp(visited.size * CASH_PER_SECTION);
   const big = compact ? "text-[24px]" : "text-[34px]";
   return (

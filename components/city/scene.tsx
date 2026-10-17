@@ -7,11 +7,12 @@
 
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { memo, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Buildings } from "./buildings";
-import { FOG_COLOR, Ground, Sky } from "./ground";
+import { Ground, Sky } from "./ground";
+import { environmentFor, setNight } from "./daylight";
 import { Props } from "./props";
 import { Markers } from "./markers";
 import { Pedestrians } from "./pedestrians";
@@ -25,9 +26,35 @@ interface SceneProps {
   onZoneChange: (zone: ZoneId | null) => void;
   onPickupChange: (name: string | null) => void;
   onReady: () => void;
+  /** 0 = night, 1 = day (see daylight.ts). */
+  daylight: number;
 }
 
-export function Scene({ store, onZoneChange, onPickupChange, onReady }: SceneProps) {
+/** Sky, fog and lights for the current time of day. */
+function Environment({ daylight }: { daylight: number }) {
+  const scene = useThree((s) => s.scene);
+  const env = useMemo(() => environmentFor(daylight), [daylight]);
+  const night = 1 - daylight;
+
+  useEffect(() => {
+    const horizon = new THREE.Color(env.horizon);
+    scene.background = horizon;
+    if (scene.fog) (scene.fog as THREE.Fog).color.copy(horizon);
+    setNight(night);
+  }, [scene, env, night]);
+
+  return (
+    <>
+      <fog attach="fog" args={[env.horizon, 30, 130]} />
+      <hemisphereLight args={[env.hemiSky, env.hemiGround, env.hemi]} />
+      <directionalLight position={env.sunPos} intensity={env.sunIntensity} color={env.sun} />
+      <Sky top={env.skyTop} mid={env.skyMid} horizon={env.horizon} night={night} />
+    </>
+  );
+}
+
+// Memoised: the HUD clock re-renders the game shell every few seconds, the 3D scene shouldn't follow
+export const Scene = memo(function Scene({ store, onZoneChange, onPickupChange, onReady, daylight }: SceneProps) {
   const wrapper = useRef<HTMLDivElement>(null);
 
   // Drag anywhere on the 3D view to rotate the camera
@@ -75,12 +102,7 @@ export function Scene({ store, onZoneChange, onPickupChange, onReady }: ScenePro
           onReady();
         }}
       >
-        <color attach="background" args={[FOG_COLOR]} />
-        <fog attach="fog" args={[FOG_COLOR, 30, 130]} />
-        {/* Flat, bright overcast light: lots of ambient, a soft warm sun */}
-        <hemisphereLight args={["#f2eee8", "#9a8f80", 2.3]} />
-        <directionalLight position={[-30, 60, -25]} intensity={1.15} color="#fff0e0" />
-        <Sky />
+        <Environment daylight={daylight} />
         <Ground />
         <Buildings />
         <Props />
@@ -91,4 +113,4 @@ export function Scene({ store, onZoneChange, onPickupChange, onReady }: ScenePro
       </Canvas>
     </div>
   );
-}
+});

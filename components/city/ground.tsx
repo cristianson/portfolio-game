@@ -8,7 +8,7 @@
 
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { CROSSWALKS, PARK, ROAD_HALF, SIDEWALK_HEIGHT, SIDEWALK_OUTER, STREET_LENGTH } from "./world";
 import { worldBox } from "./geometry";
@@ -17,10 +17,9 @@ import {
   grassTexture,
   roadTexture,
   sidewalkTexture,
-  skyTexture,
+  createSky,
 } from "./textures";
 
-export const FOG_COLOR = "#d4cbc6";
 
 const LENGTH = STREET_LENGTH;
 const CURB = new THREE.MeshLambertMaterial({ color: "#a8a49b" });
@@ -120,11 +119,14 @@ export function Ground() {
   );
 }
 
-export function Sky() {
+/** Sky dome; repainted whenever the time of day changes. */
+export function Sky({ top, mid, horizon, night }: { top: string; mid: string; horizon: string; night: number }) {
+  const sky = useMemo(() => createSky(), []);
+  useEffect(() => sky.paint(top, mid, horizon, night), [sky, top, mid, horizon, night]);
   return (
-    <mesh scale={[1, 1, 1]}>
+    <mesh>
       <sphereGeometry args={[300, 16, 12]} />
-      <meshBasicMaterial map={skyTexture()} side={THREE.BackSide} fog={false} toneMapped={false} depthWrite={false} />
+      <meshBasicMaterial map={sky.texture} side={THREE.BackSide} fog={false} toneMapped={false} depthWrite={false} />
     </mesh>
   );
 }

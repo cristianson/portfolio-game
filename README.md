@@ -7,14 +7,15 @@ A playful and interactive product design portfolio presented as a **3D open-worl
 
 ## 🎮 Overview
 
-This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. You walk down a small daytime street as a low-poly version of me, step into the glowing markers in front of the buildings to open About Me, Case Studies and Built Projects, and grab the spinning pickups on the street to find my socials.
+This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. You walk down a small city street as a low-poly version of me, step into the glowing markers in front of the buildings to open About Me, Case Studies and Built Projects, and grab the spinning pickups on the street to find my socials.
 
 **The main goal:** Make portfolio exploration fun and delightful for users, turning the typical portfolio browsing experience into an interactive adventure.
 
 ## ✨ Features
 
 - **Early-2000s 3D Look**: A low-poly city street with parked cars, pedestrians, fire escapes and shop signs
-- **GTA 3 style HUD**: Rotating radar with section blips, clock, cash and stars that track visited sections (progress is saved locally)
+- **Day and night**: The street follows the visitor's local time: daylight, dusk, then a night street with lit windows, shop fronts and lamp light (no location permission; just the device clock)
+- **GTA 3 style HUD**: Rotating radar with section blips, the visitor's local time, cash and stars that track visited sections (progress is saved locally)
 - **Mission markers**: About Me, Case Studies and Built Projects each have a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
 - **Social pickups**: LinkedIn, X and GitHub spin on the street like GTA 3 health/cash pickups; walk into one for a card with a "Go to …" link (or press Enter)
 - **Pause menu**: Jump straight to any section without walking there
@@ -55,7 +56,7 @@ pnpm build
 pnpm lint
 ```
 
-Add `?debug` to the URL to expose the game store as `window.__dd` in the console.
+Add `?debug` to the URL to expose the game store as `window.__dd` in the console, and `?time=22:30` to preview any time of day.
 
 ## 📁 Project Structure
 
@@ -73,6 +74,7 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 │   ├── sections.tsx        # Section pages (About, Case Studies, ...)
 │   ├── world.ts            # Street layout: buildings, markers, cars, pedestrians
 │   ├── scene.tsx           # Canvas, lights, fog
+│   ├── daylight.ts         # Local time → day/dusk/night palettes and night glow
 │   ├── buildings.tsx       # Buildings, signs, fire escapes
 │   ├── pedestrians.tsx     # Locals who step around you
 │   ├── props.tsx           # Street furniture and parked cars

@@ -25,8 +25,11 @@ import {
   garageDoorTexture,
   paletteFor,
   signTexture,
+  storefrontGlowTexture,
   storefrontTexture,
+  windowGlowTexture,
 } from "./textures";
+import { registerNightGlow } from "./daylight";
 
 const ROOF = new THREE.MeshLambertMaterial({ color: "#4b4a47" });
 const DOOR = new THREE.MeshLambertMaterial({ color: "#2a1d16" });
@@ -159,8 +162,19 @@ function Building({ b }: { b: BuildingDef }) {
 
   const { groundGeo, groundMats, upperGeo, upperMats } = useMemo(() => {
     const cellW = b.style === "glass" ? 3.6 : 3;
-    const wall = new THREE.MeshLambertMaterial({ map: facadeTexture(b.style) });
-    const store = new THREE.MeshLambertMaterial({ map: storefrontTexture(b.style) });
+    // After dark some windows light up and the shop fronts glow (daylight.ts)
+    const wall = new THREE.MeshLambertMaterial({
+      map: facadeTexture(b.style),
+      emissive: "#ffd9a0",
+      emissiveMap: windowGlowTexture(b.style),
+    });
+    const store = new THREE.MeshLambertMaterial({
+      map: storefrontTexture(b.style),
+      emissive: "#ffe0b0",
+      emissiveMap: storefrontGlowTexture(),
+    });
+    registerNightGlow(wall, 1);
+    registerNightGlow(store, 0.85);
     const plainWall = new THREE.MeshLambertMaterial({ color: pal.wall });
     const groundMats = [plainWall, plainWall, ROOF, ROOF, plainWall, plainWall];
     if (b.style !== "garage") groundMats[facade] = store;

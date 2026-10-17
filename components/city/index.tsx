@@ -11,6 +11,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useWebHaptics } from "web-haptics/react";
 import { Scene } from "./scene";
+import { daylightAt, localNow } from "./daylight";
 import { createStore, type Phase } from "./store";
 import { ZONES, type ZoneId } from "./world";
 import { Radar } from "./radar";
@@ -78,6 +79,15 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const { compact, touch } = useCompactLayout();
 
   const [ready, setReady] = useState(false);
+  // The visitor's own clock drives the HUD time and day/night (daylight.ts)
+  const [now, setNow] = useState(localNow);
+  useEffect(() => {
+    const id = setInterval(() => setNow(localNow()), 15000);
+    return () => clearInterval(id);
+  }, []);
+  const daylight = daylightAt(now);
+  const onSceneReady = useCallback(() => setReady(true), []);
+  const clock = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
   useEffect(() => {
     if (ready || !onFatal) return;
@@ -277,7 +287,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black select-none touch-none overscroll-none">
-      <Scene store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} onReady={() => setReady(true)} />
+      <Scene store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} onReady={onSceneReady} daylight={daylight} />
 
       {phase === "title" && <TitleScreen ready={ready} isTouch={touch} onStart={start} />}
 
@@ -292,7 +302,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
             >
               {compact ? "MENU" : "ESC · MENU"}
             </button>
-            <Stats visited={visited} compact={compact} />
+            <Stats visited={visited} compact={compact} clock={clock} />
           </div>
 
           {compact && help && (

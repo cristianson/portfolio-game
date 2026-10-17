@@ -12,7 +12,8 @@ import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { PARK_TREES, PARKED_CARS, PROPS, SIDEWALK_HEIGHT, type CarDef, type PropDef } from "./world";
-import { blobShadowTexture, signTexture } from "./textures";
+import { blobShadowTexture, lightPoolTexture, signTexture } from "./textures";
+import { registerNightGlow } from "./daylight";
 
 const mat = (color: string) => new THREE.MeshLambertMaterial({ color });
 
@@ -64,6 +65,25 @@ export function BlobShadow({ w, d, y = 0.02 }: { w: number; d: number; y?: numbe
   );
 }
 
+let poolMaterial: THREE.MeshBasicMaterial | null = null;
+/** Shared warm light pool under the lamps; only visible after dark. */
+function lightPool() {
+  if (!poolMaterial) {
+    poolMaterial = new THREE.MeshBasicMaterial({
+      map: lightPoolTexture(),
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2,
+    });
+    registerNightGlow(poolMaterial, 0.9);
+  }
+  return poolMaterial;
+}
+
 function Lamp({ x }: { x: number }) {
   // Arm reaches over the road
   const dir = x > 0 ? -1 : 1;
@@ -83,6 +103,9 @@ function Lamp({ x }: { x: number }) {
       </mesh>
       <mesh position={[dir * 1.55, 5.75, 0]} material={M.lampGlass}>
         <boxGeometry args={[0.55, 0.04, 0.25]} />
+      </mesh>
+      <mesh position={[dir * 1.1, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} material={lightPool()} renderOrder={1}>
+        <circleGeometry args={[2.6, 20]} />
       </mesh>
     </group>
   );
