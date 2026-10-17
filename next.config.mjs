@@ -3,9 +3,12 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // The 3D version used to live at /3d before it became the homepage
+  // Old addresses: the 3D preview lived at /3d, the retired 2D version at /classic
   async redirects() {
-    return [{ source: "/3d", destination: "/", permanent: false }]
+    return [
+      { source: "/3d", destination: "/", permanent: false },
+      { source: "/classic", destination: "/", permanent: false },
+    ]
   },
 }
 

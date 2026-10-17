@@ -1,240 +1,26 @@
 @import "tailwindcss";
+/* animate-in / fade-in / zoom-in utilities used by the HUD and panels */
+@import "tw-animate-css";
 
-@theme inline {
-  --font-pixel: var(--font-pixel);
-  --font-geist-mono: var(--font-geist-mono);
-  --color-game-bg: #2d3436;
-  --color-game-ui: #dfe6e9;
-  --color-game-accent: #0984e3;
-}
-
-/* Base styles - always apply */
 body {
-  font-family: var(--font-pixel), monospace;
-  image-rendering: pixelated;
-  background-color: #18181b; /* zinc-900 fallback */
+  background-color: #000;
   color: white;
 }
 
-@layer base {
-  body {
-    @apply font-pixel;
-    image-rendering: pixelated;
-  }
-}
-
-@layer components {
-  /* Typography System */
-
-  /* Geist Mono - Supports weights 400-800 (Regular to ExtraBold) */
-  .text-mono-xs {
-    @apply font-geist-mono text-xs;
-  }
-  .text-mono-sm {
-    @apply font-geist-mono text-sm;
-  }
-  .text-mono-base {
-    @apply font-geist-mono text-base;
-  }
-  .text-mono-lg {
-    @apply font-geist-mono text-lg;
-  }
-  .text-mono-xl {
-    @apply font-geist-mono text-xl;
-  }
-  .text-mono-2xl {
-    @apply font-geist-mono text-2xl;
-  }
-
-  /* Pixel Font - Single weight (Regular) */
-  .text-pixel-xs {
-    @apply font-pixel text-xs;
-  }
-  .text-pixel-sm {
-    @apply font-pixel text-sm;
-  }
-  .text-pixel-base {
-    @apply font-pixel text-base;
-  }
-  .text-pixel-lg {
-    @apply font-pixel text-lg;
-  }
-  .text-pixel-xl {
-    @apply font-pixel text-xl;
-  }
-  .text-pixel-2xl {
-    @apply font-pixel text-2xl;
-  }
-
-  /* UI Components */
-  .btn-primary {
-    @apply inline-block px-4 py-2 bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 transition-colors;
-    box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
-      0 2px 0 0 black;
-    margin: 2px;
-  }
-
-  .btn-secondary {
-    @apply inline-block px-4 py-2 bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition-colors;
-    box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
-      0 2px 0 0 black;
-    margin: 2px;
-  }
-
-  /* Pixel Borders */
-  .pixel-border {
-    box-shadow: -4px 0 0 0 black, 4px 0 0 0 black, 0 -4px 0 0 black,
-      0 4px 0 0 black;
-    margin: 4px;
-  }
-
-  .pixel-border-sm {
-    box-shadow: -2px 0 0 0 black, 2px 0 0 0 black, 0 -2px 0 0 black,
-      0 2px 0 0 black;
-    margin: 2px;
-  }
-
-  /* Snowflakes */
-  .pixel-snowflake {
-    width: 4px;
-    height: 4px;
-    background: white;
-    box-shadow: 4px 0 white, -4px 0 white, 0 4px white, 0 -4px white;
-    border-radius: 0;
-    opacity: 0.7;
-  }
-
-  .animate-fall {
-    animation: fall linear infinite;
-  }
-
-  /* Tulips - Spring Effect */
-  .pixel-tulip {
-    width: 12px;
-    height: 16px;
-    position: relative;
-  }
-
-  .animate-sway {
-    animation: sway ease-in-out infinite;
-  }
-
-  .animate-grow {
-    animation: grow ease-out forwards;
-  }
-
-  /* RPG Animations */
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-spin-slow {
-    animation: spin 3s linear infinite;
-  }
-
-  .animate-pulse-horizontal {
-    animation: pulse-horizontal 1s infinite;
-  }
-}
-
-/* Animations */
-@keyframes fall {
-  0% {
-    transform: translateY(0) translateX(-10px);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(110vh) translateX(10px);
-    opacity: 0.4;
-  }
-}
-
-@keyframes sway {
-  0%,
-  100% {
-    transform: rotate(0deg) translateX(0);
-  }
-  15% {
-    transform: rotate(-2deg) translateX(-1px);
-  }
-  30% {
-    transform: rotate(-4deg) translateX(-2px);
-  }
-  50% {
-    transform: rotate(0deg) translateX(0);
-  }
-  65% {
-    transform: rotate(2deg) translateX(1px);
-  }
-  80% {
-    transform: rotate(4deg) translateX(2px);
-  }
-}
-
-@keyframes grow {
-  0% {
-    transform: translateY(20px) scale(0);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes pulse-horizontal {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(-10px); /* Move left */
-  }
-}
-
-/* Custom Scrollbar for modals */
+/* Dark scrollbar for the section panels */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #2d3436;
+  background: #111111;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #636e72;
-  border: 2px solid #2d3436;
+  background: #3a3a3a;
+  border: 2px solid #111111;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b2bec3;
+  background: #5a5a5a;
 }

@@ -1,9 +1,8 @@
 /**
  * Portfolio Content
  *
- * Plain data for every section (text, links, jobs, projects). Both the 2D
- * game (data.tsx) and the 3D Design District (components/city/sections.tsx)
- * render from here, so copy and links only ever change in one place.
+ * Plain data for every section (text, links, jobs, projects), rendered by
+ * sections.tsx. Edit copy and links here.
  */
 
 export const ABOUT_PARAGRAPHS = [

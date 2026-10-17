@@ -2,8 +2,7 @@
  * Section Pages
  *
  * What opens when you step into a marker: one page per section, laid out for
- * the dark GTA-style panel. Copy and links come from the shared
- * components/game/content.ts, the same source the 2D version uses.
+ * the dark GTA-style panel. Copy and links come from content.ts.
  */
 
 "use client";
@@ -18,8 +17,8 @@ import {
   PROJECTS,
   SOCIALS,
   SOCIALS_INTRO,
-} from "@/components/game/content";
-import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/game/icons";
+} from "./content";
+import { GithubIcon, LinkedinIcon, TwitterIcon } from "./icons";
 import type { ZoneId } from "./world";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");

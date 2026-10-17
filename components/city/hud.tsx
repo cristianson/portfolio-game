@@ -10,7 +10,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Joystick } from "@/components/game/joystick";
+import { Joystick } from "./joystick";
 import { ZONES, type ZoneId } from "./world";
 import type { GameStore } from "./store";
 

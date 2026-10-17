@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { preload } from "react-dom";
 import { Anton, Bowlby_One_SC } from "next/font/google";
 import "./city.css";
@@ -15,12 +14,6 @@ const hud = Bowlby_One_SC({
   subsets: ["latin"],
   variable: "--font-hud",
 });
-
-export const metadata: Metadata = {
-  title: "Cristian Iordan's Portfolio",
-  description:
-    "Product designer portfolio as a 3D open-world game: walk the streets of Design District to explore my case studies, projects and more.",
-};
 
 export default function CityLayout({ children }: { children: React.ReactNode }) {
   // Fetch the avatars while the title screen is up so About Me and the HUD show them instantly

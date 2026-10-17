@@ -9,9 +9,7 @@
  * The road spans x ∈ [-5, 5], sidewalks x ∈ [5, 9] on both sides.
  */
 
-import type { InteractionType } from "@/components/game/types";
-
-export type ZoneId = Exclude<InteractionType, null>;
+export type ZoneId = "ABOUT" | "PROJECTS" | "CASE_STUDIES" | "SOCIALS";
 
 export const ROAD_HALF = 5;
 export const SIDEWALK_OUTER = 9;

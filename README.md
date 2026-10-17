@@ -7,34 +7,23 @@ A playful and interactive product design portfolio presented as a **3D open-worl
 
 ## 🎮 Overview
 
-This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. Users can explore different zones, interact with content, and discover projects in a way that's both memorable and enjoyable.
+This portfolio breaks away from traditional static portfolios by presenting design work through an engaging game-like experience. You walk down a small daytime street as a low-poly version of me, find the glowing markers in front of each building and step in to open a section: About Me, Case Studies, Built Projects and Socials.
 
 **The main goal:** Make portfolio exploration fun and delightful for users, turning the typical portfolio browsing experience into an interactive adventure.
 
 ## ✨ Features
 
-- **Early-2000s 3D Look**: A low-poly city street with a GTA 3 style HUD, radar and mission markers
-- **Interactive Navigation**: Move your character using keyboard controls (WASD/Arrow keys) or touch joystick on mobile
-- **Zone-Based Exploration**: Discover different sections like About Me, Projects, and Case Studies by exploring the game world
-- **Responsive Design**: Works seamlessly on both desktop and mobile devices
-- **Smooth Animations**: Delightful interactions and transitions throughout the experience
+- **Early-2000s 3D Look**: A low-poly city street with parked cars, pedestrians, fire escapes and shop signs
+- **GTA 3 style HUD**: Rotating radar with section blips, clock, cash and stars that track visited sections (progress is saved locally)
+- **Mission markers**: Each section has a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
+- **Pause menu**: Jump straight to any section without walking there
+- **Mobile first**: Portrait layout with an on-screen joystick and an ENTER button near markers
+- **No 3D assets to download**: Every model is built from primitives and every texture is painted on a canvas at runtime
 
-## 🏙️ Design District (3D)
-
-The homepage (**`/`**) is a GTA 3 inspired 3D game. Walk down a small daytime street as a low-poly version of me, find the glowing markers in front of each building and step in to open a section.
+## 🎯 How to Play
 
 - **Desktop**: `WASD` / arrow keys to move, `Shift` to sprint, drag to look around, `Enter` / `Space` near a marker, `Esc` for the pause menu
 - **Mobile (portrait)**: on-screen joystick to move, drag the street to look around, tap `ENTER` near a marker
-- HUD with rotating radar, clock, cash and stars that track visited sections; progress is saved locally
-- Built with **three.js** + **@react-three/fiber**; every texture is drawn on a canvas at runtime, so there are no 3D assets to download
-- Code lives in `components/city/`; the street layout (buildings, markers, cars, pedestrians) is defined in `components/city/world.ts`, the character look in `components/city/character.tsx` (`PLAYER_LOOK`)
-- Section copy and links live in `components/game/content.ts`, shared with the 2D version
-- The original 2D pixel version is still available, unlisted, at **`/classic`** (`/3d` redirects to `/`)
-
-## 🎯 How to Play (classic 2D version)
-
-- **Desktop**: Use `WASD` or arrow keys to move, `SPACE` to interact with zones, `ESC` to close modals
-- **Mobile**: Use the on-screen joystick to move and tap the interact button when near zones
 
 ## 🚀 Live Site
 
@@ -42,11 +31,11 @@ The homepage (**`/`**) is a GTA 3 inspired 3D game. Walk down a small daytime st
 
 ## 🛠️ Tech Stack
 
-- **Next.js 15** - React framework deployed on Vercel
+- **Next.js 16** - React framework deployed on Vercel
 - **React 19** - UI library
+- **three.js + @react-three/fiber** - 3D rendering
 - **TypeScript** - Type-safe development
-- **Tailwind CSS 4** - Styling with custom pixel art borders and animations
-- **Radix UI** - Accessible UI primitives (dialogs, tooltips, etc.)
+- **Tailwind CSS 4** - Styling for the HUD and section pages
 - **Lucide React** - Icon library
 
 ## 🏃 Local Development
@@ -62,25 +51,34 @@ pnpm dev
 pnpm build
 ```
 
+Add `?debug` to the URL to expose the game store as `window.__dd` in the console.
+
 ## 📁 Project Structure
 
 ```
-├── app/                    # Next.js app directory
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Home page
-│   └── globals.css         # Global styles
-├── components/
-│   └── game/               # Game components
-│       ├── index.tsx       # Main game component
-│       ├── player.tsx      # Player character
-│       ├── zone.tsx        # Interactive zones
-│       ├── modal.tsx       # Content modals
-│       ├── joystick.tsx    # Mobile controls
-│       ├── pixel-tooltip.tsx # Custom tooltips
-│       ├── data.tsx        # Portfolio content
-│       └── constants.ts    # Game constants
-└── public/                 # Static assets
+├── app/
+│   ├── layout.tsx          # Root layout (metadata, analytics)
+│   ├── globals.css         # Global styles
+│   └── (city)/             # Homepage: the 3D game
+│       ├── layout.tsx      # Game fonts + avatar preload
+│       ├── page.tsx        # Client-only entry
+│       └── city.css        # HUD text styles + colour grade
+├── components/city/
+│   ├── index.tsx           # Game shell: input, UI state, HUD layout
+│   ├── content.ts          # Section copy and links (edit text here)
+│   ├── sections.tsx        # Section pages (About, Case Studies, ...)
+│   ├── world.ts            # Street layout: buildings, markers, cars, pedestrians
+│   ├── scene.tsx           # Canvas, lights, fog
+│   ├── buildings.tsx       # Buildings, signs, fire escapes
+│   ├── props.tsx           # Street furniture and parked cars
+│   ├── character.tsx       # Characters (PLAYER_LOOK is me)
+│   ├── player.tsx          # Movement, collisions, chase camera
+│   ├── hud.tsx / radar.tsx # HUD
+│   └── panel.tsx           # Section panel + pause menu
+└── public/                 # Favicon and avatar images
 ```
+
+`/3d` (the old preview address) and `/classic` (the retired 2D version) redirect to `/`.
 
 ## 📄 License
 
