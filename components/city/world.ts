@@ -84,6 +84,9 @@ export const ZONES: ZoneDef[] = [
 /** Sections you walk into a glowing marker for. */
 export const MARKER_ZONES = ZONES.filter((z) => z.id !== "SOCIALS");
 
+/** Sections with an interior you walk straight into (the rest open a panel). */
+export const ROOM_ZONES: ZoneId[] = ["PROJECTS"];
+
 /**
  * Socials live on the street as spinning pickups, like the health and cash
  * pickups lying around in GTA 3. `name` matches SOCIALS in content.ts.

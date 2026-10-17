@@ -18,6 +18,7 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 - **Seasons**: Blossom and flowers in spring; Hawaiian shirts, shorts, café parasols and a gelato cart in summer; yellow trees and falling leaves in autumn; snow on the ground, roofs and cars and in the air in winter. From 1 December to 6 January there's a Christmas tree in the park, fairy lights, wreaths, gifts and a Santa hat
 - **GTA 3 style HUD**: Rotating radar with section blips, the visitor's local time, cash and stars that track visited sections (progress is saved locally)
 - **Mission markers**: About Me, Case Studies and Built Projects each have a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
+- **Projects Gallery**: Walk into the Built Projects marker and you fade into a classic museum hall. Each project hangs as a painting (its `cover` image from `content.ts`, or a title card until it has one); stop at one and the camera frames it with a card linking to the project. A guard greets you, visitors wander, there's a guestbook (LinkedIn) and an empty frame for the next project. Walk into the marker by the door to leave
 - **Social pickups**: LinkedIn, X and GitHub spin on the street like GTA 3 health/cash pickups; walk into one for a card with a "Go to …" link (or press Enter)
 - **Pause menu**: Jump straight to any section without walking there
 - **Mobile first**: Portrait layout with an on-screen joystick and an ENTER button near markers
@@ -71,7 +72,7 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 │       └── city.css        # HUD text styles + colour grade
 ├── components/city/
 │   ├── index.tsx           # Game shell: input, UI state, HUD layout
-│   ├── content.ts          # Section copy and links (edit text here)
+│   ├── content.ts          # Section copy, links and project covers (edit text here)
 │   ├── sections.tsx        # Section pages (About, Case Studies, ...)
 │   ├── world.ts            # Street layout: buildings, markers, cars, pedestrians
 │   ├── scene.tsx           # Canvas, lights, fog
@@ -84,6 +85,8 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 │   ├── character.tsx       # Characters (PLAYER_LOOK is me)
 │   ├── player.tsx          # Movement, collisions, chase camera
 │   ├── pickups.tsx         # Spinning social pickups on the street
+│   ├── museum.ts           # Gallery layout: paintings, spots, colliders
+│   ├── gallery.tsx         # The Built Projects gallery interior
 │   ├── hud.tsx / radar.tsx # HUD (incl. the pickup card)
 │   └── panel.tsx           # Section panel + pause menu
 └── public/                 # Favicon and avatar images

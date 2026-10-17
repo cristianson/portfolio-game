@@ -3,7 +3,8 @@
  *
  * Top-level component for the GTA 3 inspired version of the portfolio.
  * Wires keyboard/touch input into the shared store, owns the UI state
- * (title, panel, pause menu, visited sections) and lays out the HUD.
+ * (title, panel, pause menu, visited sections, street or gallery) and lays
+ * out the HUD.
  */
 
 "use client";
@@ -13,15 +14,18 @@ import { useWebHaptics } from "web-haptics/react";
 import { Scene } from "./scene";
 import { daylightAt, localNow } from "./daylight";
 import { isChristmas, seasonAt } from "./season";
-import { createStore, type Phase } from "./store";
-import { ZONES, type ZoneId } from "./world";
+import { createStore, type Location, type Phase } from "./store";
+import { ROOM_ZONES, ZONES, type ZoneId } from "./world";
+import { GALLERY_SPAWN, SPOTS } from "./museum";
 import { Radar } from "./radar";
-import { AreaName, HelpBox, Key, MissionPassed, PickupCard, Stats, TouchControls } from "./hud";
-import { SOCIALS } from "./content";
+import { AreaName, GallerySpotCard, HelpBox, Key, MissionPassed, PickupCard, Stats, TouchControls } from "./hud";
+import { GALLERY, PROJECTS, SOCIALS } from "./content";
 import { ContentPanel, PauseMenu } from "./panel";
 import { TitleScreen } from "./title-screen";
 
 const VISITED_KEY = "design-district-visited";
+
+const FADE_MS = 280;
 
 function loadVisited(): Set<ZoneId> {
   try {
@@ -113,7 +117,11 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const [visited, setVisited] = useState<Set<ZoneId>>(loadVisited);
   const [passed, setPassed] = useState<ZoneId | null>(null);
   const [introHelp, setIntroHelp] = useState(false);
-  const [areaName, setAreaName] = useState(false);
+  const [areaName, setAreaName] = useState<string | null>(null);
+  const [location, setLocation] = useState<Location>("street");
+  const [nearSpot, setNearSpot] = useState<string | null>(null);
+  const [fading, setFading] = useState(false);
+  const areaTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const passedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // `?debug` exposes the store for poking at things from the console
@@ -134,13 +142,18 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     [store]
   );
 
+  const showAreaName = useCallback((name: string) => {
+    setAreaName(name);
+    clearTimeout(areaTimer.current);
+    areaTimer.current = setTimeout(() => setAreaName(null), 4000);
+  }, []);
+
   const start = useCallback(() => {
     setPhase("play");
     setIntroHelp(true);
-    setAreaName(true);
-    setTimeout(() => setAreaName(false), 4000);
+    showAreaName("Design District");
     setTimeout(() => setIntroHelp(false), 12000);
-  }, [setPhase]);
+  }, [setPhase, showAreaName]);
 
   const openZone = useCallback(
     (zone: ZoneId) => {
@@ -169,6 +182,61 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     [visited, haptic]
   );
 
+  /** Fade to black, move between the street and the gallery, fade back in. */
+  const travel = useCallback(
+    (to: Location) => {
+      if (store.travelling || store.location === to) return;
+      store.travelling = true;
+      store.input.jx = store.input.jy = 0;
+      setFading(true);
+      setIntroHelp(false);
+      haptic("medium");
+      setTimeout(() => {
+        const p = store.player;
+        if (to === "gallery") {
+          Object.assign(p, { x: GALLERY_SPAWN.x, z: GALLERY_SPAWN.z, heading: GALLERY_SPAWN.heading, speed: 0 });
+          store.camYaw = GALLERY_SPAWN.heading;
+        } else {
+          // Back on the sidewalk in front of the door, facing the street
+          const zone = ZONES.find((z) => z.id === "PROJECTS")!;
+          Object.assign(p, { x: zone.x + 1.3, z: zone.z, heading: Math.PI / 2, speed: 0 });
+          store.camYaw = Math.PI / 2;
+          store.blockedZone = "PROJECTS";
+        }
+        store.location = to;
+        store.snapCamera = true;
+        store.nearZone = null;
+        store.nearSpot = null;
+        setNearZone(null);
+        setNearSpot(null);
+        setNearPickup(null);
+        setLocation(to);
+        setTimeout(() => {
+          store.travelling = false;
+          setFading(false);
+          if (to === "gallery") {
+            showAreaName(GALLERY.name);
+            markVisited("PROJECTS");
+          } else {
+            showAreaName("Design District");
+          }
+        }, 60);
+      }, FADE_MS);
+    },
+    [store, haptic, showAreaName, markVisited]
+  );
+
+  /** Pause menu: rooms you walk into, everything else opens its panel. */
+  const selectZone = useCallback(
+    (zone: ZoneId) => {
+      if (ROOM_ZONES.includes(zone)) {
+        setPhase("play");
+        travel("gallery");
+      } else openZone(zone);
+    },
+    [setPhase, travel, openZone]
+  );
+
   const closePanel = useCallback(() => {
     const zone = panelZone;
     setPanelZone(null);
@@ -177,8 +245,17 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   }, [panelZone, setPhase, markVisited]);
 
   const interact = useCallback(() => {
-    if (store.phase !== "play") return;
-    if (store.nearZone) openZone(store.nearZone);
+    if (store.phase !== "play" || store.travelling) return;
+    const spot = SPOTS.find((s) => s.id === store.nearSpot);
+    if (spot?.painting?.project !== undefined) {
+      window.open(PROJECTS[spot.painting.project].url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (spot?.kind === "guestbook") {
+      window.open(SOCIALS.find((s) => s.name === "LinkedIn")!.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (store.nearZone && !ROOM_ZONES.includes(store.nearZone)) openZone(store.nearZone);
     else if (store.nearPickup) {
       const social = SOCIALS.find((s) => s.name === store.nearPickup);
       if (social) window.open(social.url, "_blank", "noopener,noreferrer");
@@ -198,10 +275,27 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   const onZoneChange = useCallback(
     (zone: ZoneId | null) => {
+      // Rooms open by walking in, like the interiors in GTA 3
+      if (zone && ROOM_ZONES.includes(zone)) {
+        travel("gallery");
+        return;
+      }
       setNearZone(zone);
       if (zone) haptic("selection");
     },
-    [haptic]
+    [haptic, travel]
+  );
+
+  const onSpotChange = useCallback(
+    (id: string | null) => {
+      if (id === "exit") {
+        travel("street");
+        return;
+      }
+      setNearSpot(id);
+      if (id) haptic("selection");
+    },
+    [haptic, travel]
   );
 
   // Keyboard
@@ -290,7 +384,17 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black select-none touch-none overscroll-none">
-      <Scene store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} onReady={onSceneReady} daylight={daylight} season={season} christmas={christmas} />
+      <Scene
+        store={store}
+        onZoneChange={onZoneChange}
+        onPickupChange={onPickupChange}
+        onSpotChange={onSpotChange}
+        onReady={onSceneReady}
+        location={location}
+        daylight={daylight}
+        season={season}
+        christmas={christmas}
+      />
 
       {phase === "title" && <TitleScreen ready={ready} isTouch={touch} onStart={start} />}
 
@@ -317,12 +421,14 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
           {!compact && <Radar store={store} className="absolute left-6 bottom-6 w-[170px] h-[170px]" />}
 
           <div className={`absolute ${compact ? "inset-x-0 bottom-[190px] flex justify-center" : "right-8 bottom-6"}`}>
-            <AreaName show={areaName && playing} />
+            <AreaName name={areaName} show={Boolean(areaName) && playing} />
           </div>
 
           <MissionPassed zone={passed} allDone={visited.size === ZONES.length} />
 
           {playing && nearPickup && <PickupCard name={nearPickup} touch={touch} compact={compact} />}
+
+          {playing && nearSpot && <GallerySpotCard id={nearSpot} touch={touch} compact={compact} />}
 
           {touch && playing && <TouchControls store={store} nearZone={nearZone} onInteract={interact} />}
         </div>
@@ -330,8 +436,15 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
       {panelZone && <ContentPanel zone={panelZone} onClose={closePanel} />}
       {phase === "menu" && (
-        <PauseMenu visited={visited} isTouch={touch} onSelect={openZone} onResume={() => setPhase("play")} />
+        <PauseMenu visited={visited} isTouch={touch} onSelect={selectZone} onResume={() => setPhase("play")} />
       )}
+
+      {/* Fade between the street and an interior */}
+      <div
+        className="absolute inset-0 z-30 bg-black pointer-events-none transition-opacity ease-in-out"
+        style={{ opacity: fading ? 1 : 0, transitionDuration: `${FADE_MS}ms` }}
+        aria-hidden
+      />
     </div>
   );
 }

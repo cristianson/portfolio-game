@@ -570,3 +570,170 @@ export function stripesTexture(a: string, b: string) {
     return toTexture(c, false);
   });
 }
+
+// ── Gallery ─────────────────────────────────────────────────────
+
+/** Two-by-two checker of cream and dark marble with faint veins (one texture = 2 m). */
+export function marbleTexture() {
+  return cached("marble", () => {
+    const [c, ctx] = canvas(256, 256);
+    const r = rng(53);
+    for (let i = 0; i < 4; i++) {
+      const x = (i % 2) * 128;
+      const y = Math.floor(i / 2) * 128;
+      const dark = (i % 2) ^ Math.floor(i / 2);
+      ctx.fillStyle = dark ? "#3b3532" : "#e9e2d4";
+      ctx.fillRect(x, y, 128, 128);
+      ctx.strokeStyle = dark ? "rgba(255,255,255,0.08)" : "rgba(90,80,70,0.12)";
+      ctx.lineWidth = 1.2;
+      for (let v = 0; v < 4; v++) {
+        ctx.beginPath();
+        let px = x + r() * 128;
+        let py = y;
+        ctx.moveTo(px, py);
+        while (py < y + 128) {
+          px += (r() - 0.5) * 18;
+          py += 10 + r() * 14;
+          ctx.lineTo(Math.min(x + 128, Math.max(x, px)), Math.min(y + 128, py));
+        }
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(0,0,0,0.25)";
+      ctx.fillRect(x, y, 128, 1);
+      ctx.fillRect(x, y, 1, 128);
+    }
+    noise(ctx, 256, 256, 0.03, 54);
+    return toTexture(c);
+  });
+}
+
+/** Bordeaux damask wallpaper (one texture = 1 m). */
+export function damaskTexture() {
+  return cached("damask", () => {
+    const [c, ctx] = canvas(64, 64);
+    ctx.fillStyle = "#6a1d27";
+    ctx.fillRect(0, 0, 64, 64);
+    ctx.fillStyle = "rgba(255,190,150,0.07)";
+    for (const [x, y] of [
+      [32, 32],
+      [0, 0],
+      [64, 0],
+      [0, 64],
+      [64, 64],
+    ]) {
+      ctx.beginPath();
+      ctx.ellipse(x, y, 9, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(x, y, 15, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    noise(ctx, 64, 64, 0.05, 61);
+    return toTexture(c);
+  });
+}
+
+/** Red runner with a gold border, stretched along the hall. */
+export function carpetTexture() {
+  return cached("carpet", () => {
+    const [c, ctx] = canvas(64, 64);
+    ctx.fillStyle = "#8a1a22";
+    ctx.fillRect(0, 0, 64, 64);
+    noise(ctx, 64, 64, 0.08, 67);
+    ctx.fillStyle = "#c9a03a";
+    ctx.fillRect(4, 0, 3, 64);
+    ctx.fillRect(57, 0, 3, 64);
+    return toTexture(c);
+  });
+}
+
+/** Gold lettering on a transparent background, for the hall's title. */
+export function engravingTexture(text: string) {
+  const texture = cached(`engrave-${text}`, () => {
+    const [c, ctx] = canvas(1024, 128);
+    ctx.font = "700 76px Georgia, 'Times New Roman', serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const spaced = text.split("").join(" ");
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillText(spaced, 514, 68);
+    ctx.fillStyle = "#d9b25a";
+    ctx.fillText(spaced, 512, 64);
+    return toTexture(c, false);
+  });
+  return { texture, aspect: 1024 / 128 };
+}
+
+/** Stand-in painting until a project has a cover image: its name, set like an exhibition poster. */
+export function titleCardTexture(title: string, kind: string, hue: number) {
+  return cached(`title-card-${title}`, () => {
+    const [c, ctx] = canvas(640, 400);
+    const g = ctx.createLinearGradient(0, 0, 640, 400);
+    g.addColorStop(0, `hsl(${hue} 45% 22%)`);
+    g.addColorStop(1, `hsl(${(hue + 40) % 360} 50% 12%)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 640, 400);
+    // Big soft shapes so it reads as a painting from across the room
+    const r = rng(title.length * 31);
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = `hsla(${(hue + i * 25) % 360} 70% 60% / 0.18)`;
+      ctx.beginPath();
+      ctx.arc(r() * 640, r() * 400, 60 + r() * 140, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = "rgba(255,255,255,0.65)";
+    ctx.font = "600 22px ui-monospace, Menlo, monospace";
+    ctx.fillText(kind.toUpperCase(), 48, 300);
+    ctx.fillStyle = "#ffffff";
+    let size = 64;
+    ctx.font = `700 ${size}px Georgia, 'Times New Roman', serif`;
+    while (ctx.measureText(title).width > 560 && size > 30) {
+      size -= 4;
+      ctx.font = `700 ${size}px Georgia, 'Times New Roman', serif`;
+    }
+    ctx.fillText(title, 48, 352);
+    noise(ctx, 640, 400, 0.04, 71);
+    return toTexture(c, false);
+  });
+}
+
+/** The empty easel canvas: pencil sketch lines on paper. */
+export function sketchTexture() {
+  return cached("sketch", () => {
+    const [c, ctx] = canvas(512, 372);
+    ctx.fillStyle = "#efe7d6";
+    ctx.fillRect(0, 0, 512, 372);
+    ctx.strokeStyle = "rgba(60,60,70,0.12)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < 512; x += 24) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 372);
+      ctx.stroke();
+    }
+    for (let y = 0; y < 372; y += 24) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(512, y);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(40,40,50,0.55)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(70, 70, 372, 200);
+    ctx.strokeRect(90, 95, 150, 90);
+    ctx.beginPath();
+    ctx.moveTo(270, 110);
+    ctx.lineTo(410, 110);
+    ctx.moveTo(270, 140);
+    ctx.lineTo(380, 140);
+    ctx.moveTo(270, 170);
+    ctx.lineTo(400, 170);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(40,40,50,0.7)";
+    ctx.font = "700 30px ui-monospace, Menlo, monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("IN PROGRESS", 256, 330);
+    noise(ctx, 512, 372, 0.04, 73);
+    return toTexture(c, false);
+  });
+}

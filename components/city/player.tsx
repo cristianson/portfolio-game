@@ -5,6 +5,8 @@
  * resolves collisions, detects zones and drives a GTA-style chase camera that
  * swings in behind you while you run (and can be dragged to look around).
  * On the title screen the camera does a slow fly-through of the street.
+ * Inside the gallery it collides with the hall instead, and when you stop at
+ * a painting the camera moves in to frame it.
  */
 
 "use client";
@@ -15,6 +17,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Character, dressFor, PLAYER_LOOK, type Motion } from "./character";
 import type { Season } from "./season";
 import { COLLIDERS, groundHeight, MARKER_ZONES, PICKUP_RADIUS, PICKUPS, type ZoneId } from "./world";
+import { GALLERY_COLLIDERS, SPOTS } from "./museum";
 import { resolveCircle, resolveCircles, segmentHit } from "./collision";
 import { angleDiff, type GameStore } from "./store";
 
@@ -26,11 +29,12 @@ interface PlayerProps {
   store: GameStore;
   onZoneChange: (zone: ZoneId | null) => void;
   onPickupChange: (name: string | null) => void;
+  onSpotChange: (id: string | null) => void;
   season: Season;
   christmas: boolean;
 }
 
-export function Player({ store, onZoneChange, onPickupChange, season, christmas }: PlayerProps) {
+export function Player({ store, onZoneChange, onPickupChange, onSpotChange, season, christmas }: PlayerProps) {
   const look = useMemo(() => dressFor(PLAYER_LOOK, season, christmas, "player"), [season, christmas]);
   const group = useRef<THREE.Group>(null!);
   const motion = useRef<Motion>({ speed: 0 });
@@ -42,7 +46,9 @@ export function Player({ store, onZoneChange, onPickupChange, season, christmas 
   useFrame((state, rawDt) => {
     const dt = Math.min(rawDt, 0.05);
     const p = store.player;
-    const playing = store.phase === "play";
+    const playing = store.phase === "play" && !store.travelling;
+    const inside = store.location === "gallery";
+    const colliders = inside ? GALLERY_COLLIDERS : COLLIDERS;
 
     // ── Movement ──────────────────────────────────────────────
     let ix = store.input.kx + store.input.jx;
@@ -70,29 +76,42 @@ export function Player({ store, onZoneChange, onPickupChange, season, christmas 
     if (p.speed > 0.001) {
       p.x += Math.sin(p.heading) * p.speed * dt;
       p.z += Math.cos(p.heading) * p.speed * dt;
-      resolveCircles(p, RADIUS, store.pedestrians, 0.3);
-      resolveCircle(p, RADIUS, COLLIDERS);
+      resolveCircles(p, RADIUS, inside ? store.visitors : store.pedestrians, 0.3);
+      resolveCircle(p, RADIUS, colliders);
     }
     motion.current.speed = p.speed;
 
     const g = group.current;
     g.position.x = p.x;
     g.position.z = p.z;
-    g.position.y += (groundHeight(p.x, p.z) - g.position.y) * Math.min(1, dt * 15);
+    const ground = inside ? 0 : groundHeight(p.x, p.z);
+    if (store.snapCamera) g.position.y = ground;
+    g.position.y += (ground - g.position.y) * Math.min(1, dt * 15);
     g.rotation.y = p.heading;
 
     // ── Zones ─────────────────────────────────────────────────
     let near: ZoneId | null = null;
-    for (const z of MARKER_ZONES) {
+    for (const z of inside ? [] : MARKER_ZONES) {
       if (Math.hypot(p.x - z.x, p.z - z.z) < z.radius) near = z.id;
     }
-    if (near !== store.nearZone) {
+    // Coming back out of a building you land next to its marker: it only works again once you've stepped off
+    if (store.blockedZone && near !== store.blockedZone) store.blockedZone = null;
+    if (near && near === store.blockedZone) near = null;
+    if (near !== store.nearZone && !store.travelling) {
       store.nearZone = near;
       onZoneChange(near);
     }
     let pickup: string | null = null;
-    for (const s of PICKUPS) {
+    for (const s of inside ? [] : PICKUPS) {
       if (Math.hypot(p.x - s.x, p.z - s.z) < PICKUP_RADIUS) pickup = s.name;
+    }
+    let spot: string | null = null;
+    for (const s of inside ? SPOTS : []) {
+      if (Math.hypot(p.x - s.x, p.z - s.z) < s.radius) spot = s.id;
+    }
+    if (spot !== store.nearSpot && !store.travelling) {
+      store.nearSpot = spot;
+      onSpotChange(spot);
     }
     if (pickup !== store.nearPickup) {
       store.nearPickup = pickup;
@@ -109,7 +128,21 @@ export function Player({ store, onZoneChange, onPickupChange, season, christmas 
     }
 
     const ease = 1 - Math.exp(-dt * 7);
-    if (store.phase === "title") {
+    const framed = inside ? SPOTS.find((s) => s.id === store.nearSpot)?.painting : undefined;
+    if (framed && store.phase === "play") {
+      // Step back far enough to fit the painting (leaving room for the card below), and always
+      // behind you so your head stays under the frame
+      const aspect = size.width / size.height;
+      const vTan = Math.tan(THREE.MathUtils.degToRad(fov / 2));
+      const dist = Math.max((framed.w * 0.62) / (vTan * aspect), (framed.h * 0.95) / vTan, 4.4);
+      tmp.current.set(framed.x + framed.nx * dist, framed.y + 0.35, framed.z + framed.nz * dist);
+      camPos.current.lerp(tmp.current, 1 - Math.exp(-dt * 3.5));
+      // Aim below the painting so it sits in the upper part of the screen, clear of the card
+      const drop = (portrait ? 0.2 : 0.08) * 2 * dist * vTan;
+      lookAt.current.lerp(tmp.current.set(framed.x, framed.y - drop, framed.z), 1 - Math.exp(-dt * 3.5));
+      // Keep the controls lined up with the view
+      store.camYaw += angleDiff(Math.atan2(-framed.nx, -framed.nz), store.camYaw) * Math.min(1, dt * 3.5);
+    } else if (store.phase === "title") {
       const t = state.clock.elapsedTime;
       const z = -21 + 15 * (1 - Math.cos(t * 0.06));
       tmp.current.set(Math.sin(t * 0.13) * 2.5, 8 + Math.sin(t * 0.09) * 1.5, z);
@@ -128,10 +161,11 @@ export function Player({ store, onZoneChange, onPickupChange, season, christmas 
       const height = portrait ? 3.6 : 3.1;
       const bx = p.x - Math.sin(store.camYaw) * dist;
       const bz = p.z - Math.cos(store.camYaw) * dist;
-      const hit = segmentHit(p.x, p.z, bx, bz, COLLIDERS);
+      const hit = segmentHit(p.x, p.z, bx, bz, colliders);
       const t = Math.max(0.25, hit < 1 ? hit * 0.92 : 1);
       tmp.current.set(p.x + (bx - p.x) * t, g.position.y + height * (0.75 + 0.25 * t), p.z + (bz - p.z) * t);
-      camPos.current.lerp(tmp.current, store.phase === "play" ? ease : ease * 0.5);
+      if (store.snapCamera) camPos.current.copy(tmp.current);
+      else camPos.current.lerp(tmp.current, store.phase === "play" ? ease : ease * 0.5);
       // Pull in instantly if a wall gets between us
       if (hit < 1) {
         const want = Math.hypot(tmp.current.x - p.x, tmp.current.z - p.z);
@@ -140,8 +174,9 @@ export function Player({ store, onZoneChange, onPickupChange, season, christmas 
       }
       lookAt.current.lerp(
         tmp.current.set(p.x + Math.sin(store.camYaw) * 1.2, g.position.y + 1.5, p.z + Math.cos(store.camYaw) * 1.2),
-        1 - Math.exp(-dt * 14)
+        store.snapCamera ? 1 : 1 - Math.exp(-dt * 14)
       );
+      store.snapCamera = false;
     }
     camera.position.copy(camPos.current);
     camera.lookAt(lookAt.current);

@@ -3,7 +3,7 @@
  *
  * The on-screen overlay while playing: stats block (clock, cash, health,
  * "hiring level" stars), the black help box, the area name, the
- * MISSION PASSED splash and the touch controls.
+ * MISSION PASSED splash, the pickup and gallery cards and the touch controls.
  */
 
 "use client";
@@ -13,7 +13,8 @@ import Image from "next/image";
 import { Joystick } from "./joystick";
 import { ArrowUpRight } from "lucide-react";
 import { ZONES, type ZoneId } from "./world";
-import { SOCIALS } from "./content";
+import { GALLERY, PROJECTS, SOCIALS } from "./content";
+import { SPOTS } from "./museum";
 import { SOCIAL_ICON } from "./icons";
 
 const SOCIALS_ACCENT = ZONES.find((z) => z.id === "SOCIALS")!.color;
@@ -105,12 +106,15 @@ export function Key({ children }: { children: React.ReactNode }) {
   return <span className="inline-block px-1.5 mx-0.5 bg-white text-black rounded-sm text-[0.85em] font-bold">{children}</span>;
 }
 
-export function AreaName({ show }: { show: boolean }) {
+export function AreaName({ name, show }: { name: string | null; show: boolean }) {
+  // Keep the last name on screen while it fades out
+  const [last, setLast] = useState(name);
+  if (name && name !== last) setLast(name);
   return (
     <div
       className={`font-gta gta-stroke text-[34px] md:text-[52px] text-[#e9e2c8] transition-opacity duration-1000 ${show ? "opacity-100" : "opacity-0"}`}
     >
-      Design District
+      {last}
     </div>
   );
 }
@@ -169,6 +173,74 @@ export function PickupCard({ name, touch, compact }: { name: string; touch: bool
           <div className="-mt-2 pb-3 text-center text-[12px] text-white/50">
             or press <Key>ENTER</Key>
           </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const GALLERY_ACCENT = ZONES.find((z) => z.id === "PROJECTS")!.color;
+
+/** Card for whatever you're standing at in the gallery: a painting, the empty frame, the guestbook or the guard. */
+export function GallerySpotCard({ id, touch, compact }: { id: string; touch: boolean; compact: boolean }) {
+  const spot = SPOTS.find((s) => s.id === id);
+  if (!spot || spot.kind === "exit") return null;
+  const project = spot.painting?.project !== undefined ? PROJECTS[spot.painting.project] : null;
+
+  let label = "";
+  let title = "";
+  let text = "";
+  let link: { href: string; text: string } | null = null;
+  if (project) {
+    label = `Built project · ${project.kind}`;
+    title = project.title;
+    text = project.description;
+    link = { href: project.url, text: project.cta };
+  } else if (spot.kind === "soon") {
+    label = "Coming soon";
+    title = GALLERY.soonTitle;
+    text = GALLERY.soonText;
+  } else if (spot.kind === "guestbook") {
+    label = "Guestbook";
+    title = GALLERY.guestbookTitle;
+    text = GALLERY.guestbookText;
+    link = { href: SOCIALS.find((s) => s.name === "LinkedIn")!.url, text: GALLERY.guestbookCta };
+  } else {
+    label = "Guard";
+    text = `“${GALLERY.guard}”`;
+  }
+
+  return (
+    <div
+      className={`absolute pointer-events-auto animate-in fade-in slide-in-from-bottom-2 duration-200 ${
+        compact ? "left-4 right-4 bottom-[176px]" : "left-1/2 -translate-x-1/2 bottom-10 w-[440px]"
+      }`}
+    >
+      <div className="bg-black/85 border-2 border-black shadow-[0_8px_24px_rgba(0,0,0,0.5)] font-sans">
+        <div className="h-1" style={{ background: GALLERY_ACCENT }} />
+        <div className="p-4">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#8f8a80]">{label}</div>
+          {title && <div className="mt-1 font-gta text-[28px] leading-none text-white">{title}</div>}
+          <p className={`${title ? "mt-2" : "mt-1"} text-[14px] leading-snug text-white/80`}>{text}</p>
+        </div>
+        {link && (
+          <>
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 mx-4 mb-4 py-3 font-gta text-[20px] tracking-[0.06em] uppercase text-black border-2 border-black shadow-[3px_3px_0_#000] active:translate-y-px"
+              style={{ background: GALLERY_ACCENT }}
+            >
+              {link.text}
+              <ArrowUpRight size={20} strokeWidth={2.5} />
+            </a>
+            {!touch && (
+              <div className="-mt-2 pb-3 text-center text-[12px] text-white/50">
+                or press <Key>ENTER</Key>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

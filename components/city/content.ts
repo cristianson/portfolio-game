@@ -62,6 +62,11 @@ export interface Project {
   description: string;
   url: string;
   cta: string;
+  /**
+   * Cover image hung as a painting in the Built Projects gallery, e.g.
+   * "/projects/draw-a-run.webp" (16:10). Without one the painting shows a title card.
+   */
+  cover?: string;
 }
 
 /** Newest first. */
@@ -91,6 +96,17 @@ export const PROJECTS: Project[] = [
     cta: "Visit Ticket Gallery",
   },
 ];
+
+/** Lines spoken and shown inside the Built Projects gallery (see museum.tsx). */
+export const GALLERY = {
+  name: "Projects Gallery",
+  guard: "Welcome to the gallery. Walk up to a painting to see what it is. The exit is right behind you.",
+  soonTitle: "Next project",
+  soonText: "In progress. Check back soon.",
+  guestbookTitle: "Sign the guestbook",
+  guestbookText: "Enjoyed the gallery? Leave me a note on LinkedIn.",
+  guestbookCta: "Sign on LinkedIn",
+};
 
 export interface CaseStudy {
   company: string;

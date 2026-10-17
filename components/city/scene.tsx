@@ -1,8 +1,10 @@
 /**
  * Scene
  *
- * The <Canvas> and everything inside it: lights, fog, sky, the street and the
- * actors. Drag on the canvas to look around.
+ * The <Canvas> and everything inside it: lights, fog, sky, the street, the
+ * gallery interior and the actors. Only one place is visible at a time; the
+ * other stays mounted (hidden) so walking in and out is instant.
+ * Drag on the canvas to look around.
  */
 
 "use client";
@@ -19,15 +21,18 @@ import { Pedestrians } from "./pedestrians";
 import { Player } from "./player";
 import { Pickups } from "./pickups";
 import { Seasonal } from "./seasonal";
+import { Gallery } from "./gallery";
 import type { Season } from "./season";
-import type { GameStore } from "./store";
+import type { GameStore, Location } from "./store";
 import type { ZoneId } from "./world";
 
 interface SceneProps {
   store: GameStore;
   onZoneChange: (zone: ZoneId | null) => void;
   onPickupChange: (name: string | null) => void;
+  onSpotChange: (id: string | null) => void;
   onReady: () => void;
+  location: Location;
   /** 0 = night, 1 = day (see daylight.ts). */
   daylight: number;
   season: Season;
@@ -35,17 +40,28 @@ interface SceneProps {
 }
 
 /** Sky, fog and lights for the current time of day. */
-function Environment({ daylight, winter }: { daylight: number; winter: boolean }) {
+function Environment({ daylight, winter, indoor }: { daylight: number; winter: boolean; indoor: boolean }) {
   const scene = useThree((s) => s.scene);
   const env = useMemo(() => environmentFor(daylight, winter), [daylight, winter]);
   const night = 1 - daylight;
 
   useEffect(() => {
-    const horizon = new THREE.Color(env.horizon);
+    const horizon = new THREE.Color(indoor ? "#1a1210" : env.horizon);
     scene.background = horizon;
     if (scene.fog) (scene.fog as THREE.Fog).color.copy(horizon);
-    setNight(night);
-  }, [scene, env, night]);
+    // Indoors the lights are always on, so nothing needs a night glow
+    setNight(indoor ? 0 : night);
+  }, [scene, env, night, indoor]);
+
+  if (indoor) {
+    return (
+      <>
+        <fog attach="fog" args={["#1a1210", 60, 120]} />
+        <hemisphereLight args={["#fff1dc", "#5a3a2a", 1.9]} />
+        <directionalLight position={[3, 10, -4]} intensity={0.55} color="#fff4e0" />
+      </>
+    );
+  }
 
   return (
     <>
@@ -59,7 +75,18 @@ function Environment({ daylight, winter }: { daylight: number; winter: boolean }
 }
 
 // Memoised: the HUD clock re-renders the game shell every few seconds, the 3D scene shouldn't follow
-export const Scene = memo(function Scene({ store, onZoneChange, onPickupChange, onReady, daylight, season, christmas }: SceneProps) {
+export const Scene = memo(function Scene({
+  store,
+  onZoneChange,
+  onPickupChange,
+  onSpotChange,
+  onReady,
+  location,
+  daylight,
+  season,
+  christmas,
+}: SceneProps) {
+  const street = location === "street";
   const wrapper = useRef<HTMLDivElement>(null);
 
   // Drag anywhere on the 3D view to rotate the camera
@@ -107,15 +134,25 @@ export const Scene = memo(function Scene({ store, onZoneChange, onPickupChange, 
           onReady();
         }}
       >
-        <Environment daylight={daylight} winter={season === "winter"} />
-        <Ground winter={season === "winter"} />
-        <Buildings />
-        <Props season={season} christmas={christmas} />
-        <Seasonal season={season} christmas={christmas} night={1 - daylight} />
-        <Markers store={store} />
-        <Pickups store={store} />
-        <Pedestrians store={store} season={season} christmas={christmas} />
-        <Player store={store} onZoneChange={onZoneChange} onPickupChange={onPickupChange} season={season} christmas={christmas} />
+        <Environment daylight={daylight} winter={season === "winter"} indoor={!street} />
+        <group visible={street}>
+          <Ground winter={season === "winter"} />
+          <Buildings />
+          <Props season={season} christmas={christmas} />
+          <Seasonal season={season} christmas={christmas} night={1 - daylight} />
+          <Markers store={store} />
+          <Pickups store={store} />
+          <Pedestrians store={store} season={season} christmas={christmas} />
+        </group>
+        <Gallery store={store} visible={!street} daylight={daylight} />
+        <Player
+          store={store}
+          onZoneChange={onZoneChange}
+          onPickupChange={onPickupChange}
+          onSpotChange={onSpotChange}
+          season={season}
+          christmas={christmas}
+        />
       </Canvas>
     </div>
   );

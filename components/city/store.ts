@@ -11,6 +11,9 @@ import { SPAWN, type ZoneId } from "./world";
 
 export type Phase = "title" | "play" | "panel" | "menu";
 
+/** Out on the street, or inside the Built Projects gallery (museum.ts). */
+export type Location = "street" | "gallery";
+
 export interface GameStore {
   phase: Phase;
   input: {
@@ -26,10 +29,21 @@ export interface GameStore {
   camYaw: number;
   /** Timestamp (ms) until which the camera won't auto-swing behind the player. */
   manualCamUntil: number;
+  location: Location;
+  /** True during the fade between the street and an interior: input is ignored. */
+  travelling: boolean;
+  /** Set after a teleport so the camera jumps instead of gliding across the map. */
+  snapCamera: boolean;
+  /** A zone you just came out of; it only triggers again once you've stepped off it. */
+  blockedZone: ZoneId | null;
   nearZone: ZoneId | null;
+  /** Gallery spot (painting, guestbook, guard, exit) you're standing at. */
+  nearSpot: string | null;
   /** Name of the social pickup the player is standing on. */
   nearPickup: string | null;
   pedestrians: { x: number; z: number }[];
+  /** Gallery visitors, for bumping into. */
+  visitors: { x: number; z: number }[];
 }
 
 export function createStore(): GameStore {
@@ -39,9 +53,15 @@ export function createStore(): GameStore {
     player: { x: SPAWN.x, z: SPAWN.z, heading: SPAWN.heading, speed: 0 },
     camYaw: SPAWN.heading,
     manualCamUntil: 0,
+    location: "street",
+    travelling: false,
+    snapCamera: false,
+    blockedZone: null,
     nearZone: null,
+    nearSpot: null,
     nearPickup: null,
     pedestrians: [],
+    visitors: [],
   };
 }
 
