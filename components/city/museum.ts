@@ -66,9 +66,10 @@ export interface SpotDef {
 
 export const GUESTBOOK = { x: -5.4, z: -8.6 };
 export const GUARD = { x: 5.6, z: -9, heading: -1.36 };
-export const EXIT = { x: 0, z: -HZ + 0.9, radius: 0.9 };
+// A step in front of the door, not touching it
+export const EXIT = { x: 0, z: -HZ + 1.7, radius: 0.9 };
 /** Where you appear when you walk in. */
-export const GALLERY_SPAWN = { x: 0, z: -HZ + 3.2, heading: 0 };
+export const GALLERY_SPAWN = { x: 0, z: -HZ + 4, heading: 0 };
 
 export const SPOTS: SpotDef[] = [
   ...PAINTINGS.map((p) => ({

@@ -398,16 +398,17 @@ function Urn({ x }: { x: number }) {
 function Door() {
   const exit = signTexture("EXIT", "#1d6b3a", "#ffffff");
   return (
-    <group position={[0, 0, -HZ + 0.03]}>
-      <mesh position={[0, 1.8, 0.02]} material={M.goldDark}>
-        <boxGeometry args={[2.9, 3.6, 0.06]} />
+    <group position={[0, 0, -HZ + 0.02]}>
+      {/* Frame stands proud of the panelling and chair rail so their faces never share a plane (they flickered) */}
+      <mesh position={[0, 1.8, 0.1]} material={M.goldDark}>
+        <boxGeometry args={[2.9, 3.6, 0.16]} />
       </mesh>
       {[-0.6, 0.6].map((x) => (
         <group key={x}>
-          <mesh position={[x, 1.7, 0.06]} material={M.wood}>
+          <mesh position={[x, 1.7, 0.2]} material={M.wood}>
             <boxGeometry args={[1.15, 3.3, 0.06]} />
           </mesh>
-          <mesh position={[x * 0.25, 1.6, 0.11]} material={M.brass}>
+          <mesh position={[x * 0.25, 1.6, 0.25]} material={M.brass}>
             <boxGeometry args={[0.05, 0.4, 0.05]} />
           </mesh>
         </group>
