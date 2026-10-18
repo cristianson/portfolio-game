@@ -11,7 +11,7 @@
 
 "use client";
 
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Character, dressFor, PLAYER_LOOK, type Motion } from "./character";
@@ -24,6 +24,10 @@ import { angleDiff, type GameStore } from "./store";
 const RADIUS = 0.35;
 const RUN_SPEED = 6.4;
 const SPRINT_SPEED = 9.5;
+/** Running further than this from the camera's direction (back towards it) doesn't swing it round. */
+const FOLLOW_MAX_ANGLE = 2.0;
+/** Fastest the camera turns to follow you, rad/s, so steering with the stick feels like a gentle curve. */
+const FOLLOW_MAX_RATE = 1.4;
 
 interface PlayerProps {
   store: GameStore;
@@ -42,6 +46,8 @@ export function Player({ store, onZoneChange, onPickupChange, onSpotChange, seas
   const lookAt = useRef(new THREE.Vector3(0, 2, -30));
   const tmp = useRef(new THREE.Vector3());
   const { camera, size } = useThree();
+  // `?cam=classic`: the old camera that only follows while you run forward (for comparing)
+  const [classicCam] = useState(() => new URLSearchParams(window.location.search).get("cam") === "classic");
 
   useFrame((state, rawDt) => {
     const dt = Math.min(rawDt, 0.05);
@@ -149,12 +155,21 @@ export function Player({ store, onZoneChange, onPickupChange, onSpotChange, seas
       camPos.current.lerp(tmp.current, 1 - Math.exp(-dt * 2));
       lookAt.current.lerp(tmp.current.set(0, 4, z + 14), 1 - Math.exp(-dt * 2));
     } else {
-      // Swing behind the player while running forward-ish, unless the user is looking around
+      // Swing behind the player while running, unless the user is looking around
       const now = performance.now();
       if (now > store.manualCamUntil && p.speed > 0.5) {
         const diff = angleDiff(p.heading, store.camYaw);
-        const follow = Math.max(0, Math.cos(diff)) * (p.speed / RUN_SPEED);
-        store.camYaw += diff * Math.min(1, dt * 1.6 * follow);
+        const run = Math.min(p.speed / RUN_SPEED, 1.2);
+        if (classicCam) {
+          const follow = Math.max(0, Math.cos(diff)) * run;
+          store.camYaw += diff * Math.min(1, dt * 1.6 * follow);
+        } else if (Math.abs(diff) < FOLLOW_MAX_ANGLE) {
+          // Follow sideways running too, so pushing the stick left just steers you round a curve
+          // (one thumb, no dragging). Running back towards the camera leaves it be: with
+          // camera-relative controls, swinging round would keep "back" spinning forever.
+          const rate = THREE.MathUtils.clamp(diff * 1.6, -FOLLOW_MAX_RATE, FOLLOW_MAX_RATE);
+          store.camYaw += rate * run * dt;
+        }
       }
       // High-ish chase cam looking down at the player, like the reference
       const dist = portrait ? 6.8 : 6.0;
