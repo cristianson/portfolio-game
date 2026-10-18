@@ -197,10 +197,11 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
           Object.assign(p, { x: GALLERY_SPAWN.x, z: GALLERY_SPAWN.z, heading: GALLERY_SPAWN.heading, speed: 0 });
           store.camYaw = GALLERY_SPAWN.heading;
         } else {
-          // Back on the sidewalk in front of the door, facing the street
+          // Out on the sidewalk just past the door, looking up the street: facing the road would
+          // squeeze the camera against the building's wall
           const zone = ZONES.find((z) => z.id === "PROJECTS")!;
-          Object.assign(p, { x: zone.x + 1.3, z: zone.z, heading: Math.PI / 2, speed: 0 });
-          store.camYaw = Math.PI / 2;
+          Object.assign(p, { x: zone.x + 0.9, z: zone.z + 2.2, heading: 0, speed: 0 });
+          store.camYaw = 0;
           store.blockedZone = "PROJECTS";
         }
         store.location = to;

@@ -3,6 +3,8 @@
  *
  * Glowing cylinders on the sidewalk in front of each portfolio building, with
  * a spinning arrow bobbing above. Walk into one to get the "enter" prompt.
+ * A marker hides while the camera is right next to it (e.g. just after
+ * walking out of a building) so it never fills the screen.
  */
 
 "use client";
@@ -15,11 +17,14 @@ import { markerTexture } from "./textures";
 import type { GameStore } from "./store";
 
 function Marker({ zone, store }: { zone: ZoneDef; store: GameStore }) {
+  const root = useRef<THREE.Group>(null!);
   const cyl = useRef<THREE.Mesh>(null!);
   const arrow = useRef<THREE.Group>(null!);
   const ring = useRef<THREE.Mesh>(null!);
 
   useFrame((state) => {
+    const cam = state.camera.position;
+    root.current.visible = Math.hypot(cam.x - zone.x, cam.z - zone.z) > zone.radius + 1.4;
     const t = state.clock.elapsedTime;
     const active = store.nearZone === zone.id;
     const pulse = 1 + Math.sin(t * 3) * 0.04;
@@ -31,7 +36,7 @@ function Marker({ zone, store }: { zone: ZoneDef; store: GameStore }) {
   });
 
   return (
-    <group position={[zone.x, SIDEWALK_HEIGHT + 0.01, zone.z]}>
+    <group ref={root} position={[zone.x, SIDEWALK_HEIGHT + 0.01, zone.z]}>
       <mesh ref={cyl} position={[0, 0.8, 0]} renderOrder={2}>
         <cylinderGeometry args={[zone.radius, zone.radius, 1.6, 24, 1, true]} />
         <meshBasicMaterial
