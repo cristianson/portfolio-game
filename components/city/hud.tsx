@@ -19,6 +19,7 @@ import { SOCIAL_ICON } from "./icons";
 
 const SOCIALS_ACCENT = ZONES.find((z) => z.id === "SOCIALS")!.color;
 import type { GameStore } from "./store";
+import { trackAttrs, trackOnce } from "@/lib/analytics/track";
 
 export const CASH_PER_SECTION = 250;
 
@@ -163,6 +164,7 @@ export function PickupCard({ name, touch, compact }: { name: string; touch: bool
           href={social.url}
           target="_blank"
           rel="noopener noreferrer"
+          {...trackAttrs("social_click", { network: social.name, from: "pickup" })}
           className="flex items-center justify-center gap-2 mx-4 mb-4 py-3 font-gta text-[20px] tracking-[0.06em] uppercase text-black border-2 border-black shadow-[3px_3px_0_#000] active:translate-y-px"
           style={{ background: SOCIALS_ACCENT }}
         >
@@ -190,12 +192,12 @@ export function GallerySpotCard({ id, touch, compact }: { id: string; touch: boo
   let label = "";
   let title = "";
   let text = "";
-  let link: { href: string; text: string } | null = null;
+  let link: { href: string; text: string; track: Record<string, string> } | null = null;
   if (project) {
     label = `Built project · ${project.kind}`;
     title = project.title;
     text = project.description;
-    link = { href: project.url, text: project.cta };
+    link = { href: project.url, text: project.cta, track: trackAttrs("project_click", { project: project.title, from: "gallery" }) };
   } else if (spot.kind === "soon") {
     label = "Coming soon";
     title = GALLERY.soonTitle;
@@ -204,7 +206,11 @@ export function GallerySpotCard({ id, touch, compact }: { id: string; touch: boo
     label = "Guestbook";
     title = GALLERY.guestbookTitle;
     text = GALLERY.guestbookText;
-    link = { href: SOCIALS.find((s) => s.name === "LinkedIn")!.url, text: GALLERY.guestbookCta };
+    link = {
+      href: SOCIALS.find((s) => s.name === "LinkedIn")!.url,
+      text: GALLERY.guestbookCta,
+      track: trackAttrs("social_click", { network: "LinkedIn", from: "guestbook" }),
+    };
   } else {
     label = "Guard";
     text = `“${GALLERY.guard}”`;
@@ -229,6 +235,7 @@ export function GallerySpotCard({ id, touch, compact }: { id: string; touch: boo
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
+              {...link.track}
               className="flex items-center justify-center gap-2 mx-4 mb-4 py-3 font-gta text-[20px] tracking-[0.06em] uppercase text-black border-2 border-black shadow-[3px_3px_0_#000] active:translate-y-px"
               style={{ background: GALLERY_ACCENT }}
             >
@@ -260,6 +267,7 @@ export function TouchControls({ store, nearZone, onInteract }: TouchControlsProp
       <div className="pointer-events-auto">
         <Joystick
           onMove={(x, y) => {
+            trackOnce("first_move", { input: "joystick" }, "first_move");
             store.input.jx = x;
             store.input.jy = -y;
           }}

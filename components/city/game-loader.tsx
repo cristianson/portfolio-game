@@ -11,6 +11,7 @@
 
 import React, { Component, useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
+import { trackOnce } from "@/lib/analytics/track";
 
 // three.js needs the browser, so the game itself is client-only
 const DesignDistrict = dynamic(() => import("./index"), {
@@ -65,6 +66,7 @@ export function GameLoader() {
   useEffect(() => {
     const portfolio = document.getElementById("static-portfolio");
     if (mode === "no-webgl" || mode === "crashed") {
+      trackOnce("fallback", { reason: mode });
       // The value picks which explanation the text version shows (city.css)
       document.documentElement.setAttribute("data-fallback", mode);
       portfolio?.removeAttribute("inert");

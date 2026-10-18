@@ -24,6 +24,7 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 - **Pause menu**: Jump straight to any section without walking there
 - **Mobile first**: Portrait layout with an on-screen joystick and an ENTER button near markers
 - **No 3D assets to download**: Every model is built from primitives and every texture is painted on a canvas at runtime
+- **Own analytics**: Cookie-less counts of what visitors do (sections, gallery, projects, socials, case studies) on a private `/stats` page; see [docs/analytics.md](docs/analytics.md)
 
 ## 🎯 How to Play
 
@@ -67,6 +68,9 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 ├── app/
 │   ├── layout.tsx          # Root layout (metadata, analytics)
 │   ├── globals.css         # Global styles
+│   ├── stats/route.ts      # Private stats page (/stats?key=…)
+│   ├── api/hit/route.ts    # Analytics pings from the browser
+│   ├── api/stats/route.ts  # Raw counters as JSON
 │   └── (city)/             # Homepage: the 3D game
 │       ├── layout.tsx      # Game fonts + avatar preload
 │       ├── page.tsx        # Client-only entry
@@ -90,7 +94,9 @@ Add `?debug` to the URL to expose the game store as `window.__dd` in the console
 │   ├── gallery.tsx         # The Built Projects gallery interior
 │   ├── hud.tsx / radar.tsx # HUD (incl. the pickup card)
 │   └── panel.tsx           # Section panel + pause menu
-└── public/                 # Favicon and avatar images
+├── lib/analytics/          # Our own analytics: events, tracking, counting, stats page
+├── docs/analytics.md       # What is tracked and how to read /stats
+└── public/                 # Favicon, avatar and project cover images
 ```
 
 `/3d` (the old preview address) and `/classic` (the retired 2D version) redirect to `/`.

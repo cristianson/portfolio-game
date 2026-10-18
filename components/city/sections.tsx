@@ -20,6 +20,7 @@ import {
 } from "./content";
 import { SOCIAL_ICON } from "./icons";
 import type { ZoneId } from "./world";
+import { trackAttrs } from "@/lib/analytics/track";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
@@ -27,12 +28,13 @@ function Label({ children, className = "" }: { children: React.ReactNode; classN
   return <div className={`font-gta text-[13px] tracking-[0.22em] uppercase text-[#8f8a80] ${className}`}>{children}</div>;
 }
 
-function Cta({ href, accent, children }: { href: string; accent: string; children: React.ReactNode }) {
+function Cta({ href, accent, track, children }: { href: string; accent: string; track?: Record<string, string>; children: React.ReactNode }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      {...track}
       className="group inline-flex items-center gap-2 px-4 py-2.5 font-gta text-[17px] tracking-[0.06em] uppercase text-black border-2 border-black shadow-[3px_3px_0_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_#000] transition-all"
       style={{ background: accent }}
     >
@@ -111,6 +113,7 @@ function About({ accent }: { accent: string }) {
                 href={job.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                {...trackAttrs("job_click", { company: job.company })}
                 className="inline-flex items-center gap-1 text-[16px] font-semibold hover:underline"
                 style={{ color: accent }}
               >
@@ -140,7 +143,7 @@ function CaseStudies({ accent }: { accent: string }) {
               <h3 className="mt-1 font-gta text-[42px] md:text-[56px] leading-none text-white">{study.company}</h3>
               <p className="mt-5 text-[16px] md:text-[17px] leading-relaxed text-[#cfc9bd]">{study.summary}</p>
               <div className="mt-6">
-                <Cta href={study.url} accent={accent}>
+                <Cta href={study.url} accent={accent} track={trackAttrs("case_study_click", { study: study.company, from: "page" })}>
                   View case study
                 </Cta>
               </div>
@@ -173,6 +176,7 @@ function Projects({ accent }: { accent: string }) {
           href={project.url}
           target="_blank"
           rel="noopener noreferrer"
+          {...trackAttrs("project_click", { project: project.title, from: "page" })}
           className={`group relative flex flex-col bg-[#1a1a1a] border border-white/10 p-6 hover:border-white/30 hover:-translate-y-0.5 transition-all ${
             i === 0 ? "md:col-span-2" : ""
           }`}
@@ -223,6 +227,7 @@ function Socials({ accent }: { accent: string }) {
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                {...trackAttrs("social_click", { network: s.name, from: "page" })}
                 className="group flex items-center gap-4 py-4 px-2 -mx-2 hover:bg-white/[0.04] transition-colors"
               >
                 <span className="w-14 h-14 shrink-0 flex items-center justify-center text-white border border-white/15" style={{ background: s.color }}>

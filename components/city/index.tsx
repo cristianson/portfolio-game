@@ -22,8 +22,14 @@ import { AreaName, GallerySpotCard, HelpBox, Key, MissionPassed, PickupCard, Sta
 import { GALLERY, PROJECTS, SOCIALS } from "./content";
 import { ContentPanel, PauseMenu } from "./panel";
 import { TitleScreen } from "./title-screen";
+import { sectionReached, trackEvent, trackLink, trackOnce } from "@/lib/analytics/track";
 
 const VISITED_KEY = "design-district-visited";
+
+/** How the stats name the sections that open as a page. */
+const SECTION_IDS: Partial<Record<ZoneId, string>> = { ABOUT: "about", CASE_STUDIES: "case_studies", SOCIALS: "socials" };
+
+type Via = "walk" | "menu";
 
 const FADE_MS = 280;
 
@@ -93,7 +99,10 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const daylight = daylightAt(now);
   const season = seasonAt(now);
   const christmas = isChristmas(now);
-  const onSceneReady = useCallback(() => setReady(true), []);
+  const onSceneReady = useCallback(() => {
+    setReady(true);
+    trackOnce("ready", { ms: Math.round(performance.now()) });
+  }, []);
   const clock = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
   useEffect(() => {
@@ -123,6 +132,8 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   const [fading, setFading] = useState(false);
   const areaTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const passedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  /** When the visitor walked into the gallery (for the time spent inside). */
+  const galleryAt = useRef(0);
 
   // `?debug` exposes the store for poking at things from the console
   useEffect(() => {
@@ -133,6 +144,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   const setPhase = useCallback(
     (p: Phase) => {
+      if (p === "menu" && store.phase !== "menu") trackEvent("menu_open");
       store.phase = p;
       if (p !== "play") {
         store.input.jx = store.input.jy = 0;
@@ -149,6 +161,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   }, []);
 
   const start = useCallback(() => {
+    trackEvent("start");
     setPhase("play");
     setIntroHelp(true);
     showAreaName("Design District");
@@ -156,7 +169,10 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
   }, [setPhase, showAreaName]);
 
   const openZone = useCallback(
-    (zone: ZoneId) => {
+    (zone: ZoneId, via: Via) => {
+      const section = SECTION_IDS[zone];
+      if (section) trackEvent("section_open", { section, via });
+      sectionReached(zone);
       setPanelZone(zone);
       setPhase("panel");
       setIntroHelp(false);
@@ -184,9 +200,16 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
 
   /** Fade to black, move between the street and the gallery, fade back in. */
   const travel = useCallback(
-    (to: Location) => {
+    (to: Location, via: Via = "walk") => {
       if (store.travelling || store.location === to) return;
       store.travelling = true;
+      if (to === "gallery") {
+        trackEvent("gallery_enter", { via });
+        sectionReached("PROJECTS");
+        galleryAt.current = performance.now();
+      } else {
+        trackEvent("gallery_exit", { secs: Math.round((performance.now() - galleryAt.current) / 1000) });
+      }
       store.input.jx = store.input.jy = 0;
       setFading(true);
       setIntroHelp(false);
@@ -232,8 +255,8 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     (zone: ZoneId) => {
       if (ROOM_ZONES.includes(zone)) {
         setPhase("play");
-        travel("gallery");
-      } else openZone(zone);
+        travel("gallery", "menu");
+      } else openZone(zone, "menu");
     },
     [setPhase, travel, openZone]
   );
@@ -249,17 +272,23 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     if (store.phase !== "play" || store.travelling) return;
     const spot = SPOTS.find((s) => s.id === store.nearSpot);
     if (spot?.painting?.project !== undefined) {
-      window.open(PROJECTS[spot.painting.project].url, "_blank", "noopener,noreferrer");
+      const project = PROJECTS[spot.painting.project];
+      trackLink("project_click", { project: project.title, from: "gallery" });
+      window.open(project.url, "_blank", "noopener,noreferrer");
       return;
     }
     if (spot?.kind === "guestbook") {
+      trackLink("social_click", { network: "LinkedIn", from: "guestbook" });
       window.open(SOCIALS.find((s) => s.name === "LinkedIn")!.url, "_blank", "noopener,noreferrer");
       return;
     }
-    if (store.nearZone && !ROOM_ZONES.includes(store.nearZone)) openZone(store.nearZone);
+    if (store.nearZone && !ROOM_ZONES.includes(store.nearZone)) openZone(store.nearZone, "walk");
     else if (store.nearPickup) {
       const social = SOCIALS.find((s) => s.name === store.nearPickup);
-      if (social) window.open(social.url, "_blank", "noopener,noreferrer");
+      if (social) {
+        trackLink("social_click", { network: social.name, from: "pickup" });
+        window.open(social.url, "_blank", "noopener,noreferrer");
+      }
     }
   }, [store, openZone]);
 
@@ -268,6 +297,8 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
     (name: string | null) => {
       setNearPickup(name);
       if (!name) return;
+      trackOnce("pickup_near", { network: name });
+      sectionReached("SOCIALS");
       haptic("nudge");
       markVisited("SOCIALS");
     },
@@ -294,7 +325,13 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
         return;
       }
       setNearSpot(id);
-      if (id) haptic("selection");
+      if (!id) return;
+      haptic("selection");
+      const spot = SPOTS.find((s) => s.id === id);
+      if (spot?.painting?.project !== undefined) trackOnce("painting_near", { project: PROJECTS[spot.painting.project].title });
+      else if (spot?.kind === "soon") trackOnce("soon_near");
+      else if (spot?.kind === "guestbook") trackOnce("guestbook_near");
+      else if (spot?.kind === "guard") trackOnce("guard_talk");
     },
     [haptic, travel]
   );
@@ -335,6 +372,7 @@ export default function DesignDistrict({ onFatal }: { onFatal?: () => void }) {
         interact();
         return;
       }
+      if (store.phase === "play" && MOVE_KEYS[e.code]) trackOnce("first_move", { input: "keyboard" }, "first_move");
       pressed.add(e.code);
       sync();
     };

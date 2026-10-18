@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { Tracking } from "@/components/tracking";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -48,6 +49,8 @@ export default function RootLayout({
         className="font-sans antialiased bg-black text-white overflow-hidden"
         suppressHydrationWarning
       >
+        {/* First, so it's running before the game reports anything */}
+        <Tracking />
         {children}
         <Analytics />
       </body>
