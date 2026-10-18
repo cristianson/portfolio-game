@@ -24,8 +24,8 @@ import {
   HALL,
   PAINTINGS,
   PILASTERS,
-  PORTRAIT,
   ROPE_DISTANCE,
+  URNS,
   VISITOR_ROUTES,
   type PaintingDef,
   type Waypoint,
@@ -319,18 +319,6 @@ function Painting({ def }: { def: PaintingDef }) {
   return <Framed def={def} map={map} />;
 }
 
-function Portrait() {
-  const map = useMemo(() => {
-    const tex = new THREE.TextureLoader().load("/avatar-560.webp");
-    tex.colorSpace = THREE.SRGBColorSpace;
-    // Square photo on a portrait canvas: crop the sides
-    tex.repeat.set(PORTRAIT.w / PORTRAIT.h, 1);
-    tex.offset.set((1 - PORTRAIT.w / PORTRAIT.h) / 2, 0);
-    return tex;
-  }, []);
-  return <Framed def={PORTRAIT} map={map} />;
-}
-
 // ── Furniture ───────────────────────────────────────────────────
 
 function Bench({ x, z }: { x: number; z: number }) {
@@ -382,9 +370,9 @@ function Guestbook() {
   );
 }
 
-function Urn({ x }: { x: number }) {
+function Urn({ x, z }: { x: number; z: number }) {
   return (
-    <group position={[x, 0, -HZ + 0.6]}>
+    <group position={[x, 0, z]}>
       <mesh position={[0, 0.35, 0]} material={M.stone}>
         <cylinderGeometry args={[0.32, 0.22, 0.7, 10]} />
       </mesh>
@@ -524,13 +512,13 @@ export function Gallery({ store, visible, daylight }: { store: GameStore; visibl
       {PAINTINGS.map((p) => (
         <Painting key={p.id} def={p} />
       ))}
-      <Portrait />
       {BENCHES.map((b) => (
         <Bench key={b.x} {...b} />
       ))}
       <Guestbook />
-      <Urn x={-2.6} />
-      <Urn x={2.6} />
+      {URNS.map((u) => (
+        <Urn key={`${u.x},${u.z}`} {...u} />
+      ))}
       <Door />
       <ExitMarker store={store} />
       <Guard store={store} />

@@ -78,6 +78,7 @@ export const PROJECTS: Project[] = [
       "Draw a shape or pick one from the list, and the app finds runnable routes on real streets that trace it at the distance you want. Routes export as GPX for Strava, Garmin, Coros or any sport watch.",
     url: "https://drawarun.com",
     cta: "Visit Draw a Run",
+    cover: "/projects/draw-a-run.webp",
   },
   {
     title: "Airbnb Listing Comparer",
@@ -86,6 +87,7 @@ export const PROJECTS: Project[] = [
       "An AI-powered Chrome extension that helps travelers compare Airbnb listings and pick the most relevant one, saving time and reducing decision fatigue.",
     url: "https://chromewebstore.google.com/detail/airbnb-listing-comparer/dfkpdnhihibjifejkhbpickfpkkciohe",
     cta: "View Extension",
+    cover: "/projects/airbnb-listing-comparer.webp",
   },
   {
     title: "Public Transport Ticket Gallery",

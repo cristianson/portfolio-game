@@ -29,26 +29,33 @@ export interface PaintingDef {
   /** Direction the painting faces (into the room). */
   nx: number;
   nz: number;
-  /** Index into PROJECTS; undefined for the "coming soon" frame. */
+  /** Index into PROJECTS; undefined for an "in progress" frame. */
   project?: number;
 }
 
-/** Wall slots in the order projects fill them (newest gets the centrepiece). */
+/**
+ * Wall slots in the order projects fill them: the newest gets the centrepiece, the next ones go
+ * round the hall from the left of the door (+x is on your left as you walk in) to its right.
+ */
 const SLOTS: Omit<PaintingDef, "id" | "project">[] = [
   { x: 0, y: 2.9, z: HZ - 0.05, w: 4.4, h: 2.75, nx: 0, nz: -1 },
-  { x: -HX + 0.05, y: 2.7, z: 3.5, w: 3.4, h: 2.125, nx: 1, nz: 0 },
+  { x: HX - 0.05, y: 2.7, z: -4, w: 3.4, h: 2.125, nx: -1, nz: 0 },
   { x: HX - 0.05, y: 2.7, z: 3.5, w: 3.4, h: 2.125, nx: -1, nz: 0 },
-  { x: HX - 0.05, y: 2.7, z: -4, w: 2.6, h: 1.9, nx: -1, nz: 0 },
+  { x: -HX + 0.05, y: 2.7, z: 3.5, w: 3.4, h: 2.125, nx: 1, nz: 0 },
+  { x: -HX + 0.05, y: 2.7, z: -4, w: 3.4, h: 2.125, nx: 1, nz: 0 },
 ];
+
+const FILLED = Math.min(PROJECTS.length, SLOTS.length - 1);
 
 export const PAINTINGS: PaintingDef[] = [
-  ...PROJECTS.slice(0, SLOTS.length - 1).map((_, i) => ({ ...SLOTS[i], id: `project-${i}`, project: i })),
-  // The next free slot waits for the next project
-  { ...SLOTS[Math.min(PROJECTS.length, SLOTS.length - 1)], id: "soon" },
+  ...SLOTS.slice(0, FILLED).map((slot, i) => ({ ...slot, id: `project-${i}`, project: i })),
+  // The next free slot waits for the next project, framed to the sketch's proportions;
+  // any slots after it stay bare wall
+  { ...SLOTS[FILLED], w: 2.6, h: 1.9, id: "soon" },
 ];
 
-/** Portrait of the artist (my avatar) opposite the empty frame. */
-export const PORTRAIT = { x: -HX + 0.05, y: 2.8, z: -4, w: 1.7, h: 2.1, nx: 1, nz: 0 };
+// The last slot stays bare wall until a project needs it; a bench and a plant fill it meanwhile
+const BARE = PAINTINGS.length < SLOTS.length ? SLOTS[SLOTS.length - 1] : null;
 
 /** Velvet ropes keep you this far from the wall. */
 export const ROPE_DISTANCE = 1.2;
@@ -88,6 +95,14 @@ export const SPOTS: SpotDef[] = [
 export const BENCHES = [
   { x: -3.2, z: 3.5 },
   { x: 3.2, z: 3.5 },
+  ...(BARE ? [{ x: BARE.x + BARE.nx * 0.75, z: BARE.z }] : []),
+];
+
+/** Potted plants: two by the door, one beside the bench on the bare wall. */
+export const URNS = [
+  { x: -2.6, z: -HZ + 0.6 },
+  { x: 2.6, z: -HZ + 0.6 },
+  ...(BARE ? [{ x: BARE.x + BARE.nx * 0.75, z: BARE.z - 1.75 }] : []),
 ];
 
 /** Pilasters along the walls, placed between the paintings. */
@@ -134,11 +149,9 @@ export const GALLERY_COLLIDERS: Box2[] = [
   { x0: -HX - T, x1: HX + T, z0: HZ, z1: HZ + T, solid: true },
   { x0: -HX - T, x1: HX + T, z0: -HZ - T, z1: -HZ, solid: true },
   ...PAINTINGS.map(ropeBox),
-  ropeBox(PORTRAIT),
   ...BENCHES.map((b) => ({ x0: b.x - 0.45, x1: b.x + 0.45, z0: b.z - 1.25, z1: b.z + 1.25 })),
   ...PILASTERS.map((p) => (p.alongX ? { x0: p.x - 0.35, x1: p.x + 0.35, z0: p.z - 0.3, z1: p.z } : { x0: p.x - 0.3, x1: p.x + 0.3, z0: p.z - 0.35, z1: p.z + 0.35 })),
   { x0: GUESTBOOK.x - 0.35, x1: GUESTBOOK.x + 0.35, z0: GUESTBOOK.z - 0.35, z1: GUESTBOOK.z + 0.35 },
   { x0: GUARD.x - 0.35, x1: GUARD.x + 0.35, z0: GUARD.z - 0.35, z1: GUARD.z + 0.35 },
-  // Urns by the door
-  ...[-1, 1].map((s) => ({ x0: s * 2.6 - 0.4, x1: s * 2.6 + 0.4, z0: -HZ + 0.2, z1: -HZ + 1.0 })),
+  ...URNS.map((u) => ({ x0: u.x - 0.4, x1: u.x + 0.4, z0: u.z - 0.4, z1: u.z + 0.4 })),
 ];
