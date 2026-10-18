@@ -12,22 +12,25 @@ page views.
 
 ## Where to look
 
-- **https://cristianiordan.design/stats?key=…** (the key is the `STATS_KEY` environment variable
+- **https://www.cristianiordan.design/stats?key=…** (the key is the `STATS_KEY` environment variable
   in Vercel; keep the link private). Wrong or missing key → "Not found". The page is `noindex`,
   `no-store`, `no-referrer`. Tabs: Today, 7, 30 or 90 days (`&range=`).
-- **https://cristianiordan.design/api/stats?key=…&days=14** returns the raw daily counters as JSON
+- **https://www.cristianiordan.design/api/stats?key=…&days=14** returns the raw daily counters as JSON
   (up to 120 days), for audits.
 - Locally, `pnpm dev` then **http://localhost:3000/stats?key=dev** (without a database the
   numbers live in the dev server's memory and are gone when it restarts).
 
-## Setup (once)
+## Setup
 
-1. Vercel → the project → **Storage** (or Marketplace) → add **Upstash for Redis** (free plan)
-   and connect it to the project. It adds `KV_REST_API_URL` and `KV_REST_API_TOKEN` (or the
-   `UPSTASH_REDIS_REST_*` names; both work).
-2. Vercel → Settings → **Environment Variables** → add `STATS_KEY` (a long random string) for
-   Production.
-3. Redeploy. Until a database is connected, production simply doesn't count anything.
+Done on Oct 18, 2026, for the Vercel project `v0-interactive-portfolio-game`:
+
+1. Vercel → Storage → **Upstash for Redis** (free plan), connected to the project on Production and Preview. It adds `KV_REST_API_URL` and
+   `KV_REST_API_TOKEN` (the code also accepts the `UPSTASH_REDIS_REST_*` names). Preview deploys
+   write to the same database, so visits to preview links show up in the stats too.
+2. Project → Settings → **Environment Variables** → `STATS_KEY` (a long random string, Secret)
+   for Production.
+3. Environment variables only reach new deploys: after changing one, redeploy. Without a
+   database, production simply doesn't count anything.
 
 ## What the browser sends (`lib/analytics/track.ts`)
 
@@ -62,10 +65,10 @@ listener), so the game's cards, the section pages and the text version all count
 `from: page` becomes `text` when the text version is showing. Pressing Enter at a painting, the
 guestbook or a pickup reports the same events from `components/city/index.tsx`.
 
-**Opt out (our own devices):** open `cristianiordan.design/?notrack` once per device and browser;
+**Opt out (our own devices):** open `www.cristianiordan.design/?notrack` once per device and browser;
 it is remembered in localStorage and nothing is sent any more. `?track` undoes it.
 
-**Tagged links:** `cristianiordan.design/?ref=linkedin` (or `?utm_source=`) records the source as
+**Tagged links:** `www.cristianiordan.design/?ref=linkedin` (or `?utm_source=`) records the source as
 "linkedin (tagged link)" and is removed from the address bar. Useful because many apps don't
 tell sites where a visitor came from (they show as Direct).
 
