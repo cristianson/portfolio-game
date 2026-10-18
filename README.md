@@ -20,6 +20,7 @@ This portfolio breaks away from traditional static portfolios by presenting desi
 - **Mission markers**: About Me, Case Studies and Built Projects each have a building and a glowing marker; visiting one for the first time pays out a "Mission Passed!"
 - **Projects Gallery**: Walk into the Built Projects marker and you fade into a classic museum hall. Each project hangs as a painting (its `cover` image from `content.ts`, or a title card until it has one); stop at one and the camera frames it with a card linking to the project. A guard greets you, visitors wander, there's a guestbook (LinkedIn) and an empty frame for the next project. Walk into the marker by the door to leave
 - **Social pickups**: LinkedIn, X and GitHub spin on the street like GTA 3 health/cash pickups; walk into one for a card with a "Go to …" link (or press Enter)
+- **Chase camera**: Swings in behind you whichever way you run, so the joystick (or WASD) steers you round corners with one thumb; drag the view to look around and it takes over again a moment later
 - **Pause menu**: Jump straight to any section without walking there
 - **Mobile first**: Portrait layout with an on-screen joystick and an ENTER button near markers
 - **No 3D assets to download**: Every model is built from primitives and every texture is painted on a canvas at runtime
